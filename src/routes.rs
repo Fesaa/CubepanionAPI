@@ -24,7 +24,7 @@ pub async fn get_leaderboard(state: Data<AppState>, path: Path<String>) -> impl 
     FROM
         leaderboards
     WHERE
-        game = 'Team EggWars'
+        game = $1
     AND
         unix_time_stamp
     = (SELECT
@@ -34,10 +34,10 @@ pub async fn get_leaderboard(state: Data<AppState>, path: Path<String>) -> impl 
         WHERE
             valid = TRUE
         AND
-            game = 'Team EggWars')
+            game = $1)
     ORDER BY
-        score
-    DESC;")
+        position
+    ASC;")
         .bind(game)
         .fetch_all(&state.db)
         .await {
@@ -82,8 +82,8 @@ pub async fn get_leaderboard_between(state: Data<AppState>, path: Path<String>, 
     AND
         $3
     ORDER BY
-        score
-    DESC;")
+        position
+    ASC;")
         .bind(game)
         .bind(info.lower)
         .bind(info.upper)
@@ -124,7 +124,10 @@ pub async fn get_leaderboards_from_player(state: Data<AppState>, path: Path<Stri
         GROUP BY
             game)
     AND
-        player = $1;")
+        player = $1
+    ORDER BY
+        position
+    ASC;")
         .bind(name)
         .fetch_all(&state.db)
         .await {

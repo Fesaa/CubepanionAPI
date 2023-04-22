@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use actix_extensible_rate_limit::{backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder}, RateLimiter};
-use actix_web::{web::Data, App, HttpServer};
+use actix_web::{web::Data, App, HttpServer, middleware::Logger};
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 
 mod common;
@@ -15,12 +15,14 @@ pub struct AppState {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let database_url = "";
+    let database_url = "postgresql://ameliah:@127.0.0.1:5432/leaderboard_api";
     let pool = PgPoolOptions::new()
     .max_connections(5)
     .connect(&database_url)
     .await
     .expect("Error building a connection pool");
+
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
     let backend = InMemoryBackend::builder().build();
 
@@ -33,6 +35,7 @@ async fn main() -> std::io::Result<()> {
             .build();
         App::new()
         .wrap(middleware)
+        .wrap(Logger::default())
         .app_data(Data::new(AppState {db : pool.clone()}))
         .service(hello)
         .service(submit_leaderboard_entries)
