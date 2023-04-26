@@ -1,4 +1,3 @@
-use std::{collections::HashSet};
 use regex::Regex;
 
 use actix_web::{get, post, web::{Json}, HttpResponse, Responder, web::{Data, Path, Query}};
@@ -164,26 +163,36 @@ pub async fn submit_leaderboard_entries(state: Data<AppState>, body: Json<Leader
     .await {
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
         Ok(_) => {
-            let mut sql: String = String::from("INSERT INTO leaderboards (game, player, position, score, unix_time_stamp) VALUES ");
-            let mut player_set: HashSet<String> = HashSet::new();
-            let mut position_set: HashSet<i32> = HashSet::new();
+            let sql: String = String::from("
+                INSERT INTO
+                    leaderboards
+                    (game, player, position, score, unix_time_stamp) 
+                SELECT 
+                    *
+                FROM
+                    UNNEST($1::varchar[], $2::varchar[], $3::int8[], $4::int8[], $5::int8[]);
+                    ");
 
-            for row in body.entries.iter() {
-                if player_set.contains(&row.player) || position_set.contains(&row.position) {
-                    remove_submission(body.unix_time_stamp, state).await;
-                    return HttpResponse::BadRequest().body("Entries contains duplicate name or position.")
-                }
-                sql = sql + &format!("('{}', '{}', {}, {}, {}),", &body.game, &row.player, &row.position, &row.score, &body.unix_time_stamp);
-                player_set.insert(row.player.to_owned());
-                position_set.insert(row.position.to_owned());
-            }
+            let mut game_vec: Vec<String> = Vec::new();
+            let mut player_vec: Vec<String> = Vec::new();
+            let mut position_vec: Vec<i32> = Vec::new();
+            let mut score_vec: Vec<i32> = Vec::new();
+            let mut unix_vec: Vec<i64> = Vec::new();
 
-            match sql.strip_suffix(",") {
-                Some(s) => sql = s.to_owned() + ";",
-                None => sql = sql + ";",
-            }
+            body.entries.iter().for_each(|row| {
+                game_vec.push(row.game.to_owned());
+                player_vec.push(row.player.to_owned());
+                position_vec.push(row.position);
+                score_vec.push(row.score);
+                unix_vec.push(body.unix_time_stamp);
+            });
 
             match sqlx::query(&sql)
+            .bind(game_vec)
+            .bind(player_vec)
+            .bind(position_vec)
+            .bind(score_vec)
+            .bind(unix_vec)
             .execute(&state.db)
             .await {
                 Err(err) => {
