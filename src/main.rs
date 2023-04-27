@@ -7,7 +7,7 @@ use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 mod common;
 
 mod routes;
-use routes::{hello, submit_leaderboard_entries, get_leaderboards_from_player, get_leaderboard,get_leaderboard_between};
+use routes::{hello, submit_leaderboard_entries, get_leaderboards_from_player, get_leaderboard,get_leaderboard_between, get_leaderboard_for_all};
 
 pub struct AppState {
     db: Pool<Postgres>
@@ -42,6 +42,7 @@ async fn main() -> std::io::Result<()> {
         .service(get_leaderboards_from_player)
         .service(get_leaderboard)
         .service(get_leaderboard_between)
+        .service(get_leaderboard_for_all)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

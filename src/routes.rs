@@ -11,6 +11,36 @@ pub async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Ameliah loves you <3")
 }
 
+#[derive(Deserialize)]
+pub struct Players {
+    players: Vec<String>,
+}
+
+#[post("/leaderboard_api/leaderboard/players")]
+pub async fn get_leaderboard_for_all(state: Data<AppState>, body: Json<Players>) -> impl Responder {
+    match sqlx::query_as::<_, LeaderboardRow>("
+    SELECT l.*
+    FROM leaderboards l
+    INNER JOIN (
+        SELECT game, MAX(unix_time_stamp) AS max_time_stamp
+        FROM submissions
+        WHERE valid = TRUE
+        GROUP BY game
+    ) s ON l.game = s.game AND l.unix_time_stamp = s.max_time_stamp
+    WHERE l.player = ANY($1)
+    ORDER BY
+        l.player,l.position
+    ASC;")
+        .bind(&body.players)
+        .fetch_all(&state.db)
+        .await {
+            Ok(leaderboards) => HttpResponse::Ok().json(leaderboards),
+            Err(err) => HttpResponse::InternalServerError().body(err.to_string())
+        }
+        
+
+}
+
 #[get("/leaderboard_api/leaderboard/{game}")]
 pub async fn get_leaderboard(state: Data<AppState>, path: Path<String>) -> impl Responder {
     let game = path.into_inner();
