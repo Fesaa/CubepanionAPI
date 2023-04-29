@@ -22,8 +22,6 @@ async fn main() -> std::io::Result<()> {
     .await
     .expect("Error building a connection pool");
 
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-
     let backend = InMemoryBackend::builder().build();
 
     HttpServer::new(move || {
