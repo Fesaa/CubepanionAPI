@@ -8,6 +8,7 @@ mod common;
 
 mod routes;
 use routes::{hello, submit_leaderboard_entries, get_leaderboards_from_player, get_leaderboard,get_leaderboard_between, get_leaderboard_for_all};
+use toml::Value;
 
 pub struct AppState {
     db: Pool<Postgres>
@@ -15,7 +16,10 @@ pub struct AppState {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let database_url = "postgresql://ameliah:@127.0.0.1:5432/leaderboard_api";
+    let config_file = include_str!("../config.toml");
+    let config = config_file.parse::<Value>().unwrap();
+
+    let database_url = config["database_url"].as_str().unwrap();
     let pool = PgPoolOptions::new()
     .max_connections(5)
     .connect(&database_url)
