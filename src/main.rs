@@ -46,7 +46,7 @@ async fn main() -> std::io::Result<()> {
         .service(get_leaderboard_between)
         .service(get_leaderboard_for_all)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((config["address"].as_str().unwrap(), config["port"].as_integer().unwrap() as u16))?
     .run()
     .await
 }
