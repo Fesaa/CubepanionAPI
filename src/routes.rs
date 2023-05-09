@@ -27,11 +27,11 @@ pub async fn get_leaderboard_for_all(state: Data<AppState>, body: Json<Players>)
         WHERE valid = TRUE
         GROUP BY game
     ) s ON l.game = s.game AND l.unix_time_stamp = s.max_time_stamp
-    WHERE l.player = ANY($1)
+    WHERE UPPER(l.player) = ANY($1)
     ORDER BY
         l.player,l.position
     ASC;")
-        .bind(&body.players)
+        .bind(&body.players.iter().map(|p| p.to_uppercase()).collect::<Vec<String>>())
         .fetch_all(&state.db)
         .await {
             Ok(leaderboards) => HttpResponse::Ok().json(leaderboards),
@@ -153,7 +153,7 @@ pub async fn get_leaderboards_from_player(state: Data<AppState>, path: Path<Stri
         GROUP BY
             game)
     AND
-        player = $1
+        UPPER(player) = UPPER($1)
     ORDER BY
         position
     ASC;")
