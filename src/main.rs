@@ -8,6 +8,7 @@ use database::API;
 #[macro_use] extern crate diesel;
 
 mod leaderboard_api;
+mod chest_api;
 mod database;
 mod config;
 
@@ -43,6 +44,9 @@ async fn main() -> Result<(), std::io::Error> {
         .service(leaderboard_api::routes::player::get_leaderboards_from_player)
         .service(leaderboard_api::routes::game::get_leaderboard)
         .service(leaderboard_api::routes::game::get_leaderboard_between)
+        .service(chest_api::get_current_chests)
+        .service(chest_api::get_season_chests)
+        .service(chest_api::get_seasons)
     })
     .bind((config_clone.address, config_clone.port))?
     .run()

@@ -6,6 +6,7 @@ use regex::Regex;
 use crate::APIConfig;
 
 pub mod leaderboard;
+pub mod chests;
 pub mod schema;
 
 #[derive(Clone)]

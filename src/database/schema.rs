@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+// leaderboard_api
 use crate::leaderboard_api::models::LeaderboardEntry;
 
 table! {
@@ -56,3 +57,33 @@ table! {
 
 joinable!(leaderboards -> submissions (unix_time_stamp));
 allow_tables_to_appear_in_same_query!(leaderboards, submissions);
+
+// chest_api
+
+table! {
+    seasons (season_name) {
+        season_name -> VarChar,
+        running -> Bool,
+    }
+}
+
+table! {
+    chest_locations (season_name) {
+        season_name -> VarChar,
+        x -> Integer,
+        y -> Integer,
+        z -> Integer,
+    }
+}
+
+#[derive(Deserialize, Serialize, Queryable)]
+#[diesel(table_name = chest_locations)]
+pub struct ChestLocation {
+    pub season_name: String,
+    pub x: i32,
+    pub y: i32,
+    pub z: i32,
+}
+
+joinable!(chest_locations -> seasons (season_name));
+allow_tables_to_appear_in_same_query!(chest_locations, seasons);
