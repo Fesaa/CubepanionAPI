@@ -1,7 +1,7 @@
 use actix::Handler;
 use diesel::{QueryResult, QueryDsl};
 use crate::database::DbActor;
-use crate::leaderboard_api::models::LeaderboardRow;
+use crate::database::schema::LeaderboardRow;
 use diesel::{self, prelude::*};
 
 use super::messages::*;

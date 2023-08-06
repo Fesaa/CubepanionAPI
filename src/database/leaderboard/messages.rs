@@ -1,6 +1,6 @@
 use actix::Message;
 use diesel::QueryResult;
-use crate::leaderboard_api::models::LeaderboardRow;
+use crate::database::schema::LeaderboardRow;
 
 #[derive(Message)]
 #[rtype(result = "QueryResult<Vec<LeaderboardRow>>")]

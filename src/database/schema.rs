@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 table! {
     submissions (unix_time_stamp) {
         uuid -> Varchar,
@@ -5,6 +7,15 @@ table! {
         game -> Varchar,
         valid -> Bool,
     }
+}
+
+#[derive(Deserialize, Serialize, Queryable)]
+pub struct LeaderboardRow {
+    pub game: String,
+    pub player: String,
+    pub position: i32,
+    pub score: i32,
+    pub unix_time_stamp: i64,
 }
 
 table! {
