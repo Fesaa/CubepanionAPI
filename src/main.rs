@@ -2,24 +2,15 @@ use std::time::Duration;
 
 use actix_extensible_rate_limit::{backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder}, RateLimiter};
 use actix_web::{web::Data, App, HttpServer, middleware::Logger, Responder, HttpResponse, get};
-use regex::Regex;
-use serde::Deserialize;
-use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
-use toml::from_str;
+use config::APIConfig;
+use database::API;
+
+#[macro_use] extern crate diesel;
 
 mod leaderboard_api;
+mod database;
+mod config;
 
-pub struct API {
-    db: Pool<Postgres>,
-    username_regex: Regex
-}
-
-#[derive(Debug, Deserialize)]
-struct APIConfig {
-    database_url: String,
-    address: String,
-    port: u16
-}
 
 #[get("/")]
 pub async fn hello() -> impl Responder {
@@ -27,19 +18,12 @@ pub async fn hello() -> impl Responder {
 }
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    let config_file = include_str!("../config.toml");
-    let config: APIConfig = match from_str(&config_file) {
-        Ok(c) => c,
-        Err(e) => panic!("Could not parse config: {}", e),
+async fn main() -> Result<(), std::io::Error> {
+    let config = match APIConfig::from_file(String::from("config.toml")) {
+        Ok(config) => config,
+        Err(e) => panic!("Couldn't make config: {}", e),
     };
-
-    let database_url = config.database_url;
-    let pool = PgPoolOptions::new()
-    .max_connections(5)
-    .connect(&database_url)
-    .await
-    .expect("Error building a connection pool");
+    let config_clone = config.clone();
 
     let backend = InMemoryBackend::builder().build();
 
@@ -53,15 +37,15 @@ async fn main() -> std::io::Result<()> {
         App::new()
         .wrap(middleware)
         .wrap(Logger::default())
-        .app_data(Data::new(API {db : pool.clone(), username_regex: Regex::new(r"[a-zA-Z0-9_]{2,16}").unwrap()}))
+        .app_data(Data::new(API::new(&config)))
         .service(hello)
-        .service(leaderboard_api::routes::submission::submit_leaderboard_entries)
+        //.service(leaderboard_api::routes::submission::submit_leaderboard_entries)
         .service(leaderboard_api::routes::player::get_leaderboards_from_player)
         .service(leaderboard_api::routes::game::get_leaderboard)
         .service(leaderboard_api::routes::game::get_leaderboard_between)
-        .service(leaderboard_api::routes::players::get_leaderboard_for_all)
+        //.service(leaderboard_api::routes::players::get_leaderboard_for_all)
     })
-    .bind((config.address, config.port))?
+    .bind((config_clone.address, config_clone.port))?
     .run()
     .await
 }
