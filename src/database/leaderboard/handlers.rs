@@ -41,15 +41,23 @@ impl Handler<FetchLeaderboardForGame> for DbActor {
     type Result = QueryResult<Vec<LeaderboardRow>>;
 
     fn handle(&mut self, msg: FetchLeaderboardForGame, _ctx: &mut Self::Context) -> Self::Result {
-        use crate::database::schema::leaderboards::dsl::{leaderboards, game, position};
+        use crate::database::schema::leaderboards::dsl::{leaderboards, game, position, unix_time_stamp};
+        use crate::database::schema::submissions::dsl as s;
+        use diesel::dsl::max;
 
         let mut con = self.0.get()
         .expect("Fetch Leaderboard For Game: Unable to establish connection");
 
+        let max_unix: i64 = s::submissions
+            .filter(s::game.eq(&msg.game_name))
+            .select(max(s::unix_time_stamp))
+            .first::<Option<i64>>(&mut con)?.unwrap_or(0);
+
         leaderboards
-        //.filter(unix_time_stamp.eq(self.max_unix(&con)))
-        .filter(game.eq(msg.game_name))
+        .filter(unix_time_stamp.eq(max_unix))
+        .filter(game.eq(&msg.game_name))
         .filter(position.between(msg.min, msg.max))
+        .order(position)
         .load::<LeaderboardRow>(&mut con)
     }
 }
