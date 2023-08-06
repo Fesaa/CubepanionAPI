@@ -1,7 +1,7 @@
 use actix_web::{post, web::{Data, Json}, Responder, HttpResponse};
 use uuid::Uuid;
 
-use crate::{API, leaderboard_api::models::LeaderboardSubmission, database::{schema::{LeaderboardRow, SubmissionRow}, leaderboard::messages::{InsertLeaderboardRows, InsertSubmission}}};
+use crate::{API, leaderboard_api::models::LeaderboardSubmission, database::{schema::{LeaderboardRow, SubmissionRow}, leaderboard::messages::{InsertLeaderboardRows, InsertSubmission, DisableSubmission}}};
 
 pub fn is_valid_uuid(uuid_string: &str) -> bool {
     match Uuid::parse_str(uuid_string) {
@@ -27,15 +27,22 @@ pub async fn submit_leaderboard_entries(state: Data<API>, body: Json<Leaderboard
         .map(|entry| LeaderboardRow::from_entry(entry, body.unix_time_stamp))
         .collect::<Vec<LeaderboardRow>>();
 
+        match state.db.send(InsertSubmission{sub: SubmissionRow{uuid: body.uuid.clone(), game: body.game.clone(), valid: true, unix_time_stamp: body.unix_time_stamp}}).await {
+            Ok(Ok(_)) => (),
+            Ok(Err(err)) => return HttpResponse::InternalServerError().body(format!("Submission insert didn't go through, won't be queried: {}", err)),
+            _ => return HttpResponse::InternalServerError().body("Cannot process request"),
+        };
+
     match state.db.send(InsertLeaderboardRows {rows: rows}).await {
-        Ok(Ok(_)) =>
-            match state.db.send(InsertSubmission{sub: SubmissionRow{uuid: body.uuid.clone(), game: body.game.clone(), valid: true, unix_time_stamp: body.unix_time_stamp}}).await {
-                Ok(Ok(_)) => HttpResponse::Accepted().body("Success"),
-                Ok(Err(err)) => HttpResponse::InternalServerError().body(format!("Submission insert didn't go through, won't be queried: {}", err)),
-                _ => HttpResponse::InternalServerError().body("Cannot process request"),
-            
+        Ok(Ok(_)) => HttpResponse::Accepted().body("Success"),
+        Ok(Err(err)) => {
+            match state.db.send(DisableSubmission{unix: body.unix_time_stamp}).await {
+                Ok(Ok(_)) => (),
+                Ok(Err(err)) => return HttpResponse::InternalServerError().body(format!("Could not disable submission. We're in a bad sate! Error: {}", err)),
+                _ => return HttpResponse::InternalServerError().body("Cannot process request"),
+            }
+            HttpResponse::InternalServerError().body(err.to_string())
         },
-        Ok(Err(err)) => HttpResponse::InternalServerError().body(err.to_string()),
         _ => HttpResponse::InternalServerError().body("Cannot process request"),
     }
 }

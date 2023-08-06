@@ -43,7 +43,6 @@ async fn main() -> Result<(), std::io::Error> {
         .service(leaderboard_api::routes::player::get_leaderboards_from_player)
         .service(leaderboard_api::routes::game::get_leaderboard)
         .service(leaderboard_api::routes::game::get_leaderboard_between)
-        //.service(leaderboard_api::routes::players::get_leaderboard_for_all)
     })
     .bind((config_clone.address, config_clone.port))?
     .run()

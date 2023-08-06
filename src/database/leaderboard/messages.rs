@@ -17,13 +17,20 @@ pub struct FetchLeaderboardForGame{
 }
 
 #[derive(Message)]
-#[rtype(result = "QueryResult<String>")]
+#[rtype(result = "QueryResult<usize>")]
 pub struct InsertLeaderboardRows {
     pub rows: Vec<LeaderboardRow>
 }
 
 #[derive(Message)]
-#[rtype(result = "QueryResult<()>")]
+#[rtype(result = "QueryResult<usize>")]
 pub struct InsertSubmission {
     pub sub: SubmissionRow
+}
+
+
+#[derive(Message)]
+#[rtype(result = "QueryResult<usize>")]
+pub struct DisableSubmission {
+    pub unix: i64
 }

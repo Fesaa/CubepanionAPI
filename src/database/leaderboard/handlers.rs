@@ -63,7 +63,7 @@ impl Handler<FetchLeaderboardForGame> for DbActor {
 }
 
 impl Handler<InsertLeaderboardRows> for DbActor {
-    type Result = QueryResult<String>;
+    type Result = QueryResult<usize>;
 
     fn handle(&mut self, msg: InsertLeaderboardRows, _ctx: &mut Self::Context) -> Self::Result {
         use crate::database::schema::leaderboards::dsl::leaderboards;
@@ -71,17 +71,14 @@ impl Handler<InsertLeaderboardRows> for DbActor {
         let mut con = self.0.get()
         .expect("Insert Leaderboard Rows: Unable to establish connection");
 
-        match diesel::insert_into(leaderboards)
+        diesel::insert_into(leaderboards)
         .values(msg.rows)
-        .execute(&mut con) {
-            Ok(_) => Ok(String::from("")),
-            Err(err) => Err(err),
-        }
+        .execute(&mut con)
     }
 }
 
 impl Handler<InsertSubmission> for DbActor {
-    type Result = QueryResult<()>;
+    type Result = QueryResult<usize>;
 
     fn handle(&mut self, msg: InsertSubmission, _ctx: &mut Self::Context) -> Self::Result {
         use crate::database::schema::submissions::dsl::submissions;
@@ -89,11 +86,23 @@ impl Handler<InsertSubmission> for DbActor {
         let mut con = self.0.get()
         .expect("Insert submission: Unable to establish connection");
 
-    match diesel::insert_into(submissions)
+        diesel::insert_into(submissions)
         .values(msg.sub)
-        .execute(&mut con) {
-            Ok(_) => Ok(()),
-            Err(err) => Err(err),
-        }
+        .execute(&mut con)
+    }
+}
+
+impl Handler<DisableSubmission> for DbActor {
+    type Result = QueryResult<usize>;
+
+    fn handle(&mut self, msg: DisableSubmission, _ctx: &mut Self::Context) -> Self::Result {
+        use crate::database::schema::submissions::dsl::{submissions, unix_time_stamp, valid};
+        
+        let mut con = self.0.get()
+        .expect("Insert submission: Unable to establish connection");
+
+        diesel::update(submissions.filter(unix_time_stamp.eq(msg.unix)))
+        .set(valid.eq(false))
+        .execute(&mut con)
     }
 }
