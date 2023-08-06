@@ -12,7 +12,7 @@ table! {
 }
 
 #[derive(Deserialize, Serialize, Queryable, Insertable)]
-#[table_name = "submissions"]
+#[diesel(table_name = submissions)]
 pub struct SubmissionRow {
     pub uuid: String,
     pub unix_time_stamp: i64,
@@ -21,7 +21,7 @@ pub struct SubmissionRow {
 }
 
 #[derive(Deserialize, Serialize, Queryable, Insertable)]
-#[table_name = "leaderboards"]
+#[diesel(table_name = leaderboards)]
 pub struct LeaderboardRow {
     pub game: String,
     pub player: String,

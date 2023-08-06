@@ -1,6 +1,6 @@
 use actix::{Actor, SyncContext, Addr, SyncArbiter};
-use diesel::{r2d2::{Pool, ConnectionManager}, PgConnection, dsl::max};
-use diesel::{self, prelude::*};
+use diesel::{r2d2::{Pool, ConnectionManager}, PgConnection};
+use diesel;
 use regex::Regex;
 
 use crate::APIConfig;
@@ -13,20 +13,6 @@ pub struct DbActor(pub Pool<ConnectionManager<PgConnection>>);
 
 impl Actor for DbActor {
     type Context = SyncContext<Self>;
-}
-
-impl DbActor {
-
-    pub fn max_unix(&self, con: &PgConnection) -> i64 {
-        use crate::database::schema::submissions::dsl::{unix_time_stamp, submissions, valid};
-        submissions
-        .filter(valid.eq_all(true))
-        .select(max(unix_time_stamp))
-        .first::<Option<i64>>(con)
-        .unwrap_or(Some(0))
-        .unwrap_or(0)
-    }
-
 }
 
 pub struct API {

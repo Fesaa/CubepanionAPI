@@ -11,7 +11,7 @@ pub async fn get_leaderboards_from_player(state: Data<API>, path: Path<String>) 
 
     match state.db.send(FetchLeaderboardFromPlayer{player_name: name}).await {
         Ok(Ok(leaderboards)) => HttpResponse::Ok().json(leaderboards),
-        Ok(Err(_)) => HttpResponse::NotFound().finish(),
+        Ok(Err(err)) => HttpResponse::InternalServerError().body(err.to_string()),
         _ => HttpResponse::InternalServerError().body("Unable to retrieve leaderboards"),
     }
 }
