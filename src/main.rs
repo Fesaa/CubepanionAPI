@@ -39,7 +39,7 @@ async fn main() -> Result<(), std::io::Error> {
         .wrap(Logger::default())
         .app_data(Data::new(API::new(&config)))
         .service(hello)
-        //.service(leaderboard_api::routes::submission::submit_leaderboard_entries)
+        .service(leaderboard_api::routes::submission::submit_leaderboard_entries)
         .service(leaderboard_api::routes::player::get_leaderboards_from_player)
         .service(leaderboard_api::routes::game::get_leaderboard)
         .service(leaderboard_api::routes::game::get_leaderboard_between)
