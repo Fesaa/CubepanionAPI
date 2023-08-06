@@ -6,7 +6,7 @@ use regex::Regex;
 use crate::APIConfig;
 
 pub mod leaderboard;
-mod schema;
+pub mod schema;
 
 #[derive(Clone)]
 pub struct DbActor(pub Pool<ConnectionManager<PgConnection>>);
