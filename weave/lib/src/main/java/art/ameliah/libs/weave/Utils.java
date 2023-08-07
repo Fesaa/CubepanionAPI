@@ -14,13 +14,13 @@ import java.io.IOException;
 
 class Utils {
 
-    static JsonArray tryContentStringWithJsonEncoding(String url, CloseableHttpClient httpClient) throws WeaveException {
+    static Result<JsonArray, WeaveException> tryContentStringWithJsonEncoding(String url, CloseableHttpClient httpClient) {
         HttpGet req = new HttpGet(url);
         HttpResponse response;
         try {
             response = httpClient.execute(req);
         } catch (IOException e) {
-            throw new WeaveException("Could not execute request", e);
+            return Result.Err(new WeaveException("Could not execute request", e));
         }
 
         if (response.containsHeader("retry-after")) {
@@ -32,36 +32,34 @@ class Utils {
             } else {
                 again = "60";
             }
-            throw new WeaveException("Rate limited, try again in: " + again + "s");
+            return Result.Err(new WeaveException("Rate limited, try again in: " + again + "s"));
         }
 
         HttpEntity entity = response.getEntity();
         if (entity == null) {
-            throw new WeaveException("Response entity was null");
+            return Result.Err(new WeaveException("Response entity was null"));
         }
 
         Header contentTypeHeader = entity.getContentType();
         if (contentTypeHeader == null) {
-            throw new WeaveException("No content type");
+            return Result.Err(new WeaveException("No content type"));
         }
 
         String contentType = contentTypeHeader.getValue();
         if (!contentType.contains("application/json")) {
-
-
-            throw new WeaveException("Responded with non json. API error");
+            return Result.Err(new WeaveException("Responded with non json. API error"));
         }
 
         String responseBody;
         try {
             responseBody = EntityUtils.toString(entity);
         } catch (IOException e) {
-            throw new WeaveException("Could not get responseBody", e);
+            return Result.Err(new WeaveException("Could not get responseBody", e));
         }
         try {
-            return new Gson().fromJson(responseBody, JsonArray.class);
+            return Result.Ok(new Gson().fromJson(responseBody, JsonArray.class));
         } catch (JsonSyntaxException e) {
-            throw new WeaveException("Could not construct JsonArray", e);
+            return Result.Err(new WeaveException("Could not construct JsonArray", e));
         }
     }
 

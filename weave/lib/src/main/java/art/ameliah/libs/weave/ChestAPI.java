@@ -6,6 +6,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import java.util.ArrayList;
 import java.util.List;
 
+import static art.ameliah.libs.weave.Utils.tryContentStringWithJsonEncoding;
+
 /**
  * Interaction class for ChestAPI
  */
@@ -16,8 +18,7 @@ public class ChestAPI {
 
 
     /**
-     *
-     * @param url base API url
+     * @param url        base API url
      * @param httpClient connection client
      */
     protected ChestAPI(String url, CloseableHttpClient httpClient) {
@@ -27,11 +28,16 @@ public class ChestAPI {
 
     /**
      * Requests chests locations for the current running season
+     *
      * @return Array of ChestLocation's
-     * @throws WeaveException Any exceptions throw during requests
      */
-    public ChestLocation[] getCurrentChestLocations() throws WeaveException {
-        JsonArray array = Utils.tryContentStringWithJsonEncoding(baseURL + "/chest_api/current", httpClient);
+    public Result<ChestLocation[], WeaveException> getCurrentChestLocations() {
+        Result<JsonArray, WeaveException> result = tryContentStringWithJsonEncoding(baseURL + "/chest_api/current", httpClient);
+        if (result.isErr()) {
+            return Result.Err(result.getError());
+        }
+        JsonArray array = result.getValue();
+
         List<ChestLocation> locs = new ArrayList<>();
 
         for (JsonElement el : array) {
@@ -43,45 +49,57 @@ public class ChestAPI {
                     chestLocation.get("z").getAsInt()
             ));
         }
-        return locs.toArray(new ChestLocation[0]);
+        return Result.Ok(locs.toArray(new ChestLocation[0]));
     }
 
     /**
      * Get all chest locations for a specific season
+     *
      * @param season The Season the request the chests for
      * @return Array of ChestLocation's
-     * @throws WeaveException Any exceptions throw during requests
      */
-    public ChestLocation[] getChestLocationsForSeason(String season) throws WeaveException {
-        JsonArray array = Utils.tryContentStringWithJsonEncoding(baseURL + "/chest_api/season/" + season, httpClient);
+    public Result<ChestLocation[], WeaveException> getChestLocationsForSeason(String season) {
+        String url = baseURL + "/chest_api/season/" + season;
+        Result<JsonArray, WeaveException> result = tryContentStringWithJsonEncoding(url, httpClient);
+        if (result.isErr()) {
+            return Result.Err(result.getError());
+        }
+        JsonArray array = result.getValue();
+
         try {
-            return new Gson().fromJson(array, ChestLocation[].class);
+            return Result.Ok(new Gson().fromJson(array, ChestLocation[].class));
         } catch (JsonSyntaxException e) {
-            throw new WeaveException("Could not constrict ChestLocation[]", e);
+            return Result.Err(new WeaveException("Could not constrict ChestLocation[]", e));
         }
     }
 
     /**
      * Get all seasons
+     *
      * @return Array of seasons (String)
-     * @throws WeaveException Any exceptions throw during requests
      */
-    public String[] getSeasons() throws WeaveException {
+    public Result<String[], WeaveException> getSeasons() {
         return getSeasons(SeasonType.ALL);
     }
 
     /**
      * Get seasons bounded by the request type
+     *
      * @param seasonType Request type
      * @return Array of seasons (String)
-     * @throws WeaveException Any exceptions throw during requests
      */
-    public String[] getSeasons(SeasonType seasonType) throws WeaveException {
-        JsonArray array = Utils.tryContentStringWithJsonEncoding(baseURL + "/chest_api/seasons/" + seasonType.bool(), httpClient);
+    public Result<String[], WeaveException> getSeasons(SeasonType seasonType) {
+        String url = baseURL + "/chest_api/seasons/" + seasonType.bool();
+        Result<JsonArray, WeaveException> result = tryContentStringWithJsonEncoding(url, httpClient);
+        if (result.isErr()) {
+            return Result.Err(result.getError());
+        }
+        JsonArray array = result.getValue();
+
         try {
-            return new Gson().fromJson(array, String[].class);
+            return Result.Ok(new Gson().fromJson(array, String[].class));
         } catch (JsonSyntaxException e) {
-            throw new WeaveException("Could not constrict ChestLocation[]", e);
+            return Result.Err(new WeaveException("Could not constrict ChestLocation[]", e));
         }
     }
 
@@ -108,10 +126,11 @@ public class ChestAPI {
 
     /**
      * Location of a chest
+     *
      * @param season_name Season the chest is connected to
-     * @param x x-coord
-     * @param y y-coord
-     * @param z z-coord
+     * @param x           x-coord
+     * @param y           y-coord
+     * @param z           z-coord
      */
     public record ChestLocation(String season_name, int x, int y, int z) {
     }

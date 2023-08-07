@@ -23,6 +23,7 @@ public class Weave {
 
     /**
      * Setup API in prod env
+     *
      * @return Weave
      */
     public static Weave Production() {
@@ -35,9 +36,10 @@ public class Weave {
 
     /**
      * Setup API for the default dev env (http://127.0.0.1:8080)
+     *
      * @return Weave
      */
-    public static Weave Dev(){
+    public static Weave Dev() {
         try {
             return new Weave("127.0.0.1", 8080);
         } catch (MalformedURLException e) {
@@ -47,6 +49,7 @@ public class Weave {
 
     /**
      * Setup API in dev env with custom port
+     *
      * @param port custom port
      * @return Weave
      * @throws MalformedURLException Could not construct API-url
@@ -57,8 +60,9 @@ public class Weave {
 
     /**
      * Setup custom API in dev env
+     *
      * @param domain custom domain
-     * @param port custom port
+     * @param port   custom port
      * @return Weave
      * @throws MalformedURLException Could not construct API-url
      */
@@ -67,7 +71,6 @@ public class Weave {
     }
 
     /**
-     *
      * @return LeaderboardAPI
      */
     public LeaderboardAPI getLeaderboardAPI() {
@@ -75,7 +78,6 @@ public class Weave {
     }
 
     /**
-     *
      * @return ChestAPI
      */
     public ChestAPI getChestAPI() {

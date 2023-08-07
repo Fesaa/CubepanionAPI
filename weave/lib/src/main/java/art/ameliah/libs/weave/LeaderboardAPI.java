@@ -1,6 +1,9 @@
 package art.ameliah.libs.weave;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -26,8 +29,7 @@ public class LeaderboardAPI {
     private final CloseableHttpClient httpClient;
 
     /**
-     *
-     * @param url base API url
+     * @param url        base API url
      * @param httpClient connection client
      */
     protected LeaderboardAPI(String url, CloseableHttpClient httpClient) {
@@ -37,14 +39,15 @@ public class LeaderboardAPI {
 
     /**
      * Submit a new leaderboard
-     * @param uuid Submitters uuid
-     * @param game name
+     *
+     * @param uuid    Submitters uuid
+     * @param game    name
      * @param entries LeaderboardRows
-     * @throws WeaveException Any exceptions throw during requests
+     * @return StatusCode or Error
      */
-    public void submitLeaderboard(UUID uuid, Leaderboard game, Set<LeaderboardRow> entries) throws WeaveException {
+    public Result<Integer, WeaveException> submitLeaderboard(UUID uuid, Leaderboard game, Set<LeaderboardRow> entries) {
         if (entries.size() != 200) {
-            throw new WeaveException("entries set must contain exactly 200 entries.");
+            return Result.Err(new WeaveException("entries set must contain exactly 200 entries."));
         }
 
         JsonObject main = new JsonObject();
@@ -66,32 +69,32 @@ public class LeaderboardAPI {
         try {
             response = httpClient.execute(req);
         } catch (IOException e) {
-            throw new WeaveException("Could not execute request", e);
+            return Result.Err(new WeaveException("Could not execute request", e));
         }
 
         StatusLine statusLine = response.getStatusLine();
         int code = statusLine.getStatusCode();
         if (code == 202) {
-            return;
+            return Result.Ok(202);
         }
 
         HttpEntity entity = response.getEntity();
         if (entity == null) {
-            throw new WeaveException("Request failed for unknown reason with status code: " + code);
+            return Result.Err(new WeaveException("Request failed for unknown reason with status code: " + code));
         }
 
         try {
             String error = EntityUtils.toString(entity);
-            throw new WeaveException("Failed to submit: " + error);
+            return Result.Err(new WeaveException("Failed to submit: " + error));
         } catch (IOException e) {
-            throw new WeaveException("Failed to convert entity; Request failed for unknown reason with status code: " + code, e);
+            return Result.Err(new WeaveException("Failed to convert entity; Request failed for unknown reason with status code: " + code, e));
         }
     }
 
-    private LeaderboardRow[] jsonArrayToArray(JsonArray array) throws WeaveException {
+    private Result<LeaderboardRow[], WeaveException> jsonArrayToArray(JsonArray array) {
         List<LeaderboardRow> rows = new ArrayList<>();
 
-        for(JsonElement el : array) {
+        for (JsonElement el : array) {
             JsonObject row = el.getAsJsonObject();
             rows.add(new LeaderboardRow(
                     Leaderboard.stringToLeaderboard(row.get("game").getAsString()),
@@ -101,64 +104,53 @@ public class LeaderboardAPI {
                     row.get("unix_time_stamp").getAsInt()
             ));
         }
-        return rows.toArray(new LeaderboardRow[0]);
+        return Result.Ok(rows.toArray(new LeaderboardRow[0]));
     }
 
     /**
      * Retrieve all leaderboards for a player
+     *
      * @param player name
      * @return Array of LeaderboardRow's
-     * @throws WeaveException Any exceptions throw during requests
      */
-    public LeaderboardRow[] getLeaderboardsForPlayer(String player) throws WeaveException {
+    public Result<LeaderboardRow[], WeaveException> getLeaderboardsForPlayer(String player) {
         String url = String.format("%s/leaderboard_api/player/%s", baseURL, player);
-        JsonArray array = Utils.tryContentStringWithJsonEncoding(url, httpClient);
-        return jsonArrayToArray(array);
+        Result<JsonArray, WeaveException> result = Utils.tryContentStringWithJsonEncoding(url, httpClient);
+        if (result.isErr()) {
+            return Result.Err(result.getError());
+        }
+        return jsonArrayToArray(result.getValue());
     }
 
     /**
      * Retrieve all leaderboardRows for a game
+     *
      * @param game name
      * @return Array of LeaderboardRow's
-     * @throws WeaveException Any exceptions throw during requests
      */
-    public LeaderboardRow[] getGameLeaderboard(Leaderboard game) throws WeaveException {
+    public Result<LeaderboardRow[], WeaveException> getGameLeaderboard(Leaderboard game) {
         return getGameLeaderboard(game, 1, 200);
     }
 
     /**
      * Retrieve all leaderboardRows for a game between bounds
+     *
      * @param game name
-     * @param low lower bound
-     * @param up upper bound (must be higher than low)
+     * @param low  lower bound
+     * @param up   upper bound (must be higher than low)
      * @return Array of LeaderboardRow's
-     * @throws WeaveException Any exceptions throw during requests
      */
-    public LeaderboardRow[] getGameLeaderboard(Leaderboard game, int low, int up) throws WeaveException {
-        if (up < low) throw new WeaveException("Upper bound must be higher than the lower bound");
+    public Result<LeaderboardRow[], WeaveException> getGameLeaderboard(Leaderboard game, int low, int up) {
+        if (up < low) {
+            return Result.Err(new WeaveException("Upper bound must be higher than the lower bound"));
+        }
         String url = String.format("%s/leaderboard_api/leaderboard/%s/bounded?lower=%d&upper=%d", baseURL,
                 game.getString().replace(" ", "%20"), low, up);
-        JsonArray array = Utils.tryContentStringWithJsonEncoding(url, httpClient);
-        return jsonArrayToArray(array);
-    }
-
-    /**
-     * Leaderboard Row
-     * @param game Game's leaderboards
-     * @param player name
-     * @param position int
-     * @param score int
-     * @param unix submission unix time stamp
-     */
-    public record LeaderboardRow(Leaderboard game, String player, int position, int score, int unix) {
-        private JsonElement getAsJsonElement() {
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("game", game.getString());
-            jsonObject.addProperty("player", player);
-            jsonObject.addProperty("position", position);
-            jsonObject.addProperty("score", score);
-            return jsonObject;
+        Result<JsonArray, WeaveException> result = Utils.tryContentStringWithJsonEncoding(url, httpClient);
+        if (result.isErr()) {
+            return Result.Err(result.getError());
         }
+        return jsonArrayToArray(result.getValue());
     }
 
     /**
@@ -202,13 +194,13 @@ public class LeaderboardAPI {
         }
 
         /**
-         /**
+         * /**
          * Tries converting to a leaderboard
+         *
          * @param s String to try on
          * @return Leaderboard (NONE if none found)
-         * @throws WeaveException If no Leaderboard are found
          */
-        public static Leaderboard stringToLeaderboard(String s) throws WeaveException {
+        public static Leaderboard stringToLeaderboard(String s) {
             switch (s.toLowerCase()) {
                 case "team eggwars", "eggwars", "tew", "ew" -> {
                     return Leaderboard.TEAM_EGGWARS;
@@ -229,17 +221,36 @@ public class LeaderboardAPI {
                     return Leaderboard.PARKOUR;
                 }
                 default -> {
-                    throw new WeaveException("String is not a valid leaderboard");
+                    return Leaderboard.NONE;
                 }
             }
         }
 
         /**
-         *
          * @return Properly formatted String
          */
         public String getString() {
             return string;
+        }
+    }
+
+    /**
+     * Leaderboard Row
+     *
+     * @param game     Game's leaderboards
+     * @param player   name
+     * @param position int
+     * @param score    int
+     * @param unix     submission unix time stamp
+     */
+    public record LeaderboardRow(Leaderboard game, String player, int position, int score, int unix) {
+        private JsonElement getAsJsonElement() {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("game", game.getString());
+            jsonObject.addProperty("player", player);
+            jsonObject.addProperty("position", position);
+            jsonObject.addProperty("score", score);
+            return jsonObject;
         }
     }
 

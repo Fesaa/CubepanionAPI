@@ -7,6 +7,7 @@ public class WeaveException extends Exception {
 
     /**
      * Artificial exception
+     *
      * @param msg extra info
      */
     protected WeaveException(String msg) {
@@ -15,7 +16,8 @@ public class WeaveException extends Exception {
 
     /**
      * Artificial wrapper exception
-     * @param msg extra info
+     *
+     * @param msg   extra info
      * @param cause original exception
      */
     protected WeaveException(String msg, Throwable cause) {
@@ -24,6 +26,7 @@ public class WeaveException extends Exception {
 
     /**
      * Wrapper exception
+     *
      * @param cause original exception
      */
     protected WeaveException(Throwable cause) {
