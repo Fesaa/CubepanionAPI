@@ -3,3 +3,6 @@ config.toml
 .vscode
 /venv
 input.txt
+.gradle
+.idea
+build
