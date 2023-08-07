@@ -24,10 +24,10 @@ jobs:
         run: chmod +x ./weave/gradlew
 
       - name: Run test
-        run: ./weave//gradlew test -Dtest.prod=true
+        run: ./weave/gradlew test -Dtest.prod=true
 
       - name: Build with Gradle
-        run: ./weave//gradlew build --full-stacktrace
+        run: ./weave/gradlew build --full-stacktrace
     
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
