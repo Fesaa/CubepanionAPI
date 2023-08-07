@@ -20,8 +20,6 @@ pub async fn submit_leaderboard_entries(state: Data<API>, body: Json<Leaderboard
         return HttpResponse::BadRequest().body(String::from("Invalid uuid <") + &body.uuid + ">")
     }
 
-    println!("Request found {} {}", body.uuid, body.game);
-
     let rows: Vec<LeaderboardRow> = body.entries
         .iter()
         .map(|entry| LeaderboardRow::from_entry(entry, body.unix_time_stamp))
