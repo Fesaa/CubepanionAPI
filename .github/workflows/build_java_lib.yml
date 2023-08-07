@@ -20,20 +20,17 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
 
-      - name: cd into Java dir
-        run: cd weave
-
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+        run: chmod +x ./weave/gradlew
 
       - name: Run test
-        run: ./gradlew test -Dtest.prod=true
+        run: ./weave//gradlew test -Dtest.prod=true
 
       - name: Build with Gradle
-        run: ./gradlew build --full-stacktrace
+        run: ./weave//gradlew build --full-stacktrace
     
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: Weave lib
-          path: lib/build/libs/lib-*.jar
+          path: ./weave/lib/build/libs/lib-*.jar
