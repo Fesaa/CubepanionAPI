@@ -1,4 +1,4 @@
-name: Weave build
+name: Weave tests
 
 on:
   push:
@@ -22,11 +22,5 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
 
-      - name: Build with Gradle
-        run: cd weave && chmod +x ./gradlew && ./gradlew build -Dtest.prod=true --stacktrace
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: Weave lib
-          path: ./weave/lib/build/libs/lib-*.jar
+      - name: Run test
+        run: cd weave && chmod +x ./gradlew && ./gradlew test -Dtest.prod=true
