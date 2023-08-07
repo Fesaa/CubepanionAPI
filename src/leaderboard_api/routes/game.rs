@@ -10,7 +10,7 @@ pub async fn get_leaderboard(state: Data<API>, path: Path<String>) -> impl Respo
     }
     match state.db.send(FetchLeaderboardForGame{game_name: game, max: 200, min: 1}).await {
         Ok(Ok(leaderboards)) => HttpResponse::Ok().json(leaderboards),
-        Ok(Err(_)) => HttpResponse::NotFound().finish(),
+        Ok(Err(err)) => HttpResponse::InternalServerError().body(format!("Unable to retrieve leaderboards: {}", err)),
         _ => HttpResponse::InternalServerError().body("Unable to retrieve leaderboards"),
     }
 }
@@ -29,7 +29,7 @@ pub async fn get_leaderboard_between(state: Data<API>, path: Path<String>, info:
     }
     match state.db.send(FetchLeaderboardForGame{game_name: game, max: info.upper, min: info.lower}).await {
         Ok(Ok(leaderboards)) => HttpResponse::Ok().json(leaderboards),
-        Ok(Err(_)) => HttpResponse::NotFound().finish(),
+        Ok(Err(err)) => HttpResponse::InternalServerError().body(format!("Unable to retrieve leaderboards: {}", err)),
         _ => HttpResponse::InternalServerError().body("Unable to retrieve leaderboards"),
     }
 }
