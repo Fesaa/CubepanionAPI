@@ -59,7 +59,7 @@ public class LeaderboardAPI {
 
         String url = baseURL + "/leaderboard_api";
         HttpPost req = new HttpPost(url);
-        req.setEntity(new StringEntity(main.getAsString(), ContentType.APPLICATION_JSON));
+        req.setEntity(new StringEntity((new Gson()).toJson(main), ContentType.APPLICATION_JSON));
 
 
         HttpResponse response;
@@ -71,7 +71,7 @@ public class LeaderboardAPI {
 
         StatusLine statusLine = response.getStatusLine();
         int code = statusLine.getStatusCode();
-        if (code == 200) {
+        if (code == 202) {
             return;
         }
 
