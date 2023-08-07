@@ -3,8 +3,10 @@ name: Cubepanion API Build
 on:
   push:
     branches: [ "master", "main" ]
+    paths: ["src/**", ".github/workflows/**"]
   pull_request:
     branches: [ "master", "main" ]
+    paths: ["src/**", ".github/workflows/**"]
   workflow_dispatch:
 
 jobs:
