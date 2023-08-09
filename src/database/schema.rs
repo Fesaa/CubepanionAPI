@@ -98,6 +98,7 @@ table! {
         team_size -> Integer,
         build_limit -> Integer,
         colours -> VarChar,
+        layout -> VarChar,
     }
 }
 
@@ -109,6 +110,7 @@ pub struct EggWarsMap {
     pub team_size: i32,
     pub build_limit: i32,
     pub colours: String,
+    pub layout: String,
 }
 
 table! {

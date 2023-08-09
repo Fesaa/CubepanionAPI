@@ -11,6 +11,7 @@ pub struct EggWarsMapJson {
     pub team_size: i32,
     pub build_limit: i32,
     pub colours: String,
+    pub layout: String,
     pub generators: Vec<Generator>,
 }
 
@@ -24,6 +25,7 @@ impl EggWarsMapJson {
             team_size: map.team_size,
             build_limit: map.build_limit,
             colours: map.colours.clone(),
+            layout: map.layout.clone(),
             generators: vec![],
         }
     }
