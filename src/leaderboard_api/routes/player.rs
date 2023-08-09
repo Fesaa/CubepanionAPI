@@ -3,6 +3,17 @@ use diesel::result::Error::NotFound;
 
 use crate::database::{API, leaderboard::messages::FetchLeaderboardFromPlayer};
 
+#[utoipa::path(get,
+    responses(
+        (status = 200, description = "All leaderboards for the player", body = Vec<LeaderboardRow>),
+        (status = 400, description = "Invalid name"),
+        (status = 404, description = "No leaderboards found"),
+        (status = 500, description = "SQL error", example = json!(HttpResponse::InternalServerError().body("Unable to retrieve leaderboards")))
+    ),
+    params(
+        ("name", description = "Player name")
+    )
+)]
 #[get("/leaderboard_api/player/{name}")]
 pub async fn get_leaderboards_from_player(state: Data<API>, path: Path<String>) -> impl Responder {
     let name = path.into_inner();

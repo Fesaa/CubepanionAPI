@@ -5,6 +5,10 @@ use actix_web::{web::Data, App, HttpServer, middleware::Logger, Responder, HttpR
 use config::APIConfig;
 use database::API;
 
+use docs::ApiDoc;
+use utoipa::OpenApi;
+use utoipa_rapidoc::RapiDoc;
+
 #[macro_use] extern crate diesel;
 
 mod leaderboard_api;
@@ -12,6 +16,7 @@ mod chest_api;
 mod eggwars_map_api;
 mod database;
 mod config;
+mod docs;
 
 
 #[get("/")]
@@ -40,6 +45,7 @@ async fn main() -> Result<(), std::io::Error> {
         .wrap(middleware)
         .wrap(Logger::default())
         .app_data(Data::new(API::new(&config)))
+        .service(RapiDoc::with_openapi("/api-docs/openapi.json", ApiDoc::openapi()).path("/rapidoc"))
         .service(hello)
         .service(leaderboard_api::routes::submission::submit_leaderboard_entries)
         .service(leaderboard_api::routes::player::get_leaderboards_from_player)

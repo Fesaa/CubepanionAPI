@@ -1,8 +1,21 @@
 use actix_web::{web::{Data, Path, Query}, Responder, HttpResponse, get};
 use diesel::result::Error::NotFound;
 use serde::Deserialize;
+use utoipa::{ToSchema, IntoParams};
 use crate::{API, database::leaderboard::messages::FetchLeaderboardForGame};
 
+#[utoipa::path(
+    get,
+    responses(
+        (status = 200, description = "All leaderboards for the game", body = Vec<LeaderboardRow>),
+        (status = 400, description = "Invalid game"),
+        (status = 404, description = "No leaderboards found"),
+        (status = 500, description = "SQL error", example = json!(HttpResponse::InternalServerError().body("Unable to retrieve leaderboards")))
+    ),
+    params(
+        ("game", description = "Game name")
+    )
+)]
 #[get("/leaderboard_api/leaderboard/{game}")]
 pub async fn get_leaderboard(state: Data<API>, path: Path<String>) -> impl Responder {
     let game = path.into_inner();
@@ -19,12 +32,25 @@ pub async fn get_leaderboard(state: Data<API>, path: Path<String>) -> impl Respo
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema, IntoParams)]
 pub struct BoundedRequest {
     lower: i32,
     upper: i32,
 }
 
+#[utoipa::path(
+    get,
+    responses(
+        (status = 200, description = "All leaderboards for the game between the bounds", body = Vec<LeaderboardRow>),
+        (status = 400, description = "Invalid game"),
+        (status = 404, description = "No leaderboards found"),
+        (status = 500, description = "SQL error", example = json!(HttpResponse::InternalServerError().body("Unable to retrieve leaderboards")))
+    ),
+    params(
+        ("game", description = "Game name"),
+        BoundedRequest
+    )
+)]
 #[get("/leaderboard_api/leaderboard/{game}/bounded")]
 pub async fn get_leaderboard_between(state: Data<API>, path: Path<String>, info: Query<BoundedRequest>) -> impl Responder {
     let game = path.into_inner();
