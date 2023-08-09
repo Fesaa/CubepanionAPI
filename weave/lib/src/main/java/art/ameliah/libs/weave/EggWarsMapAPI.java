@@ -78,6 +78,7 @@ public class EggWarsMapAPI {
         return new EggWarsMap(
                 map.get("unique_name").getAsString(),
                 map.get("map_name").getAsString(),
+                map.get("layout").getAsString(),
                 map.get("team_size").getAsInt(),
                 map.get("build_limit").getAsInt(),
                 map.get("colours").getAsString(),
@@ -87,7 +88,7 @@ public class EggWarsMapAPI {
     /**
      * EggWars map
      */
-    public record EggWarsMap(String uniqueName, String mapName, int teamSize, int buildLimit, String colour, Generator[] generators) {};
+    public record EggWarsMap(String uniqueName, String mapName, String layout, int teamSize, int buildLimit, String colour, Generator[] generators) {};
     /**
      * Generator
      */
