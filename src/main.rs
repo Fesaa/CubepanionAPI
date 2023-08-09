@@ -9,6 +9,7 @@ use database::API;
 
 mod leaderboard_api;
 mod chest_api;
+mod eggwars_map_api;
 mod database;
 mod config;
 
@@ -47,6 +48,8 @@ async fn main() -> Result<(), std::io::Error> {
         .service(chest_api::get_current_chests)
         .service(chest_api::get_season_chests)
         .service(chest_api::get_seasons)
+        .service(eggwars_map_api::get_all_eggwars_maps)
+        .service(eggwars_map_api::get_eggwars_map)
     })
     .bind((config_clone.address, config_clone.port))?
     .run()

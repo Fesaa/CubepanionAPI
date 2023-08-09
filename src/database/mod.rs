@@ -7,6 +7,7 @@ use crate::APIConfig;
 
 pub mod leaderboard;
 pub mod chests;
+pub mod eggwars_maps;
 pub mod schema;
 
 #[derive(Clone)]

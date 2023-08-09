@@ -42,7 +42,7 @@ CREATE TYPE gentype AS ENUM ('iron', 'gold', 'diamond');
 CREATE TABLE IF NOT EXISTS eggwars_maps (
     unique_name VARCHAR NOT NULL,
     map_name VARCHAR NOT NULL,
-    team_size VARCHAR NOT NULL,
+    team_size INT NOT NULL,
     build_limit INT NOT NULL,
     colours VARCHAR NOT NULL,
     PRIMARY KEY (unique_name)

@@ -87,3 +87,51 @@ pub struct ChestLocation {
 
 joinable!(chest_locations -> seasons (season_name));
 allow_tables_to_appear_in_same_query!(chest_locations, seasons);
+
+
+// eggwars_map_api
+
+table! {
+    eggwars_maps (unique_name) {
+        unique_name -> VarChar,
+        map_name -> VarChar,
+        team_size -> Integer,
+        build_limit -> Integer,
+        colours -> VarChar,
+    }
+}
+
+#[derive(Deserialize, Serialize, Queryable)]
+#[diesel(table_name = eggwars_maps)]
+pub struct EggWarsMap {
+    pub unique_name: String,
+    pub map_name: String,
+    pub team_size: i32,
+    pub build_limit: i32,
+    pub colours: String,
+}
+
+table! {
+    gen_layout (unique_name) {
+        unique_name -> Varchar,
+        ordering -> Integer,
+        gen_type -> VarChar,
+        gen_location -> VarChar,
+        level -> Integer,
+        count -> Integer,
+    }
+}
+
+#[derive(Deserialize, Serialize, Queryable)]
+#[diesel(table_name = gen_layout)]
+pub struct GenLayout {
+    pub unique_name: String,
+    pub ordering: i32,
+    pub gen_type: String,
+    pub gen_location: String,
+    pub level: i32,
+    pub count: i32,
+}
+
+joinable!(gen_layout -> eggwars_maps (unique_name));
+allow_tables_to_appear_in_same_query!(gen_layout, eggwars_maps);
