@@ -34,3 +34,29 @@ CREATE TABLE IF NOT EXISTS chest_locations (
     FOREIGN KEY (season_name)
         REFERENCES seasons(season_name)
 );
+
+CREATE TYPE maptype AS ENUM ('cross', 'doublecross', 'square');
+CREATE TYPE genlocation AS ENUM ('base', 'semimiddle', 'middle');
+CREATE TYPE gentype AS ENUM ('iron', 'gold', 'diamond');
+
+CREATE TABLE IF NOT EXISTS eggwars_maps (
+    unique_name VARCHAR NOT NULL,
+    map_name VARCHAR NOT NULL,
+    team_size VARCHAR NOT NULL,
+    build_limit INT NOT NULL,
+    colours VARCHAR NOT NULL,
+    PRIMARY KEY (unique_name)
+);
+
+
+CREATE TABLE IF NOT EXISTS gen_layout (
+    unique_name VARCHAR NOT NULL,
+    ordering INT NOT NULL,
+    gen_type gentype NOT NULL,
+    gen_location genlocation NOT NULL,
+    level INT NOT NULL,
+    count INT NOT NULL,
+    PRIMARY KEY (unique_name, ordering),
+    FOREIGN KEY (unique_name)
+        REFERENCES eggwars_maps(unique_name)
+);

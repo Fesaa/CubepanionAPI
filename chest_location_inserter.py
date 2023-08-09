@@ -1,7 +1,5 @@
 import asyncio
-import os
 import re
-import sys
 
 import asyncpg
 import toml
