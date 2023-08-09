@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 #[derive(Deserialize)]
 pub struct Players {
     pub players: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct LeaderboardSubmission {
     pub uuid: String,
     pub unix_time_stamp: i64,

@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 // leaderboard_api
 use crate::leaderboard_api::models::LeaderboardEntry;
@@ -21,7 +22,7 @@ pub struct SubmissionRow {
     pub valid: bool
 }
 
-#[derive(Deserialize, Serialize, Queryable, Insertable)]
+#[derive(Deserialize, Serialize, Queryable, Insertable, ToSchema)]
 #[diesel(table_name = leaderboards)]
 pub struct LeaderboardRow {
     pub game: String,
@@ -76,7 +77,7 @@ table! {
     }
 }
 
-#[derive(Deserialize, Serialize, Queryable)]
+#[derive(Deserialize, Serialize, Queryable, ToSchema)]
 #[diesel(table_name = chest_locations)]
 pub struct ChestLocation {
     pub season_name: String,
@@ -102,7 +103,7 @@ table! {
     }
 }
 
-#[derive(Deserialize, Serialize, Queryable)]
+#[derive(Deserialize, Serialize, Queryable, ToSchema)]
 #[diesel(table_name = eggwars_maps)]
 pub struct EggWarsMap {
     pub unique_name: String,

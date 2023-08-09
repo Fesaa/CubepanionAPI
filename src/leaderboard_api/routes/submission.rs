@@ -10,7 +10,17 @@ pub fn is_valid_uuid(uuid_string: &str) -> bool {
     }
 }
 
-
+/// Submit a leaderboard
+//
+///  Inserts the data into the database, requests are validated by the server
+#[utoipa::path(post,
+    request_body = LeaderboardSubmission,
+    responses(
+        (status = 202, description = "Accepted your submission"),
+        (status = 400, description = "Invalid submission data"),
+        (status = 500, description = "SQL error", example = json!(HttpResponse::InternalServerError().body("Submission insert didn't go through, won't be queried:")))
+    )
+)]
 #[post("/leaderboard_api")]
 pub async fn submit_leaderboard_entries(state: Data<API>, body: Json<LeaderboardSubmission>) -> impl Responder {
     if body.entries.len() != 200 {

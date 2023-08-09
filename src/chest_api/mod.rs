@@ -3,6 +3,15 @@ use diesel::result::Error::NotFound;
 
 use crate::database::{API, chests::messages::{FetchChestLocationsForRunningSeason, FetchChestLocationsForSeason, FetchSeasons}};
 
+/// Get all current ChestLocations
+#[utoipa::path(
+    get,
+    responses(
+        (status = 200, description = "All chests for the current season", body = Vec<ChestLocation>),
+        (status = 404, description =  "No chests found for the current season"),
+        (status = 500, description = "Unable to retrieve chest locations")
+    )
+)]
 #[get("/chest_api/current")]
 pub async fn get_current_chests(state: Data<API>) -> impl Responder {
     match state.db.send(FetchChestLocationsForRunningSeason{}).await {
@@ -15,6 +24,18 @@ pub async fn get_current_chests(state: Data<API>) -> impl Responder {
     }
 }
 
+/// Get all ChestLocations for a given season
+#[utoipa::path(
+    get,
+    responses(
+        (status = 200, description = "All chests for the given season", body = Vec<ChestLocation>),
+        (status = 404, description =  "No chests found for the current season"),
+        (status = 500, description = "Unable to retrieve chest locations")
+    ),
+    params(
+        ("season", description = "Season name")
+    )
+)]
 #[get("/chest_api/season/{season}")]
 pub async fn get_season_chests(state: Data<API>, path: Path<String>) -> impl Responder {
     match state.db.send(FetchChestLocationsForSeason{season: path.into_inner()}).await {
@@ -28,6 +49,18 @@ pub async fn get_season_chests(state: Data<API>, path: Path<String>) -> impl Res
     }
 }
 
+/// Get seasons
+#[utoipa::path(
+    get,
+    responses(
+        (status = 200, description = "All queried seasons", body = Vec<String>),
+        (status = 404, description =  "No seasons found"),
+        (status = 500, description = "Unable to retrieve seasons")
+    ),
+    params(
+        ("running", description = "Running seasons only, or all seasons")
+    )
+)]
 #[get("/chest_api/seasons/{running}")]
 pub async fn get_seasons(state: Data<API>, path: Path<bool>) -> impl Responder {
     match state.db.send(FetchSeasons{running: path.into_inner()}).await {
@@ -36,6 +69,6 @@ pub async fn get_seasons(state: Data<API>, path: Path<bool>) -> impl Responder {
             NotFound => HttpResponse::NotFound().body("No seasons found"),
             _ => HttpResponse::InternalServerError().body(format!("Unable to retrieve seasons: {}", err)),
         },
-        _ => HttpResponse::InternalServerError().body("Unable to retrieve chest locations"),
+        _ => HttpResponse::InternalServerError().body("Unable to retrieve seasons"),
     }
 }
