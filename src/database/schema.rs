@@ -77,7 +77,7 @@ table! {
     }
 }
 
-#[derive(Deserialize, Serialize, Queryable)]
+#[derive(Deserialize, Serialize, Queryable, ToSchema)]
 #[diesel(table_name = chest_locations)]
 pub struct ChestLocation {
     pub season_name: String,
