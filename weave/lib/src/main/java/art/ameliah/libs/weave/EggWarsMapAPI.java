@@ -11,6 +11,9 @@ import java.util.List;
 
 import static art.ameliah.libs.weave.Utils.tryContentStringWithJsonEncoding;
 
+/**
+ * API for EggWars maps
+ */
 public class EggWarsMapAPI {
 
     private final String baseURL;
@@ -26,6 +29,10 @@ public class EggWarsMapAPI {
         this.httpClient = httpClient;
     }
 
+    /**
+     *  Get all EggWars maps
+     * @return all EggWars maps
+     */
     public Result<EggWarsMap[], WeaveException> getAllEggWarsMaps() {
         String url = baseURL + "/eggwars_map_api";
         Result<JsonArray, WeaveException> result = tryContentStringWithJsonEncoding(url, httpClient);
@@ -40,6 +47,11 @@ public class EggWarsMapAPI {
         return Result.Ok(maps.toArray(new EggWarsMap[0]));
     }
 
+    /**
+     * Get EggWars map by name
+     * @param name map name
+     * @return EggWars map
+     */
     public Result<EggWarsMap, WeaveException> getEggWarsMap(String name) {
         String url = baseURL + "/eggwars_map_api/" + name;
         Result<JsonObject, WeaveException> result = tryContentStringWithJsonEncoding(url, httpClient, JsonObject.class);
@@ -72,7 +84,12 @@ public class EggWarsMapAPI {
                 generatorsList.toArray(new Generator[0]));
     }
 
-
+    /**
+     * EggWars map
+     */
     public record EggWarsMap(String uniqueName, String mapName, int teamSize, int buildLimit, String colour, Generator[] generators) {};
+    /**
+     * Generator
+     */
     public record Generator(String uniqueName, int ordering, String genType, String location, int level, int count) {};
 }
