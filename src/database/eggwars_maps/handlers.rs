@@ -3,7 +3,7 @@ use diesel::{QueryResult, QueryDsl, RunQueryDsl};
 use diesel::{self, prelude::*};
 
 use crate::database::DbActor;
-use crate::database::schema::{EggWarsMap, GenLayout};
+use crate::database::schema::{EggWarsMap, Generator};
 
 use super::EggWarsMapJson;
 use super::messages::{FetchEggWarsMaps, FetchEggWarsMap};
@@ -15,7 +15,7 @@ impl Handler<FetchEggWarsMaps> for DbActor {
 
     fn handle(&mut self, _msg: FetchEggWarsMaps, _ctx: &mut Self::Context) -> Self::Result {
         use crate::database::schema::eggwars_maps::dsl::eggwars_maps;
-        use crate::database::schema::gen_layout::dsl::gen_layout;
+        use crate::database::schema::generators::dsl::generators;
 
         let mut con = self.0.get()
         .expect("Fetch Leaderboard From Player: Unable to establish connection");
@@ -26,8 +26,8 @@ impl Handler<FetchEggWarsMaps> for DbActor {
             .map(|map| EggWarsMapJson::from_eggwars_map(map))
             .collect::<Vec<EggWarsMapJson>>();
 
-        let gens = gen_layout
-            .load::<GenLayout>(&mut con)?;
+        let gens = generators
+            .load::<Generator>(&mut con)?;
 
         for gen in gens {
             let map_option = maps.iter_mut().find(|map| map.unique_name == gen.unique_name);
@@ -45,7 +45,7 @@ impl Handler<FetchEggWarsMap> for DbActor {
 
     fn handle(&mut self, msg: FetchEggWarsMap, _ctx: &mut Self::Context) -> Self::Result {
         use crate::database::schema::eggwars_maps::dsl::{eggwars_maps, unique_name};
-        use crate::database::schema::gen_layout::dsl::{gen_layout, unique_name as name};
+        use crate::database::schema::generators::dsl::{generators, unique_name as name};
 
         let mut con = self.0.get()
         .expect("Fetch Leaderboard From Player: Unable to establish connection");
@@ -57,9 +57,9 @@ impl Handler<FetchEggWarsMap> for DbActor {
 
             let mut map_json = EggWarsMapJson::from_eggwars_map(&map);
 
-        let gens: Vec<GenLayout> = gen_layout
+        let gens: Vec<Generator> = generators
             .filter(name.eq(&msg.name))
-            .load::<GenLayout>(&mut con)?;
+            .load::<Generator>(&mut con)?;
 
         for gen in gens {
             map_json.add_gen_layout(gen);

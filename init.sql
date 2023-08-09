@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS eggwars_maps (
 );
 
 
-CREATE TABLE IF NOT EXISTS gen_layout (
+CREATE TABLE IF NOT EXISTS generators (
     unique_name VARCHAR NOT NULL,
     ordering INT NOT NULL,
     gen_type gentype NOT NULL,

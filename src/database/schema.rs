@@ -112,7 +112,7 @@ pub struct EggWarsMap {
 }
 
 table! {
-    gen_layout (unique_name) {
+    generators (unique_name) {
         unique_name -> Varchar,
         ordering -> Integer,
         gen_type -> VarChar,
@@ -123,8 +123,8 @@ table! {
 }
 
 #[derive(Deserialize, Serialize, Queryable)]
-#[diesel(table_name = gen_layout)]
-pub struct GenLayout {
+#[diesel(table_name = generators)]
+pub struct Generator {
     pub unique_name: String,
     pub ordering: i32,
     pub gen_type: String,
@@ -133,5 +133,5 @@ pub struct GenLayout {
     pub count: i32,
 }
 
-joinable!(gen_layout -> eggwars_maps (unique_name));
-allow_tables_to_appear_in_same_query!(gen_layout, eggwars_maps);
+joinable!(generators -> eggwars_maps (unique_name));
+allow_tables_to_appear_in_same_query!(generators, eggwars_maps);
