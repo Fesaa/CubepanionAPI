@@ -46,3 +46,11 @@ tasks.named<Test>("test") {
     systemProperty("test.prod", System.getProperty("test.prod"))
     useJUnitPlatform()
 }
+
+tasks.register<Javadoc>("generateJavadoc") {
+    sourceSets.main.get().java.srcDirs.forEach {
+        source(it)
+    }
+    classpath += configurations.getByName("compileClasspath")
+    destinationDir = file("$buildDir/docs/javadoc")
+}
