@@ -4,6 +4,7 @@ use serde::Deserialize;
 use utoipa::{ToSchema, IntoParams};
 use crate::{API, database::leaderboard::messages::FetchLeaderboardForGame};
 
+/// Get all LeaderboardRow for a game
 #[utoipa::path(
     get,
     responses(
@@ -38,6 +39,7 @@ pub struct BoundedRequest {
     upper: i32,
 }
 
+/// Get all LeaderboardRow for a game between the bounds	
 #[utoipa::path(
     get,
     responses(

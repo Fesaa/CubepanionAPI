@@ -10,9 +10,9 @@ pub fn is_valid_uuid(uuid_string: &str) -> bool {
     }
 }
 
-// Submit a leaderboard
+/// Submit a leaderboard
 //
-//  Inserts the data into the database, requests are validated by the server
+///  Inserts the data into the database, requests are validated by the server
 #[utoipa::path(post,
     request_body = LeaderboardSubmission,
     responses(

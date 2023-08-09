@@ -3,6 +3,7 @@ use diesel::result::Error::NotFound;
 
 use crate::database::{API, leaderboard::messages::FetchLeaderboardFromPlayer};
 
+/// Get all LeaderboardRow for a player
 #[utoipa::path(get,
     responses(
         (status = 200, description = "All leaderboards for the player", body = Vec<LeaderboardRow>),

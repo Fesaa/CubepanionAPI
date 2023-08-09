@@ -3,7 +3,7 @@ use diesel::result::Error::NotFound;
 
 use crate::database::{API, eggwars_maps::messages::{FetchEggWarsMaps, FetchEggWarsMap}};
 
-
+/// Get all EggWarsMaps
 #[utoipa::path(
     get,
     responses(
@@ -21,6 +21,7 @@ pub async fn get_all_eggwars_maps(state: Data<API>) -> impl Responder {
     }
 }
 
+/// Get EggWarsMap by name
 #[utoipa::path(
     get,
     responses(

@@ -3,6 +3,7 @@ use diesel::result::Error::NotFound;
 
 use crate::database::{API, chests::messages::{FetchChestLocationsForRunningSeason, FetchChestLocationsForSeason, FetchSeasons}};
 
+/// Get all current ChestLocations
 #[utoipa::path(
     get,
     responses(
@@ -23,6 +24,7 @@ pub async fn get_current_chests(state: Data<API>) -> impl Responder {
     }
 }
 
+/// Get all ChestLocations for a given season
 #[utoipa::path(
     get,
     responses(
@@ -47,6 +49,7 @@ pub async fn get_season_chests(state: Data<API>, path: Path<String>) -> impl Res
     }
 }
 
+/// Get seasons
 #[utoipa::path(
     get,
     responses(
