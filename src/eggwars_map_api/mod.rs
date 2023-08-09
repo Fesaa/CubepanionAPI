@@ -4,6 +4,14 @@ use diesel::result::Error::NotFound;
 use crate::database::{API, eggwars_maps::messages::{FetchEggWarsMaps, FetchEggWarsMap}};
 
 
+#[utoipa::path(
+    get,
+    responses(
+        (status = 200, description = "All EggWars maps", body = Vec<EggWarsMap>),
+        (status = 404, description =  "No EggWars maps found"),
+        (status = 500, description = "Unable to retrieve EggWars maps")
+    )
+)]
 #[get("/eggwars_map_api")]
 pub async fn get_all_eggwars_maps(state: Data<API>) -> impl Responder {
     match state.db.send(FetchEggWarsMaps{}).await {
@@ -13,6 +21,17 @@ pub async fn get_all_eggwars_maps(state: Data<API>) -> impl Responder {
     }
 }
 
+#[utoipa::path(
+    get,
+    responses(
+        (status = 200, description = "All EggWars maps", body = Vec<EggWarsMap>),
+        (status = 404, description =  "No EggWars maps found"),
+        (status = 500, description = "Unable to retrieve EggWars maps")
+    ),
+    params(
+        ("name", description = "EggWars map name")
+    )
+)]
 #[get("/eggwars_map_api/{name}")]
 pub async fn get_eggwars_map(state: Data<API>, path: Path<String>) -> impl Responder {
     match state.db.send(FetchEggWarsMap{name: path.into_inner()}).await {

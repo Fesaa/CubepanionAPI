@@ -103,7 +103,7 @@ table! {
     }
 }
 
-#[derive(Deserialize, Serialize, Queryable)]
+#[derive(Deserialize, Serialize, Queryable, ToSchema)]
 #[diesel(table_name = eggwars_maps)]
 pub struct EggWarsMap {
     pub unique_name: String,

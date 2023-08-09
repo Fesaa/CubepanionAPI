@@ -1,8 +1,9 @@
 use utoipa::OpenApi;
 
-use crate::database::schema::{ChestLocation, LeaderboardRow};
+use crate::database::schema::{ChestLocation, LeaderboardRow, EggWarsMap};
 use crate::leaderboard_api::routes::game::BoundedRequest;
 
+use super::eggwars_map_api;
 use super::chest_api;
 use super::leaderboard_api::{self, models::LeaderboardSubmission};
 
@@ -16,10 +17,12 @@ use super::leaderboard_api::{self, models::LeaderboardSubmission};
         leaderboard_api::routes::game::get_leaderboard_between,
         chest_api::get_current_chests,
         chest_api::get_season_chests,
-        chest_api::get_seasons
+        chest_api::get_seasons,
+        eggwars_map_api::get_all_eggwars_maps,
+        eggwars_map_api::get_eggwars_map
     ),
     components(
-        schemas(LeaderboardSubmission, LeaderboardRow, BoundedRequest, ChestLocation)
+        schemas(LeaderboardSubmission, LeaderboardRow, BoundedRequest, ChestLocation, EggWarsMap)
     )
 
 )]
