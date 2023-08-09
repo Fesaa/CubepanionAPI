@@ -15,6 +15,10 @@ import java.io.IOException;
 class Utils {
 
     static Result<JsonArray, WeaveException> tryContentStringWithJsonEncoding(String url, CloseableHttpClient httpClient) {
+        return tryContentStringWithJsonEncoding(url, httpClient, JsonArray.class);
+    }
+
+    static <T> Result<T, WeaveException> tryContentStringWithJsonEncoding(String url, CloseableHttpClient httpClient, Class<T> clazz) {
         HttpGet req = new HttpGet(url);
         HttpResponse response;
         try {
@@ -57,7 +61,7 @@ class Utils {
             return Result.Err(new WeaveException("Could not get responseBody", e));
         }
         try {
-            return Result.Ok(new Gson().fromJson(responseBody, JsonArray.class));
+            return Result.Ok(new Gson().fromJson(responseBody, clazz));
         } catch (JsonSyntaxException e) {
             return Result.Err(new WeaveException("Could not construct JsonArray", e));
         }

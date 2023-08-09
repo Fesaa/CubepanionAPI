@@ -13,12 +13,14 @@ public class Weave {
 
     private final LeaderboardAPI leaderboardAPI;
     private final ChestAPI chestAPI;
+    private final EggWarsMapAPI eggWarsMapAPI;
 
     private Weave(String domain, int port) throws MalformedURLException {
         String baseURL = (new URL(String.format("http://%s:%d", domain, port))).toString();
         CloseableHttpClient httpClient = HttpClients.createDefault();
         leaderboardAPI = new LeaderboardAPI(baseURL, httpClient);
         chestAPI = new ChestAPI(baseURL, httpClient);
+        eggWarsMapAPI = new EggWarsMapAPI(baseURL, httpClient);
     }
 
     /**
@@ -82,5 +84,12 @@ public class Weave {
      */
     public ChestAPI getChestAPI() {
         return chestAPI;
+    }
+
+    /**
+     * @return EggWarsMapAPI
+     */
+    public EggWarsMapAPI getEggWarsMapAPI() {
+        return eggWarsMapAPI;
     }
 }

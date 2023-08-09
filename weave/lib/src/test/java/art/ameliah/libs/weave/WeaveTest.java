@@ -23,6 +23,16 @@ public class WeaveTest {
     }
 
     @Test
+    void testEggWarsMapAPI() {
+        Result<EggWarsMapAPI.EggWarsMap, WeaveException> result = weave.getEggWarsMapAPI().getEggWarsMap("palace");
+        assertTrue(result.isOk());
+
+        Result<EggWarsMapAPI.EggWarsMap[], WeaveException> result2 = weave.getEggWarsMapAPI().getAllEggWarsMaps();
+        assertTrue(result2.isOk());
+        assertTrue(result2.getValue().length >= 13);
+    }
+
+    @Test
     void testChestAPISeasonGetters() {
         assertArrayEquals(
                 weave.getChestAPI().getSeasons().unwrap_or_default(() -> new String[0]),
