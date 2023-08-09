@@ -1,4 +1,5 @@
 use actix_web::{get, web::{Data, Path}, Responder, HttpResponse};
+use diesel::result::Error::NotFound;
 
 use crate::database::{API, leaderboard::messages::FetchLeaderboardFromPlayer};
 
@@ -11,7 +12,10 @@ pub async fn get_leaderboards_from_player(state: Data<API>, path: Path<String>) 
 
     match state.db.send(FetchLeaderboardFromPlayer{player_name: name}).await {
         Ok(Ok(leaderboards)) => HttpResponse::Ok().json(leaderboards),
-        Ok(Err(err)) => HttpResponse::InternalServerError().body(err.to_string()),
+        Ok(Err(err)) => match err {
+            NotFound => HttpResponse::NotFound().body("No leaderboards found"),
+            _ => HttpResponse::InternalServerError().body(format!("Unable to retrieve leaderboards: {}", err)),
+        },
         _ => HttpResponse::InternalServerError().body("Unable to retrieve leaderboards"),
     }
 }

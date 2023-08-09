@@ -1,4 +1,5 @@
 use actix_web::{web::{Data, Path, Query}, Responder, HttpResponse, get};
+use diesel::result::Error::NotFound;
 use serde::Deserialize;
 use crate::{API, database::leaderboard::messages::FetchLeaderboardForGame};
 
@@ -10,7 +11,10 @@ pub async fn get_leaderboard(state: Data<API>, path: Path<String>) -> impl Respo
     }
     match state.db.send(FetchLeaderboardForGame{game_name: game, max: 200, min: 1}).await {
         Ok(Ok(leaderboards)) => HttpResponse::Ok().json(leaderboards),
-        Ok(Err(err)) => HttpResponse::InternalServerError().body(format!("Unable to retrieve leaderboards: {}", err)),
+        Ok(Err(err)) => match err {
+            NotFound => HttpResponse::NotFound().body("No leaderboards found"),
+            _ => HttpResponse::InternalServerError().body(format!("Unable to retrieve leaderboards: {}", err)),
+        },
         _ => HttpResponse::InternalServerError().body("Unable to retrieve leaderboards"),
     }
 }
@@ -29,7 +33,10 @@ pub async fn get_leaderboard_between(state: Data<API>, path: Path<String>, info:
     }
     match state.db.send(FetchLeaderboardForGame{game_name: game, max: info.upper, min: info.lower}).await {
         Ok(Ok(leaderboards)) => HttpResponse::Ok().json(leaderboards),
-        Ok(Err(err)) => HttpResponse::InternalServerError().body(format!("Unable to retrieve leaderboards: {}", err)),
+        Ok(Err(err)) => match err {
+            NotFound => HttpResponse::NotFound().body("No leaderboards found"),
+            _ => HttpResponse::InternalServerError().body(format!("Unable to retrieve leaderboards: {}", err)),
+        },
         _ => HttpResponse::InternalServerError().body("Unable to retrieve leaderboards"),
     }
 }
