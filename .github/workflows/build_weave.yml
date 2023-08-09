@@ -4,9 +4,6 @@ on:
   push:
     branches: [ "master", "main" ]
     paths: ["weave/**"]
-  pull_request:
-    branches: [ "master", "main" ]
-    paths: ["weave/**"]
   workflow_dispatch:
 
 jobs:
