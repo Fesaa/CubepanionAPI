@@ -15,7 +15,7 @@ impl Handler<FetchEggWarsMaps> for DbActor {
 
     fn handle(&mut self, _msg: FetchEggWarsMaps, _ctx: &mut Self::Context) -> Self::Result {
         use crate::database::schema::eggwars_maps::dsl::eggwars_maps;
-        use crate::database::schema::generators::dsl::generators;
+        use crate::database::schema::generators::dsl::{generators, ordering};
 
         let mut con = self.0.get()
         .expect("Fetch Leaderboard From Player: Unable to establish connection");
@@ -27,6 +27,7 @@ impl Handler<FetchEggWarsMaps> for DbActor {
             .collect::<Vec<EggWarsMapJson>>();
 
         let gens = generators
+            .order(ordering)
             .load::<Generator>(&mut con)?;
 
         for gen in gens {
@@ -45,7 +46,7 @@ impl Handler<FetchEggWarsMap> for DbActor {
 
     fn handle(&mut self, msg: FetchEggWarsMap, _ctx: &mut Self::Context) -> Self::Result {
         use crate::database::schema::eggwars_maps::dsl::{eggwars_maps, unique_name};
-        use crate::database::schema::generators::dsl::{generators, unique_name as name};
+        use crate::database::schema::generators::dsl::{generators, unique_name as name, ordering};
 
         let mut con = self.0.get()
         .expect("Fetch Leaderboard From Player: Unable to establish connection");
@@ -59,6 +60,7 @@ impl Handler<FetchEggWarsMap> for DbActor {
 
         let gens: Vec<Generator> = generators
             .filter(name.eq(&msg.name))
+            .order(ordering)
             .load::<Generator>(&mut con)?;
 
         for gen in gens {
