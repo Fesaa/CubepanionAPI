@@ -69,7 +69,7 @@ public class ChestAPI {
         try {
             return Result.Ok(new Gson().fromJson(array, ChestLocation[].class));
         } catch (JsonSyntaxException e) {
-            return Result.Err(new WeaveException("Could not constrict ChestLocation[]", e));
+            return Result.Err(new WeaveException("Could not construct ChestLocation[]", e));
         }
     }
 
@@ -99,7 +99,7 @@ public class ChestAPI {
         try {
             return Result.Ok(new Gson().fromJson(array, String[].class));
         } catch (JsonSyntaxException e) {
-            return Result.Err(new WeaveException("Could not constrict ChestLocation[]", e));
+            return Result.Err(new WeaveException("Could not construct String[]", e));
         }
     }
 
