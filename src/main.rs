@@ -20,8 +20,8 @@ mod docs;
 
 
 #[get("/")]
-pub async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Ameliah loves you <3")
+async fn hello() -> impl Responder {
+    HttpResponse::Ok().body("Amelia loves you <3")
 }
 
 #[actix_web::main]
