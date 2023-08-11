@@ -21,7 +21,7 @@ mod docs;
 
 #[get("/")]
 async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Amelia loves you <3")
+    HttpResponse::Ok().body("Amelia loves you very much <3")
 }
 
 #[actix_web::main]
