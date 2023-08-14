@@ -19,7 +19,7 @@ class Generator:
 
 class EggWarsMap:
 
-    def __init__(self, unique_name: str, map_name: str, team_size: int, build_limit: int, colours: str, generators: list[Generator]) -> None:
+    def __init__(self, unique_name: str, map_name: str, team_size: int, build_limit: int, colours: str, generators: list[dict]) -> None:
         self.unique_name = unique_name
         self.map_name = map_name
         self.team_size = team_size
