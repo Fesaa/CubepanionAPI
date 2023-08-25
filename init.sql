@@ -66,5 +66,6 @@ CREATE TABLE IF NOT EXISTS games (
     display_name VARCHAR NOT NULL,
     aliases VARCHAR NOT NULL DEFAULT "",
     active NOT NULL BOOLEAN,
+    score_type VARCHAR NOT NULL,
     PRIMARY KEY (game)
 )

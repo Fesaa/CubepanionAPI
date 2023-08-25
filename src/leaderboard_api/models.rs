@@ -28,4 +28,5 @@ pub struct LeaderboardGame {
     pub display_name: String,
     pub aliases: Vec<String>,
     pub active: bool,
+    pub score_type: String,
 }

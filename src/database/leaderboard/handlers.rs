@@ -135,6 +135,7 @@ impl Handler<GetGames> for DbActor {
                     display_name: row.display_name.clone(),
                     aliases: row.aliases.clone().split(",").map(|s| s.to_string()).collect(),
                     active: row.active,
+                    score_type: row.score_type.clone(),
                 })
             })
             .collect::<QueryResult<Vec<LeaderboardGame>>>()

@@ -47,6 +47,7 @@ pub struct GameRow {
     pub display_name: String,
     pub aliases: String,
     pub active: bool,
+    pub score_type: String,
 }
 
 table! {
@@ -72,6 +73,7 @@ table! {
         display_name -> VarChar,
         aliases -> VarChar,
         active -> Bool,
+        score_type -> VarChar,
     }
 }
 
