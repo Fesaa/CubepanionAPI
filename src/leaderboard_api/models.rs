@@ -21,3 +21,11 @@ pub struct LeaderboardEntry {
     pub score: i32,
     pub game: String
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct LeaderboardGame {
+    pub game: String,
+    pub display_name: String,
+    pub aliases: Vec<String>,
+    pub active: bool,
+}

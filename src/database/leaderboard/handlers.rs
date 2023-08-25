@@ -1,6 +1,6 @@
 use actix::Handler;
 use diesel::{QueryResult, QueryDsl, dsl::sql, sql_types::Bool};
-use crate::database::{schema::LeaderboardRow, DbActor};
+use crate::{database::{schema::{LeaderboardRow, GameRow}, DbActor}, leaderboard_api::models::LeaderboardGame};
 use diesel::{self, prelude::*};
 
 use super::messages::*;
@@ -106,3 +106,40 @@ impl Handler<DisableSubmission> for DbActor {
         .execute(&mut con)
     }
 }
+
+
+impl Handler<GetGames> for DbActor {
+    type Result = QueryResult<Vec<LeaderboardGame>>;
+
+    fn handle(&mut self, msg: GetGames, _ctx: &mut Self::Context) -> Self::Result {
+        use crate::database::schema::games::dsl::{games, active};
+        
+        let mut con = self.0.get()
+        .expect("Get Games: Unable to establish connection");
+
+
+        let rows = if msg.must_be_active {
+            games
+                .filter(active.eq(true))
+                .load::<GameRow>(&mut con)?
+        } else {
+            games
+                .load::<GameRow>(&mut con)?
+        };
+
+
+        rows.iter()
+            .map(|row| {
+                Ok(LeaderboardGame {
+                    game: row.game.clone(),
+                    display_name: row.display_name.clone(),
+                    aliases: row.aliases.clone().split(",").map(|s| s.to_string()).collect(),
+                    active: row.active,
+                })
+            })
+            .collect::<QueryResult<Vec<LeaderboardGame>>>()
+
+
+    }
+}
+

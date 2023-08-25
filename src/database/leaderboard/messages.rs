@@ -1,6 +1,7 @@
 use actix::Message;
 use diesel::QueryResult;
 use crate::database::schema::{LeaderboardRow, SubmissionRow};
+use crate::leaderboard_api::models::LeaderboardGame;
 
 #[derive(Message)]
 #[rtype(result = "QueryResult<Vec<LeaderboardRow>>")]
@@ -33,4 +34,10 @@ pub struct InsertSubmission {
 #[rtype(result = "QueryResult<usize>")]
 pub struct DisableSubmission {
     pub unix: i64
+}
+
+#[derive(Message)]
+#[rtype(result = "QueryResult<Vec<LeaderboardGame>>")]
+pub struct GetGames {
+    pub must_be_active: bool
 }

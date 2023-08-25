@@ -40,6 +40,15 @@ impl LeaderboardRow {
 
 }
 
+#[derive(Deserialize, Serialize, Queryable, Insertable, ToSchema)]
+#[diesel(table_name = games)]
+pub struct GameRow {
+    pub game: String,
+    pub display_name: String,
+    pub aliases: String,
+    pub active: bool,
+}
+
 table! {
     leaderboards (unix_time_stamp) {
         game -> VarChar,
@@ -55,6 +64,17 @@ table! {
         uuid -> Varchar,
     }
 }
+
+
+table! {
+    games (game) {
+        game -> VarChar,
+        display_name -> VarChar,
+        aliases -> VarChar,
+        active -> Bool,
+    }
+}
+
 
 joinable!(leaderboards -> submissions (unix_time_stamp));
 allow_tables_to_appear_in_same_query!(leaderboards, submissions);

@@ -2,7 +2,7 @@ use actix_web::{web::{Data, Path, Query}, Responder, HttpResponse, get};
 use diesel::result::Error::NotFound;
 use serde::Deserialize;
 use utoipa::{ToSchema, IntoParams};
-use crate::{API, database::leaderboard::messages::FetchLeaderboardForGame};
+use crate::{API, database::leaderboard::messages::{FetchLeaderboardForGame, GetGames}};
 
 /// Get all LeaderboardRow for a game
 #[utoipa::path(
@@ -68,3 +68,31 @@ pub async fn get_leaderboard_between(state: Data<API>, path: Path<String>, info:
         _ => HttpResponse::InternalServerError().body("Unable to retrieve leaderboards"),
     }
 }
+
+
+/// Get all (active) games
+#[utoipa::path(
+    get,
+    responses(
+        (status = 200, description = "All games", body = Vec<GameRow>),
+        (status = 404, description = "No games found"),
+        (status = 500, description = "SQL error", example = json!(HttpResponse::InternalServerError().body("Unable to retrieve games")))
+    ),
+    params(
+        ("active", description = "Whether to only get active games")
+    )
+)]
+#[get("/leaderboard_api/games/{active}")]
+pub async fn get_games(state: Data<API>, path: Path<bool>) -> impl Responder {
+    let active = path.into_inner();
+    match state.db.send(GetGames{must_be_active: active}).await {
+        Ok(Ok(games)) => HttpResponse::Ok().json(games),
+        Ok(Err(err)) => match err {
+            NotFound => HttpResponse::NotFound().body("No games found"),
+            _ => HttpResponse::InternalServerError().body(format!("Unable to retrieve games: {}", err)),
+        },
+        _ => HttpResponse::InternalServerError().body("Unable to retrieve games"),
+    }
+}
+
+

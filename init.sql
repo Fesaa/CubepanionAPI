@@ -60,3 +60,11 @@ CREATE TABLE IF NOT EXISTS generators (
     FOREIGN KEY (unique_name)
         REFERENCES eggwars_maps(unique_name)
 );
+
+CREATE TABLE IF NOT EXISTS games (
+    game VARCHAR NOT NULL,
+    display_name VARCHAR NOT NULL,
+    aliases VARCHAR NOT NULL DEFAULT "",
+    active NOT NULL BOOLEAN,
+    PRIMARY KEY (game)
+)
