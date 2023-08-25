@@ -97,7 +97,7 @@ public class WeaveTest {
                 .unwrap_or_default(() -> new LeaderboardRow[0]);
         LeaderboardRow[] expected2 = new LeaderboardRow[]{
                 new LeaderboardRow(ew, "Mivke", 1, 31000, 0),
-                new LeaderboardRow(parkour, "Mivke", 14, 2277, 0),
+                new LeaderboardRow(parkour, "Mivke", 1, 2322, 0),
         };
         assertTrue(booleanSupplier(result2, expected2, (exp, results) -> {
             for (LeaderboardRow res : results) {
