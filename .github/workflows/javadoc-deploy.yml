@@ -3,7 +3,7 @@ name: Deploy Javadoc to GitHub Pages
 on:
   push:
         branches: [ "master", "main" ]
-        paths: ["weave/**"] # Adjust this to match your main branch name
+        paths: ["weave/lib/src/main/**"]
 
 jobs:
   deploy:
