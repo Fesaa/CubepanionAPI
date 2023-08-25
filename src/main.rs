@@ -35,7 +35,7 @@ async fn main() -> Result<(), std::io::Error> {
     let backend = InMemoryBackend::builder().build();
 
     HttpServer::new(move || {
-        let input = SimpleInputFunctionBuilder::new(Duration::from_secs(60), 10)
+        let input = SimpleInputFunctionBuilder::new(Duration::from_secs(60), 20)
             .real_ip_key()
             .build();
         let middleware = RateLimiter::builder(backend.clone(), input)
