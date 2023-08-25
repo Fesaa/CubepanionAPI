@@ -1,6 +1,8 @@
 package art.ameliah.libs.weave;
 
-import art.ameliah.libs.weave.LeaderboardAPI.Leaderboard;
+import art.ameliah.libs.weave.leaderboard.LeaderboardAPI;
+import art.ameliah.libs.weave.leaderboard.LeaderboardAPI.Leaderboard;
+import art.ameliah.libs.weave.leaderboard.LeaderboardRow;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -69,14 +71,14 @@ public class WeaveTest {
 
     @Test
     void testLeaderboardAPILeaderboardRowGameGetters() {
-        LeaderboardAPI.LeaderboardRow[] result = weave.getLeaderboardAPI().getGameLeaderboard(Leaderboard.TEAM_EGGWARS)
-                .unwrap_or_default(() -> new LeaderboardAPI.LeaderboardRow[0]);
-        LeaderboardAPI.LeaderboardRow[] expected = new LeaderboardAPI.LeaderboardRow[]{
-                new LeaderboardAPI.LeaderboardRow(Leaderboard.TEAM_EGGWARS, "Mivke", 1, 31000, 0),
-                new LeaderboardAPI.LeaderboardRow(Leaderboard.TEAM_EGGWARS, "Fesa", 11, 0, 0),
+        LeaderboardRow[] result = weave.getLeaderboardAPI().getGameLeaderboard(Leaderboard.TEAM_EGGWARS)
+                .unwrap_or_default(() -> new LeaderboardRow[0]);
+        LeaderboardRow[] expected = new LeaderboardRow[]{
+                new LeaderboardRow(Leaderboard.TEAM_EGGWARS, "Mivke", 1, 31000, 0),
+                new LeaderboardRow(Leaderboard.TEAM_EGGWARS, "Fesa", 11, 0, 0),
         };
         assertTrue(booleanSupplier(result, expected, (exp, results) -> {
-            for (LeaderboardAPI.LeaderboardRow res : results) {
+            for (LeaderboardRow res : results) {
                 if (res.game().equals(exp.game())
                         && res.player().equals(exp.player())
                         && res.position() == exp.position()
@@ -88,14 +90,14 @@ public class WeaveTest {
             return false;
         }));
 
-        LeaderboardAPI.LeaderboardRow[] result2 = weave.getLeaderboardAPI().getLeaderboardsForPlayer("Mivke")
-                .unwrap_or_default(() -> new LeaderboardAPI.LeaderboardRow[0]);
-        LeaderboardAPI.LeaderboardRow[] expected2 = new LeaderboardAPI.LeaderboardRow[]{
-                new LeaderboardAPI.LeaderboardRow(Leaderboard.TEAM_EGGWARS, "Mivke", 1, 31000, 0),
-                new LeaderboardAPI.LeaderboardRow(Leaderboard.PARKOUR, "Mivke", 12, 2277, 0),
+        LeaderboardRow[] result2 = weave.getLeaderboardAPI().getLeaderboardsForPlayer("Mivke")
+                .unwrap_or_default(() -> new LeaderboardRow[0]);
+        LeaderboardRow[] expected2 = new LeaderboardRow[]{
+                new LeaderboardRow(Leaderboard.TEAM_EGGWARS, "Mivke", 1, 31000, 0),
+                new LeaderboardRow(Leaderboard.PARKOUR, "Mivke", 12, 2277, 0),
         };
         assertTrue(booleanSupplier(result2, expected2, (exp, results) -> {
-            for (LeaderboardAPI.LeaderboardRow res : results) {
+            for (LeaderboardRow res : results) {
                 if (res.game().equals(exp.game())
                         && res.player().equals(exp.player())
                         && res.position() == exp.position()

@@ -12,13 +12,13 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 
-class Utils {
+public class Utils {
 
-    static Result<JsonArray, WeaveException> tryContentStringWithJsonEncoding(String url, CloseableHttpClient httpClient) {
+    public static Result<JsonArray, WeaveException> tryContentStringWithJsonEncoding(String url, CloseableHttpClient httpClient) {
         return tryContentStringWithJsonEncoding(url, httpClient, JsonArray.class);
     }
 
-    static <T> Result<T, WeaveException> tryContentStringWithJsonEncoding(String url, CloseableHttpClient httpClient, Class<T> clazz) {
+    public static <T> Result<T, WeaveException> tryContentStringWithJsonEncoding(String url, CloseableHttpClient httpClient, Class<T> clazz) {
         HttpGet req = new HttpGet(url);
         HttpResponse response;
         try {

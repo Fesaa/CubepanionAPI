@@ -1,5 +1,6 @@
 package art.ameliah.libs.weave;
 
+import art.ameliah.libs.weave.leaderboard.LeaderboardAPI;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
