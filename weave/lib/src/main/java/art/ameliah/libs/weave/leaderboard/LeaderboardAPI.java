@@ -31,6 +31,8 @@ public class LeaderboardAPI {
 
     private final CloseableHttpClient httpClient;
 
+    private final ILeaderboardFactory factory;
+
     /**
      * @param url        base API url
      * @param httpClient connection client
@@ -38,6 +40,14 @@ public class LeaderboardAPI {
     public LeaderboardAPI(String url, CloseableHttpClient httpClient) {
         this.baseURL = url;
         this.httpClient = httpClient;
+
+        ILeaderboardFactory factory1;
+        try {
+           factory1 = new LeaderboardFactory(url, httpClient);
+        } catch (WeaveException e) {
+            factory1 = new LeaderboardFactoryDummy();
+        }
+        this.factory = factory1;
     }
 
     /**
@@ -52,11 +62,14 @@ public class LeaderboardAPI {
         if (entries.size() != 200) {
             return Result.Err(new WeaveException("entries set must contain exactly 200 entries."));
         }
+        if (!game.active()) {
+            return Result.Err(new WeaveException("Game is not active, cannot submit"));
+        }
 
         JsonObject main = new JsonObject();
         main.addProperty("uuid", uuid.toString());
         main.addProperty("unix_time_stamp", System.currentTimeMillis());
-        main.addProperty("game", game.getString());
+        main.addProperty("game", game.displayName());
         JsonArray cachedEntries = new JsonArray(200);
         for (LeaderboardRow entry : entries) {
             cachedEntries.add(entry.getAsJsonElement());
@@ -100,7 +113,7 @@ public class LeaderboardAPI {
         for (JsonElement el : array) {
             JsonObject row = el.getAsJsonObject();
             rows.add(new LeaderboardRow(
-                    Leaderboard.stringToLeaderboard(row.get("game").getAsString()),
+                    factory.getLeaderboard(row.get("game").getAsString()),
                     row.get("player").getAsString(),
                     row.get("position").getAsInt(),
                     row.get("score").getAsInt(),
@@ -148,7 +161,7 @@ public class LeaderboardAPI {
             return Result.Err(new WeaveException("Upper bound must be higher than the lower bound"));
         }
         String url = String.format("%s/leaderboard_api/leaderboard/%s/bounded?lower=%d&upper=%d", baseURL,
-                game.getString().replace(" ", "%20"), low, up);
+                game.displayName().replace(" ", "%20"), low, up);
         Result<JsonArray, WeaveException> result = Utils.tryContentStringWithJsonEncoding(url, httpClient);
         if (result.isErr()) {
             return Result.Err(result.getError());
@@ -157,83 +170,15 @@ public class LeaderboardAPI {
     }
 
     /**
-     * Avaiable leaderboards
+     * Tries getting the Leaderboard class for a game
+     * @param game Can be the display name, name or an alias
+     * @return Leaderboard or Error wrapped in Result
      */
-    public enum Leaderboard {
-        /**
-         * In use
-         */
-        TEAM_EGGWARS("Team EggWars"),
-        /**
-         * Not updated. Will return no rows
-         */
-        TEAM_EGGWARS_SEASON_2("Team EggWars Season 2"),
-        /**
-         * In use
-         */
-        SOLO_LUCKYISLANDS("Lucky Islands"),
-        /**
-         * In use
-         */
-        SOLO_SKYWARS("Solo SkyWars"),
-        /**
-         * In use
-         */
-        FFA("Free For All"),
-        /**
-         * For completion
-         */
-        NONE(""),
-        /**
-         * In use
-         */
-        PARKOUR("Parkour");
-
-
-        private final String string;
-
-        Leaderboard(String s) {
-            this.string = s;
+    public Result<Leaderboard, WeaveException> getLeaderboard(String game) {
+        Leaderboard lb = factory.getLeaderboard(game);
+        if (lb == null) {
+            return Result.Err(new WeaveException("Leaderboard not found"));
         }
-
-        /**
-         * /**
-         * Tries converting to a leaderboard
-         *
-         * @param s String to try on
-         * @return Leaderboard (NONE if none found)
-         */
-        public static Leaderboard stringToLeaderboard(String s) {
-            switch (s.toLowerCase()) {
-                case "team eggwars", "eggwars", "tew", "ew" -> {
-                    return Leaderboard.TEAM_EGGWARS;
-                }
-                case "eggwars season 2", "ew2", "tew2" -> {
-                    return Leaderboard.TEAM_EGGWARS_SEASON_2;
-                }
-                case "solo skywars", "skywars", "sw" -> {
-                    return Leaderboard.SOLO_SKYWARS;
-                }
-                case "lucky islands", "li" -> {
-                    return Leaderboard.SOLO_LUCKYISLANDS;
-                }
-                case "free for all", "ffa" -> {
-                    return Leaderboard.FFA;
-                }
-                case "parkour" -> {
-                    return Leaderboard.PARKOUR;
-                }
-                default -> {
-                    return Leaderboard.NONE;
-                }
-            }
-        }
-
-        /**
-         * @return Properly formatted String
-         */
-        public String getString() {
-            return string;
-        }
+        return Result.Ok(lb);
     }
 }

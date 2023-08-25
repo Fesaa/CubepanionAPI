@@ -1,10 +1,11 @@
 package art.ameliah.libs.weave;
 
-import art.ameliah.libs.weave.leaderboard.LeaderboardAPI;
-import art.ameliah.libs.weave.leaderboard.LeaderboardAPI.Leaderboard;
+import art.ameliah.libs.weave.leaderboard.Leaderboard;
 import art.ameliah.libs.weave.leaderboard.LeaderboardRow;
 import org.junit.jupiter.api.Test;
 
+import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -15,11 +16,11 @@ public class WeaveTest {
 
     private final Weave weave;
 
-    public WeaveTest() {
+    public WeaveTest() throws WeaveException, MalformedURLException {
         if (System.getProperty("test.prod").equals("true")) {
             weave = Weave.Production();
         } else {
-            weave = Weave.Dev();
+            weave = Weave.Dev(7070);
         }
 
     }
@@ -49,7 +50,7 @@ public class WeaveTest {
     private <T> boolean booleanSupplier(T[] result, T[] expected, BiFunction<T, List<T>, Boolean> checker) {
         for (T exp : expected) {
             if (!checker.apply(exp, List.of(result))) {
-                fail(String.format("Could not find expected element (%s) in array.", exp));
+                fail(String.format("Could not find expected element (%s) in array (%s).", exp, Arrays.toString(result)));
                 return false;
             }
         }
@@ -71,11 +72,13 @@ public class WeaveTest {
 
     @Test
     void testLeaderboardAPILeaderboardRowGameGetters() {
-        LeaderboardRow[] result = weave.getLeaderboardAPI().getGameLeaderboard(Leaderboard.TEAM_EGGWARS)
+        Leaderboard ew = weave.getLeaderboardAPI().getLeaderboard("ew").unwrap();
+        Leaderboard parkour = weave.getLeaderboardAPI().getLeaderboard("parkour").unwrap();
+        LeaderboardRow[] result = weave.getLeaderboardAPI().getGameLeaderboard(ew)
                 .unwrap_or_default(() -> new LeaderboardRow[0]);
         LeaderboardRow[] expected = new LeaderboardRow[]{
-                new LeaderboardRow(Leaderboard.TEAM_EGGWARS, "Mivke", 1, 31000, 0),
-                new LeaderboardRow(Leaderboard.TEAM_EGGWARS, "Fesa", 11, 0, 0),
+                new LeaderboardRow(ew, "Mivke", 1, 31000, 0),
+                new LeaderboardRow(ew, "Fesa", 11, 0, 0),
         };
         assertTrue(booleanSupplier(result, expected, (exp, results) -> {
             for (LeaderboardRow res : results) {
@@ -93,12 +96,12 @@ public class WeaveTest {
         LeaderboardRow[] result2 = weave.getLeaderboardAPI().getLeaderboardsForPlayer("Mivke")
                 .unwrap_or_default(() -> new LeaderboardRow[0]);
         LeaderboardRow[] expected2 = new LeaderboardRow[]{
-                new LeaderboardRow(Leaderboard.TEAM_EGGWARS, "Mivke", 1, 31000, 0),
-                new LeaderboardRow(Leaderboard.PARKOUR, "Mivke", 12, 2277, 0),
+                new LeaderboardRow(ew, "Mivke", 1, 31000, 0),
+                new LeaderboardRow(parkour, "Mivke", 14, 2277, 0),
         };
         assertTrue(booleanSupplier(result2, expected2, (exp, results) -> {
             for (LeaderboardRow res : results) {
-                if (res.game().equals(exp.game())
+                if (res.game().name().equals(exp.game().name())
                         && res.player().equals(exp.player())
                         && res.position() == exp.position()
                         && (res.score() == exp.score() || exp.score() == 0)

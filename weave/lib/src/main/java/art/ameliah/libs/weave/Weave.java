@@ -26,7 +26,6 @@ public class Weave {
 
     /**
      * Setup API in prod env
-     *
      * @return Weave
      */
     public static Weave Production() {

@@ -12,10 +12,10 @@ import com.google.gson.JsonObject;
  * @param score    int
  * @param unix     submission unix time stamp
  */
-public record LeaderboardRow(LeaderboardAPI.Leaderboard game, String player, int position, int score, int unix) {
+public record LeaderboardRow(Leaderboard game, String player, int position, int score, int unix) {
     JsonElement getAsJsonElement() {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("game", game.getString());
+        jsonObject.addProperty("game", game.displayName());
         jsonObject.addProperty("player", player);
         jsonObject.addProperty("position", position);
         jsonObject.addProperty("score", score);

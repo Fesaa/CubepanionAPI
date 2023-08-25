@@ -33,4 +33,8 @@ public class WeaveException extends Exception {
         super(cause);
     }
 
+    public static WeaveException fromResult(Result<?, WeaveException> result) {
+        return new WeaveException(result.getError().getMessage(), result.getError());
+    }
+
 }
