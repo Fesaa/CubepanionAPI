@@ -20,7 +20,7 @@ public class WeaveTest {
         if (System.getProperty("test.prod").equals("true")) {
             weave = Weave.Production();
         } else {
-            weave = Weave.Dev(7070);
+            weave = Weave.Dev(7070, false);
         }
 
     }

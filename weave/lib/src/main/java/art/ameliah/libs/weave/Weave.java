@@ -16,8 +16,16 @@ public class Weave {
     private final ChestAPI chestAPI;
     private final EggWarsMapAPI eggWarsMapAPI;
 
-    private Weave(String domain, int port) throws MalformedURLException {
-        String baseURL = (new URL(String.format("http://%s:%d", domain, port))).toString();
+    private Weave(String domain, int port, boolean ssl) throws MalformedURLException {
+        String baseURL = (new URL(String.format("http%s://%s:%d", ssl ? "s": "", domain, port))).toString();
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        leaderboardAPI = new LeaderboardAPI(baseURL, httpClient);
+        chestAPI = new ChestAPI(baseURL, httpClient);
+        eggWarsMapAPI = new EggWarsMapAPI(baseURL, httpClient);
+    }
+
+    private Weave(String domain, boolean ssl) throws MalformedURLException {
+        String baseURL = (new URL(String.format("http%s://%s:", ssl ? "s": "", domain))).toString();
         CloseableHttpClient httpClient = HttpClients.createDefault();
         leaderboardAPI = new LeaderboardAPI(baseURL, httpClient);
         chestAPI = new ChestAPI(baseURL, httpClient);
@@ -30,7 +38,7 @@ public class Weave {
      */
     public static Weave Production() {
         try {
-            return new Weave("ameliah.art", 7070);
+            return new Weave("ameliah.art/cubepanion_api", true);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -41,9 +49,9 @@ public class Weave {
      *
      * @return Weave
      */
-    public static Weave Dev() {
+    public static Weave Dev(boolean ssl) {
         try {
-            return new Weave("127.0.0.1", 8080);
+            return new Weave("127.0.0.1", 8080, ssl);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -56,8 +64,8 @@ public class Weave {
      * @return Weave
      * @throws MalformedURLException Could not construct API-url
      */
-    public static Weave Dev(int port) throws MalformedURLException {
-        return new Weave("127.0.0.1", port);
+    public static Weave Dev(int port, boolean ssl) throws MalformedURLException {
+        return new Weave("127.0.0.1", port, ssl);
     }
 
     /**
@@ -68,8 +76,8 @@ public class Weave {
      * @return Weave
      * @throws MalformedURLException Could not construct API-url
      */
-    public static Weave Dev(String domain, int port) throws MalformedURLException {
-        return new Weave(domain, port);
+    public static Weave Dev(String domain, int port, boolean ssl) throws MalformedURLException {
+        return new Weave(domain, port, ssl);
     }
 
     /**
