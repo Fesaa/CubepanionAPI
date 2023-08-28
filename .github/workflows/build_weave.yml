@@ -20,7 +20,7 @@ jobs:
           java-version: '17'
 
       - name: Build with Gradle
-        run: cd weave && chmod +x ./gradlew && ./gradlew build -Dtest.prod=true --stacktrace
+        run: cd weave && chmod +x ./gradlew && ./gradlew build --stacktrace
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
