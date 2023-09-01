@@ -36,7 +36,8 @@ use super::leaderboard_api::{models::LeaderboardSubmission, routes::submission, 
             name = "Amelia",
             url = "https://github.com/Fesaa/CubepanionAPI"
         ),
-        version = "1.0.0"
+        version = "1.0.0",
+        servers(url="/cubepanion_api")
     )
 
 )]
