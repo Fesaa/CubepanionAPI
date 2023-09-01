@@ -25,7 +25,7 @@ public class Weave {
     }
 
     private Weave(String domain, boolean ssl) throws MalformedURLException {
-        String baseURL = (new URL(String.format("http%s://%s:", ssl ? "s": "", domain))).toString();
+        String baseURL = (new URL(String.format("http%s://%s", ssl ? "s": "", domain))).toString();
         CloseableHttpClient httpClient = HttpClients.createDefault();
         leaderboardAPI = new LeaderboardAPI(baseURL, httpClient);
         chestAPI = new ChestAPI(baseURL, httpClient);
