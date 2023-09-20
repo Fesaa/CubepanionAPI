@@ -1,8 +1,7 @@
 package art.ameliah.libs.weave;
 
-import art.ameliah.libs.weave.leaderboard.LeaderboardAPI;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Dsl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,16 +16,16 @@ public class Weave {
     private final EggWarsMapAPI eggWarsMapAPI;
 
     private Weave(String domain, int port, boolean ssl) throws MalformedURLException {
-        String baseURL = (new URL(String.format("http%s://%s:%d", ssl ? "s": "", domain, port))).toString();
-        CloseableHttpClient httpClient = HttpClients.createDefault();
+        String baseURL = (new URL(String.format("http%s://%s:%d", ssl ? "s" : "", domain, port))).toString();
+        AsyncHttpClient httpClient = Dsl.asyncHttpClient();
         leaderboardAPI = new LeaderboardAPI(baseURL, httpClient);
         chestAPI = new ChestAPI(baseURL, httpClient);
         eggWarsMapAPI = new EggWarsMapAPI(baseURL, httpClient);
     }
 
     private Weave(String domain, boolean ssl) throws MalformedURLException {
-        String baseURL = (new URL(String.format("http%s://%s", ssl ? "s": "", domain))).toString();
-        CloseableHttpClient httpClient = HttpClients.createDefault();
+        String baseURL = (new URL(String.format("http%s://%s", ssl ? "s" : "", domain))).toString();
+        AsyncHttpClient httpClient = Dsl.asyncHttpClient();
         leaderboardAPI = new LeaderboardAPI(baseURL, httpClient);
         chestAPI = new ChestAPI(baseURL, httpClient);
         eggWarsMapAPI = new EggWarsMapAPI(baseURL, httpClient);
@@ -34,6 +33,7 @@ public class Weave {
 
     /**
      * Setup API in prod env
+     *
      * @return Weave
      */
     public static Weave Production() {
@@ -47,6 +47,7 @@ public class Weave {
     /**
      * Setup API for the default dev env (http://127.0.0.1:8080)
      *
+     * @param ssl if ssl is enabled
      * @return Weave
      */
     public static Weave Dev(boolean ssl) {
@@ -61,6 +62,7 @@ public class Weave {
      * Setup API in dev env with custom port
      *
      * @param port custom port
+     * @param ssl  if ssl is enabled
      * @return Weave
      * @throws MalformedURLException Could not construct API-url
      */
@@ -73,6 +75,7 @@ public class Weave {
      *
      * @param domain custom domain
      * @param port   custom port
+     * @param ssl    if ssl is enabled
      * @return Weave
      * @throws MalformedURLException Could not construct API-url
      */

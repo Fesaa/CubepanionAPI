@@ -1,12 +1,10 @@
 package art.ameliah.libs.weave;
 
-import com.google.gson.*;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.asynchttpclient.AsyncHttpClient;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import static art.ameliah.libs.weave.Utils.tryContentStringWithJsonEncoding;
+import static art.ameliah.libs.weave.Utils.makeRequest;
 
 /**
  * Interaction class for ChestAPI
@@ -14,14 +12,14 @@ import static art.ameliah.libs.weave.Utils.tryContentStringWithJsonEncoding;
 public class ChestAPI {
 
     private final String baseURL;
-    private final CloseableHttpClient httpClient;
+    private final AsyncHttpClient httpClient;
 
 
     /**
      * @param url        base API url
      * @param httpClient connection client
      */
-    protected ChestAPI(String url, CloseableHttpClient httpClient) {
+    protected ChestAPI(String url, AsyncHttpClient httpClient) {
         this.baseURL = url;
         this.httpClient = httpClient;
     }
@@ -31,25 +29,9 @@ public class ChestAPI {
      *
      * @return Array of ChestLocation's
      */
-    public Result<ChestLocation[], WeaveException> getCurrentChestLocations() {
-        Result<JsonArray, WeaveException> result = tryContentStringWithJsonEncoding(baseURL + "/chest_api/current", httpClient);
-        if (result.isErr()) {
-            return Result.Err(result.getError());
-        }
-        JsonArray array = result.getValue();
-
-        List<ChestLocation> locs = new ArrayList<>();
-
-        for (JsonElement el : array) {
-            JsonObject chestLocation = el.getAsJsonObject();
-            locs.add(new ChestLocation(
-                    chestLocation.get("season_name").getAsString(),
-                    chestLocation.get("x").getAsInt(),
-                    chestLocation.get("y").getAsInt(),
-                    chestLocation.get("z").getAsInt()
-            ));
-        }
-        return Result.Ok(locs.toArray(new ChestLocation[0]));
+    public CompletableFuture<ChestLocation[]> getCurrentChestLocations() {
+        String url = baseURL + "/chest_api/current";
+        return makeRequest(httpClient, url, ChestLocation[].class);
     }
 
     /**
@@ -58,19 +40,9 @@ public class ChestAPI {
      * @param season The Season the request the chests for
      * @return Array of ChestLocation's
      */
-    public Result<ChestLocation[], WeaveException> getChestLocationsForSeason(String season) {
+    public CompletableFuture<ChestLocation[]> getChestLocationsForSeason(String season) {
         String url = baseURL + "/chest_api/season/" + season;
-        Result<JsonArray, WeaveException> result = tryContentStringWithJsonEncoding(url, httpClient);
-        if (result.isErr()) {
-            return Result.Err(result.getError());
-        }
-        JsonArray array = result.getValue();
-
-        try {
-            return Result.Ok(new Gson().fromJson(array, ChestLocation[].class));
-        } catch (JsonSyntaxException e) {
-            return Result.Err(new WeaveException("Could not construct ChestLocation[]", e));
-        }
+        return makeRequest(httpClient, url, ChestLocation[].class);
     }
 
     /**
@@ -78,7 +50,7 @@ public class ChestAPI {
      *
      * @return Array of seasons (String)
      */
-    public Result<String[], WeaveException> getSeasons() {
+    public CompletableFuture<String[]> getSeasons() {
         return getSeasons(SeasonType.ALL);
     }
 
@@ -88,19 +60,9 @@ public class ChestAPI {
      * @param seasonType Request type
      * @return Array of seasons (String)
      */
-    public Result<String[], WeaveException> getSeasons(SeasonType seasonType) {
+    public CompletableFuture<String[]> getSeasons(SeasonType seasonType) {
         String url = baseURL + "/chest_api/seasons/" + seasonType.bool();
-        Result<JsonArray, WeaveException> result = tryContentStringWithJsonEncoding(url, httpClient);
-        if (result.isErr()) {
-            return Result.Err(result.getError());
-        }
-        JsonArray array = result.getValue();
-
-        try {
-            return Result.Ok(new Gson().fromJson(array, String[].class));
-        } catch (JsonSyntaxException e) {
-            return Result.Err(new WeaveException("Could not construct String[]", e));
-        }
+        return makeRequest(httpClient, url, String[].class);
     }
 
     /**

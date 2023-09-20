@@ -5,31 +5,20 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/8.2.1/userguide/building_java_projects.html in the Gradle documentation.
  */
 
-version = "0.1.0"
+version = "0.2.0"
 
 
 plugins {
-    // Apply the java-library plugin for API and implementation separation.
     `java-library`
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
-
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api("org.apache.commons:commons-math3:3.6.1")
-
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation("com.google.guava:guava:31.1-jre")
-    implementation("org.apache.httpcomponents:httpclient:4.5.13")
+    implementation("org.asynchttpclient:async-http-client:3.0.0.Beta2")
     implementation("com.google.code.gson:gson:2.8.9")
 }
 
@@ -39,12 +28,6 @@ java {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
     withJavadocJar()
-}
-
-tasks.named<Test>("test") {
-    // Use JUnit Platform for unit tests.
-    systemProperty("test.prod", System.getProperty("test.prod"))
-    useJUnitPlatform()
 }
 
 tasks.register<Javadoc>("generateJavadoc") {
