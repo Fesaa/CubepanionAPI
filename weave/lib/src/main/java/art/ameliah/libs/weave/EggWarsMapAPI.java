@@ -50,7 +50,7 @@ public class EggWarsMapAPI {
      * EggWars map
      */
     public record EggWarsMap(String unique_name, String map_name, String layout, int team_size, int build_limit,
-                             String colour, Generator[] generators) {
+                             String colours, Generator[] generators) {
     }
 
     /**
