@@ -175,6 +175,16 @@ public class LeaderboardAPI {
     }
 
     /**
+     * Get all leaderboards with their associated aliases
+     * @return Hashmap
+     */
+    public HashMap<Leaderboard, Set<String>> getAliases() {
+        HashMap<Leaderboard, Set<String>> aliasesMap = new HashMap<>(this.converter.values().size());
+        this.converter.forEach((key, value) -> aliasesMap.computeIfAbsent(value, k -> new HashSet<>()).add(key));
+        return aliasesMap;
+    }
+
+    /**
      * @param name        internal name
      * @param displayName display name
      * @param active      if the leaderboard is active (and can be submitted to)
