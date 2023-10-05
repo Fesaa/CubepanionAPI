@@ -12,11 +12,6 @@ Created as backend to make [Cubepanion](https://github.com/Fesaa/Cubepanion) mor
 The API is freely available on `https://ameliah.art/cubepanion_api/`, with a high rate limit. Documentation can be found [here](https://ameliah.art/cubepanion_api/rapidoc)
 
 
-## Weave
-A java library is available, with no internal thrown errors 🙌, with [docs](https://fesaa.github.io/CubepanionAPI) and [example](https://github.com/Fesaa/Cubepanion) usage.
-
-Other languages may be made if I I'm bored enough for.
-
 # Contribution & Bugs
 Always welcome to open an issue or fix the bug yourself and opening a pull request. For features, please first open a ticket or contact me on discord (ameliahh)
 
