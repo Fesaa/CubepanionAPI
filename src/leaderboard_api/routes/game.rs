@@ -4,6 +4,10 @@ use serde::Deserialize;
 use utoipa::{ToSchema, IntoParams};
 use crate::{API, database::leaderboard::messages::{FetchLeaderboardForGame, GetGames}};
 
+const GAME: &'static str = "[GET] LB game";
+const BOUNDED_GAME: &'static str = "[GET] LB game - bounded";
+const GAMES: &'static str = "[GET] LB games";
+
 /// Get all LeaderboardRow for a game
 #[utoipa::path(
     get,
@@ -23,7 +27,7 @@ pub async fn get_leaderboard(state: Data<API>, path: Path<String>) -> impl Respo
     if !state.username_regex.is_match(&game) {
         return HttpResponse::BadRequest().body(String::from("Invalid name <") + &game + ">")
     }
-    match state.db.send(FetchLeaderboardForGame{game_name: game, max: 200, min: 1}).await {
+    match state.db.send(FetchLeaderboardForGame{game_name: game, max: 200, min: 1}, GAME).await {
         Ok(Ok(leaderboards)) => HttpResponse::Ok().json(leaderboards),
         Ok(Err(err)) => match err {
             NotFound => HttpResponse::NotFound().body("No leaderboards found"),
@@ -59,7 +63,7 @@ pub async fn get_leaderboard_between(state: Data<API>, path: Path<String>, info:
     if !state.username_regex.is_match(&game) {
         return HttpResponse::BadRequest().body(String::from("Invalid name <") + &game + ">")
     }
-    match state.db.send(FetchLeaderboardForGame{game_name: game, max: info.upper, min: info.lower}).await {
+    match state.db.send(FetchLeaderboardForGame{game_name: game, max: info.upper, min: info.lower}, BOUNDED_GAME).await {
         Ok(Ok(leaderboards)) => HttpResponse::Ok().json(leaderboards),
         Ok(Err(err)) => match err {
             NotFound => HttpResponse::NotFound().body("No leaderboards found"),
@@ -85,7 +89,7 @@ pub async fn get_leaderboard_between(state: Data<API>, path: Path<String>, info:
 #[get("/leaderboard_api/games/{active}")]
 pub async fn get_games(state: Data<API>, path: Path<bool>) -> impl Responder {
     let active = path.into_inner();
-    match state.db.send(GetGames{must_be_active: active}).await {
+    match state.db.send(GetGames{must_be_active: active}, GAMES).await {
         Ok(Ok(games)) => HttpResponse::Ok().json(games),
         Ok(Err(err)) => match err {
             NotFound => HttpResponse::NotFound().body("No games found"),

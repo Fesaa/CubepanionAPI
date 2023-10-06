@@ -3,6 +3,10 @@ use diesel::result::Error::NotFound;
 
 use crate::database::{API, chests::messages::{FetchChestLocationsForRunningSeason, FetchChestLocationsForSeason, FetchSeasons}};
 
+const CHESTS: &'static str = "[GET] Chests";
+const CHESTS_SEASON: &'static str = "[GET] Chests - season";
+const SEASONS: &'static str = "[GET] Seasons";
+
 /// Get all current ChestLocations
 #[utoipa::path(
     get,
@@ -14,7 +18,7 @@ use crate::database::{API, chests::messages::{FetchChestLocationsForRunningSeaso
 )]
 #[get("/chest_api/current")]
 pub async fn get_current_chests(state: Data<API>) -> impl Responder {
-    match state.db.send(FetchChestLocationsForRunningSeason{}).await {
+    match state.db.send(FetchChestLocationsForRunningSeason{}, CHESTS).await {
         Ok(Ok(chests)) => HttpResponse::Ok().json(chests),
         Ok(Err(err)) => match err {
             NotFound => HttpResponse::NotFound().body("No chests found for the current season"),
@@ -38,7 +42,7 @@ pub async fn get_current_chests(state: Data<API>) -> impl Responder {
 )]
 #[get("/chest_api/season/{season}")]
 pub async fn get_season_chests(state: Data<API>, path: Path<String>) -> impl Responder {
-    match state.db.send(FetchChestLocationsForSeason{season: path.into_inner()}).await {
+    match state.db.send(FetchChestLocationsForSeason{season: path.into_inner()}, CHESTS_SEASON).await {
         Ok(Ok(chests)) => HttpResponse::Ok().json(chests),
         Ok(Err(err)) => match err {
             NotFound => HttpResponse::NotFound().body("No chests found for that season"),
@@ -63,7 +67,7 @@ pub async fn get_season_chests(state: Data<API>, path: Path<String>) -> impl Res
 )]
 #[get("/chest_api/seasons/{running}")]
 pub async fn get_seasons(state: Data<API>, path: Path<bool>) -> impl Responder {
-    match state.db.send(FetchSeasons{running: path.into_inner()}).await {
+    match state.db.send(FetchSeasons{running: path.into_inner()}, SEASONS).await {
         Ok(Ok(seasons)) => HttpResponse::Ok().json(seasons),
         Ok(Err(err)) => match err {
             NotFound => HttpResponse::NotFound().body("No seasons found"),

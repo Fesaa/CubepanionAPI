@@ -3,6 +3,9 @@ use uuid::Uuid;
 
 use crate::{API, leaderboard_api::models::LeaderboardSubmission, database::{schema::{LeaderboardRow, SubmissionRow}, leaderboard::messages::{InsertLeaderboardRows, InsertSubmission, DisableSubmission}}};
 
+const SUBMISSION: &'static str = "[POST] LB Submission";
+const SUBMISSION_FAILED: &'static str = "[POST] LB Submission - failed";
+
 pub fn is_valid_uuid(uuid_string: &str) -> bool {
     match Uuid::parse_str(uuid_string) {
         Ok(_) => true,
@@ -35,16 +38,16 @@ pub async fn submit_leaderboard_entries(state: Data<API>, body: Json<Leaderboard
         .map(|entry| LeaderboardRow::from_entry(entry, body.unix_time_stamp))
         .collect::<Vec<LeaderboardRow>>();
 
-        match state.db.send(InsertSubmission{sub: SubmissionRow{uuid: body.uuid.clone(), game: body.game.clone(), valid: true, unix_time_stamp: body.unix_time_stamp}}).await {
+        match state.db.send(InsertSubmission{sub: SubmissionRow{uuid: body.uuid.clone(), game: body.game.clone(), valid: true, unix_time_stamp: body.unix_time_stamp}}, SUBMISSION).await {
             Ok(Ok(_)) => (),
             Ok(Err(err)) => return HttpResponse::InternalServerError().body(format!("Submission insert didn't go through, won't be queried: {}", err)),
             _ => return HttpResponse::InternalServerError().body("Cannot process request"),
         };
 
-    match state.db.send(InsertLeaderboardRows {rows: rows}).await {
+    match state.db.send(InsertLeaderboardRows {rows: rows}, SUBMISSION).await {
         Ok(Ok(_)) => HttpResponse::Accepted().body("Success"),
         Ok(Err(err)) => {
-            match state.db.send(DisableSubmission{unix: body.unix_time_stamp}).await {
+            match state.db.send(DisableSubmission{unix: body.unix_time_stamp}, SUBMISSION_FAILED).await {
                 Ok(Ok(_)) => (),
                 Ok(Err(err)) => return HttpResponse::InternalServerError().body(format!("Could not disable submission. We're in a bad sate! Error: {}", err)),
                 _ => return HttpResponse::InternalServerError().body("Cannot process request"),

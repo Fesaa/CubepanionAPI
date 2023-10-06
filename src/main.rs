@@ -1,7 +1,10 @@
 use std::time::Duration;
 
-use actix_extensible_rate_limit::{backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder}, RateLimiter};
-use actix_web::{web::Data, App, HttpServer, middleware::Logger, Responder, HttpResponse, get};
+use actix_extensible_rate_limit::{
+    backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder},
+    RateLimiter,
+};
+use actix_web::{get, middleware::Logger, web::Data, App, HttpResponse, HttpServer, Responder};
 use config::APIConfig;
 use database::API;
 
@@ -9,15 +12,16 @@ use docs::ApiDoc;
 use utoipa::OpenApi;
 use utoipa_rapidoc::RapiDoc;
 
-#[macro_use] extern crate diesel;
+#[macro_use]
+extern crate diesel;
 
-mod leaderboard_api;
 mod chest_api;
-mod eggwars_map_api;
-mod database;
 mod config;
+mod database;
 mod docs;
-
+mod eggwars_map_api;
+mod leaderboard_api;
+mod prometheus;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -26,6 +30,12 @@ async fn hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> Result<(), std::io::Error> {
+
+    let metrics = prometheus::setup_metrics().await;
+    if let Err(e) = metrics {
+        panic!("{}", e)
+    }
+
     let config = match APIConfig::from_file(String::from("config.toml")) {
         Ok(config) => config,
         Err(e) => panic!("Couldn't make config: {}", e),
@@ -42,21 +52,24 @@ async fn main() -> Result<(), std::io::Error> {
             .add_headers()
             .build();
         App::new()
-        .wrap(middleware)
-        .wrap(Logger::default())
-        .app_data(Data::new(API::new(&config)))
-        .service(RapiDoc::with_openapi("/api-docs/openapi.json", ApiDoc::openapi()).path("/rapidoc"))
-        .service(hello)
-        .service(leaderboard_api::routes::submission::submit_leaderboard_entries)
-        .service(leaderboard_api::routes::player::get_leaderboards_from_player)
-        .service(leaderboard_api::routes::game::get_leaderboard)
-        .service(leaderboard_api::routes::game::get_leaderboard_between)
-        .service(leaderboard_api::routes::game::get_games)
-        .service(chest_api::get_current_chests)
-        .service(chest_api::get_season_chests)
-        .service(chest_api::get_seasons)
-        .service(eggwars_map_api::get_all_eggwars_maps)
-        .service(eggwars_map_api::get_eggwars_map)
+            .wrap(middleware)
+            .wrap(Logger::default())
+            .app_data(Data::new(API::new(&config)))
+            .service(
+                RapiDoc::with_openapi("/api-docs/openapi.json", ApiDoc::openapi()).path("/rapidoc"),
+            )
+            .service(hello)
+            .service(leaderboard_api::routes::submission::submit_leaderboard_entries)
+            .service(leaderboard_api::routes::player::get_leaderboards_from_player)
+            .service(leaderboard_api::routes::game::get_leaderboard)
+            .service(leaderboard_api::routes::game::get_leaderboard_between)
+            .service(leaderboard_api::routes::game::get_games)
+            .service(chest_api::get_current_chests)
+            .service(chest_api::get_season_chests)
+            .service(chest_api::get_seasons)
+            .service(eggwars_map_api::get_all_eggwars_maps)
+            .service(eggwars_map_api::get_eggwars_map)
+            .service(prometheus::get_metrics)
     })
     .bind((config_clone.address, config_clone.port))?
     .run()
