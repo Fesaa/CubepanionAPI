@@ -19,7 +19,7 @@ impl Handler<FetchLeaderboardFromPlayer> for DbActor {
         msg: FetchLeaderboardFromPlayer,
         _ctx: &mut Self::Context,
     ) -> Self::Result {
-        use crate::database::schema::leaderboards::dsl::{leaderboards, player, position};
+        use crate::database::schema::leaderboards::dsl::{leaderboards, position};
         use crate::database::schema::submissions::dsl as s;
         use diesel::dsl::max;
 
@@ -41,7 +41,7 @@ impl Handler<FetchLeaderboardFromPlayer> for DbActor {
             .join(",");
 
         leaderboards
-            .filter(player.eq(msg.player_name))
+            .filter(sql::<Bool>(&format!("UPPER(player) = UPPER('{}')", msg.player_name)))
             .filter(sql::<Bool>(&format!(
                 "({}, {}) IN ({})",
                 "game", "unix_time_stamp", s
