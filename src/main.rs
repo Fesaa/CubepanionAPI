@@ -30,7 +30,6 @@ async fn hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> Result<(), std::io::Error> {
-
     let metrics = prometheus::setup_metrics().await;
     if let Err(e) = metrics {
         panic!("{}", e)

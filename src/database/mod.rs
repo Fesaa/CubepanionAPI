@@ -32,16 +32,16 @@ impl <A: Actor> Holder<A> {
         A: Handler<M>,
         A::Context: ToEnvelope<A, M>,
     {
-        counter!("total_requests", 1, "endpoint" => endpoint.clone());
+        counter!("total_requests", 1, "endpoint" => endpoint);
 
         let start = Instant::now();
         let response:Result<M::Result, MailboxError> = self.addr.send(msg).await;
         let delta = start.elapsed();
-        histogram!("request_duration", delta, "endpoint" => endpoint.clone());
+        histogram!("request_duration", delta, "endpoint" => endpoint);
         
         return match response {
             Ok(r) => {
-                counter!("success_requests", 1, "endpoint" => endpoint.clone());
+                counter!("success_requests", 1, "endpoint" => endpoint);
                 Ok(r)
             },
             Err(e) => Err(e),
