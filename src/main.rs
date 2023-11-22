@@ -4,7 +4,12 @@ use actix_extensible_rate_limit::{
     backend::{memory::InMemoryBackend, SimpleInputFunctionBuilder},
     RateLimiter,
 };
-use actix_web::{get, middleware::Logger, web::Data, App, HttpResponse, HttpServer, Responder};
+use actix_web::{
+    get,
+    middleware::Logger,
+    web::{self, Data},
+    App, HttpResponse, HttpServer, Responder,
+};
 use config::APIConfig;
 use database::API;
 
@@ -25,7 +30,11 @@ mod prometheus;
 
 #[get("/")]
 async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Amelia loves you very much <3 <3")
+    HttpResponse::Ok().body("Amelia loves you <3")
+}
+
+async fn not_found() -> impl Responder {
+    HttpResponse::NotFound().body("404 Not Found")
 }
 
 #[actix_web::main]
@@ -69,6 +78,7 @@ async fn main() -> Result<(), std::io::Error> {
             .service(eggwars_map_api::get_all_eggwars_maps)
             .service(eggwars_map_api::get_eggwars_map)
             .service(prometheus::get_metrics)
+            .default_service(web::route().to(not_found))
     })
     .bind((config_clone.address, config_clone.port))?
     .run()
