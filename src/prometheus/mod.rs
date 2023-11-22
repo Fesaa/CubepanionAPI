@@ -7,7 +7,7 @@ pub async fn setup_metrics() -> Result<Recorder, Box<dyn std::error::Error>> {
 
     register_counter!("total_requests", "endpoint" => "");
     register_counter!("success_requests", "endpoint" => "");
-    register_counter!("lb-submissions", "game" => "");
+    register_counter!("lb_submissions", "game" => "");
     register_histogram!("request_duration", "endpoint" => "");
 
     return Ok(recorder);

@@ -87,7 +87,7 @@ pub async fn submit_leaderboard_entries(
         .await
     {
         Ok(Ok(_)) => {
-            counter!("lb-submissions", 1, "game" => body.game.clone());
+            counter!("lb_submissions", 1, "game" => body.game.clone());
             HttpResponse::Accepted().body("Success")
         }
         Ok(Err(err)) => {
@@ -115,4 +115,3 @@ pub async fn submit_leaderboard_entries(
         _ => HttpResponse::InternalServerError().body("Cannot process request"),
     }
 }
-
