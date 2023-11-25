@@ -39,6 +39,9 @@ async fn not_found() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> Result<(), std::io::Error> {
+    std::env::set_var("RUST_LOG", "actix_web=debug");
+    env_logger::init();
+
     let metrics = prometheus::setup_metrics().await;
     if let Err(e) = metrics {
         panic!("{}", e)
