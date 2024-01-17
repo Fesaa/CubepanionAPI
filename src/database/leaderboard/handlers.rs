@@ -41,7 +41,10 @@ impl Handler<FetchLeaderboardFromPlayer> for DbActor {
             .join(",");
 
         leaderboards
-            .filter(sql::<Bool>(&format!("UPPER(player) = UPPER('{}')", msg.player_name)))
+            .filter(sql::<Bool>(&format!(
+                "UPPER(player) = UPPER('{}')",
+                msg.player_name
+            )))
             .filter(sql::<Bool>(&format!(
                 "({}, {}) IN ({})",
                 "game", "unix_time_stamp", s
@@ -55,6 +58,7 @@ impl Handler<FetchLeaderboardForGame> for DbActor {
     type Result = QueryResult<Vec<LeaderboardRow>>;
 
     fn handle(&mut self, msg: FetchLeaderboardForGame, _ctx: &mut Self::Context) -> Self::Result {
+        use crate::database::schema::games::dsl as g;
         use crate::database::schema::leaderboards::dsl::{
             game, leaderboards, position, unix_time_stamp,
         };
@@ -66,15 +70,32 @@ impl Handler<FetchLeaderboardForGame> for DbActor {
             .get()
             .expect("Fetch Leaderboard For Game: Unable to establish connection");
 
+        if msg.game_name.contains(',') {
+            return Err(diesel::result::Error::QueryBuilderError(
+                "Game name cannot contain commas".into(),
+            ));
+        }
+
+        let game_name = g::games
+            .filter(g::game.eq(&msg.game_name))
+            .or_filter(sql::<Bool>(&format!(
+                "'{}' IN (SELECT unnest(string_to_array(aliases, ',')))",
+                msg.game_name
+            )))
+            .select(g::display_name)
+            .first::<String>(&mut con)
+            .unwrap_or(msg.game_name);
+
         let max_unix: i64 = s::submissions
-            .filter(s::game.eq(&msg.game_name))
+            .filter(s::game.eq(&game_name))
             .select(max(s::unix_time_stamp))
-            .first::<Option<i64>>(&mut con)?
+            .first::<Option<i64>>(&mut con)
+            .unwrap_or(None)
             .unwrap_or(0);
 
         leaderboards
             .filter(unix_time_stamp.eq(max_unix))
-            .filter(game.eq(&msg.game_name))
+            .filter(game.eq(&game_name))
             .filter(position.between(msg.min, msg.max))
             .order(position)
             .load::<LeaderboardRow>(&mut con)
