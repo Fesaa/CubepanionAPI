@@ -2,7 +2,7 @@ name: Cubepanion API Build
 
 on:
   push:
-    branches: [ "master", "main" ]
+    branches: []
     paths: ["src/**"]
   workflow_dispatch:
 

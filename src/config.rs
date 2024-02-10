@@ -1,4 +1,4 @@
-use std::{fs::File, io::{Error, Read}};
+use std::{env::VarError, fs::File, io::{Error, Read}};
 
 use serde::Deserialize;
 use toml::from_str;
@@ -12,6 +12,15 @@ pub struct APIConfig {
 
 impl APIConfig {
 
+    pub fn from_env() -> Result<APIConfig, VarError> {
+        Ok(APIConfig{
+            database_url: std::env::var("DATABASE_URL")?,
+            address: String::from("0.0.0.0"),
+            port: 8000
+        })
+    }
+
+    #[allow(dead_code)]
     pub fn from_file(path: String) -> Result<APIConfig, Error> {
         let mut file = File::open(path)?;
 
