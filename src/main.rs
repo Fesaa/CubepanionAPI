@@ -46,8 +46,8 @@ async fn main() -> Result<(), std::io::Error> {
     if let Err(e) = metrics {
         panic!("{}", e)
     }
-
-    let config = match APIConfig::from_env() {
+    
+    let config = match APIConfig::from_file(String::from("config.toml")) {
         Ok(config) => config,
         Err(e) => panic!("Couldn't make config: {}", e),
     };
