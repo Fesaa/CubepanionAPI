@@ -1,28 +1,23 @@
-name: Cubepanion API Build
+name: Tests
 
 on:
   push:
-    branches: []
-    paths: ["src/**"]
-  workflow_dispatch:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - name: Setup Go
+        uses: actions/setup-go@v4
         with:
-          toolchain: stable
+          go-version: "1.21"
 
-      - name: Build Rust Binary
-        run: cargo build --release
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: Rust-Binary
-          path: target/release/cubepanion_api
+      - name: Run test
+        run: go test -v ./...i
