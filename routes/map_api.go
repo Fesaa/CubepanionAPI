@@ -12,7 +12,7 @@ func MapApi(app *fiber.App) {
 }
 
 func mapAPI_specific(c *fiber.Ctx) error {
-	holder, _ := c.Locals("holder").(models.Holder)
+	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
 
 	mapName := c.Params("mapName")
@@ -25,7 +25,7 @@ func mapAPI_specific(c *fiber.Ctx) error {
 }
 
 func mapAPI_all(c *fiber.Ctx) error {
-	holder, _ := c.Locals("holder").(models.Holder)
+	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
 
 	maps, err := db.GetEggWarsMaps()

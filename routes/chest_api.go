@@ -13,7 +13,7 @@ func ChestApi(app *fiber.App) {
 }
 
 func chestAPI_current(c *fiber.Ctx) error {
-	holder, _ := c.Locals("holder").(models.Holder)
+	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
 	locations, err := db.GetCurrentChestLocations()
 	if err != nil {
@@ -23,7 +23,7 @@ func chestAPI_current(c *fiber.Ctx) error {
 }
 
 func chestAPI_seasons(c *fiber.Ctx) error {
-	holder, _ := c.Locals("holder").(models.Holder)
+	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
 
 	runningS := c.Params("running", "false")
@@ -37,7 +37,7 @@ func chestAPI_seasons(c *fiber.Ctx) error {
 }
 
 func chestAPI_season(c *fiber.Ctx) error {
-	holder, _ := c.Locals("holder").(models.Holder)
+	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
 
 	season := c.Params("season")

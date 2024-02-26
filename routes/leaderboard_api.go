@@ -20,7 +20,7 @@ func LeaderboardApi(app *fiber.App) {
 }
 
 func leaderboardAPI_games(c *fiber.Ctx) error {
-	holder, _ := c.Locals("holder").(models.Holder)
+	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
 
 	activeS := c.Query("active", "true")
@@ -35,7 +35,7 @@ func leaderboardAPI_games(c *fiber.Ctx) error {
 }
 
 func leaderboardAPI_player(c *fiber.Ctx) error {
-	holder, _ := c.Locals("holder").(models.Holder)
+	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
 
 	player := c.Params("name")
@@ -55,7 +55,7 @@ func leaderboardAPI_player(c *fiber.Ctx) error {
 }
 
 func leaderboardAPI_game_bounded(c *fiber.Ctx) error {
-	holder, _ := c.Locals("holder").(models.Holder)
+	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
 
 	game := c.Params("game")
@@ -97,7 +97,7 @@ func leaderboardAPI_game_bounded(c *fiber.Ctx) error {
 }
 
 func leaderboardAPI_game(c *fiber.Ctx) error {
-	holder, _ := c.Locals("holder").(models.Holder)
+	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
 
 	game := c.Params("game")
