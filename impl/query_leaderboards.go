@@ -127,7 +127,11 @@ func innerGetGames(active bool) ([]models.Game, error) {
 			slog.Error("Error scanning game: %v", err)
 			return nil, err
 		}
-		game.Aliases = strings.Split(aliases, ",")
+		if aliases == "" {
+			game.Aliases = []string{}
+		} else {
+			game.Aliases = strings.Split(aliases, ",")
+		}
 		games = append(games, game)
 	}
 

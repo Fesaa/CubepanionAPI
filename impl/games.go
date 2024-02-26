@@ -1,6 +1,8 @@
 package impl
 
 import (
+	"fmt"
+	"log/slog"
 	"sync"
 
 	"github.com/Fesaa/CubepanionAPI/models"
@@ -26,6 +28,7 @@ func newGamesImpl(d models.DatabaseProvider) (models.GamesProvider, error) {
 	for _, game := range allGames {
 		games[game.DisplayName] = &game
 		for _, alias := range game.Aliases {
+			slog.Debug(fmt.Sprintf("Adding alias %s for game %s", alias, game.DisplayName))
 			aliases[alias] = game.DisplayName
 		}
 	}
