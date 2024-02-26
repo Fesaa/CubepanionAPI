@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Fesaa/CubepanionAPI/impl"
+	"github.com/Fesaa/CubepanionAPI/integration"
 	"github.com/Fesaa/CubepanionAPI/routes"
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/fiber/v2"
@@ -48,6 +49,10 @@ func main() {
 	routes.ChestApi(app)
 	routes.MapApi(app)
 	routes.LeaderboardApi(app)
+
+	// Web Socket Integration
+	app.Use("/ws", integration.RequireUpgrade)
+	app.Get("/ws/:uuid", integration.Handler())
 
 	err = app.Listen(fmt.Sprintf("%s:%d", config.Address, config.Port))
 	if err != nil {

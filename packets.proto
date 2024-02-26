@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package art.ameliah.laby.addons.cubepanion;
+
+option java_multiple_files = true;
+option java_package = "art.ameliah.laby.addons.cubepanion.core.proto";
+option java_outer_classname = "Packets";
+
+option go_package = "proto/packets";
+
+message S2CPacket {
+    oneof packet {
+        S2CPerkUpdatePacket updatePerk = 1;
+    }
+}
+
+message S2CPerkUpdatePacket {
+    PerkCategory category = 1;
+    repeated string perkTags = 2;
+}
+
+message C2SPacket {
+    oneof packet {
+        C2SUpdateLocationPacket updateLocation = 1;
+        C2SPerkUpdatePacket updatePerk = 2;
+    }
+}
+
+message C2SUpdateLocationPacket {
+    string origin = 1;
+    string destination = 2;
+    bool preLobby = 3;
+}
+
+enum PerkCategory {
+    PERSONAL = 0;
+    TEAM = 1;
+    GAME = 2;
+}
+
+message C2SPerkUpdatePacket {
+    PerkCategory category = 1;
+    repeated string perkTags = 2;
+}
