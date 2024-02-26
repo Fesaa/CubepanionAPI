@@ -16,7 +16,7 @@ var gameRegex = regexp.MustCompile(`^[a-zA-Z0-9_ ]`)
 func LeaderboardApi(app *fiber.App) {
 	g := app.Group("/leaderboard_api")
 	g.Get("/leaderboard/:game", leaderboardAPI_game)
-	g.Get("/leaderboard/:game/bounded/+", leaderboardAPI_game_bounded)
+	g.Get("/leaderboard/:game/bounded", leaderboardAPI_game_bounded)
 	g.Get("/player/:name", leaderboardAPI_player)
 	g.Get("/games/:active", leaderboardAPI_games)
 }
@@ -68,8 +68,12 @@ func leaderboardAPI_game_bounded(c *fiber.Ctx) error {
 		return jsonError(c, 400, "game must only contain letters, numbers, and underscores")
 	}
 
-	startS := c.Params("lower", "0")
-	endS := c.Params("upper", "200")
+	startS := c.Query("lower")
+	endS := c.Query("upper")
+
+	if startS == "" || endS == "" {
+		return jsonError(c, 400, "lower and upper parameters are required")
+	}
 
 	start, err := strconv.Atoi(startS)
 	if err != nil {
