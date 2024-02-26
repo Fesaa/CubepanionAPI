@@ -27,6 +27,8 @@ func newGamesImpl(d models.DatabaseProvider) (models.GamesProvider, error) {
 
 	for _, game := range allGames {
 		games[game.DisplayName] = &game
+		aliases[game.DisplayName] = game.DisplayName
+		aliases[game.Game] = game.DisplayName
 		for _, alias := range game.Aliases {
 			slog.Debug(fmt.Sprintf("Adding alias %s for game %s", alias, game.DisplayName))
 			aliases[alias] = game.DisplayName

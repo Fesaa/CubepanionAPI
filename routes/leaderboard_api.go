@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 	"log/slog"
+	"net/url"
 	"regexp"
 	"strconv"
 
@@ -57,7 +58,7 @@ func leaderboardAPI_games(c *fiber.Ctx) error {
 	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
 
-	activeS := c.Query("active", "true")
+	activeS := c.Params("active", "true")
 	active := activeS == "true"
 
 	games, err := db.GetGames(active)
@@ -97,8 +98,10 @@ func leaderboardAPI_game_bounded(c *fiber.Ctx) error {
 	if !gameRegex.MatchString(game) {
 		return jsonError(c, 400, "game must only contain letters, numbers, and underscores")
 	}
-	game = g.GetGameDisplayName(game)
-	if game == "" {
+	
+	game, _ = url.QueryUnescape(game)
+	displayName := g.GetGameDisplayName(game)
+	if displayName == "" {
 		return jsonError(c, 400, fmt.Sprintf("game %s does not exist", game))
 	}
 
@@ -128,7 +131,7 @@ func leaderboardAPI_game_bounded(c *fiber.Ctx) error {
 		return jsonError(c, 400, "end must be less than or equal to 200")
 	}
 
-	leaderboard, err := db.GetLeaderboardBounded(game, start, end)
+	leaderboard, err := db.GetLeaderboardBounded(displayName, start, end)
 	if err != nil {
 		return jsonError(c, 500, err.Error())
 	}
@@ -149,12 +152,13 @@ func leaderboardAPI_game(c *fiber.Ctx) error {
 		return jsonError(c, 400, "game must only contain letters, numbers, and underscores")
 	}
 
-	game = g.GetGameDisplayName(game)
-	if game == "" {
+	game, _ = url.QueryUnescape(game)
+	displayName := g.GetGameDisplayName(game)
+	if displayName == "" {
 		return jsonError(c, 400, fmt.Sprintf("game %s does not exist", game))
 	}
 
-	leaderboard, err := db.GetLeaderboard(game)
+	leaderboard, err := db.GetLeaderboard(displayName)
 	if err != nil {
 		return jsonError(c, 500, err.Error())
 	}
