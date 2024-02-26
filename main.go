@@ -7,6 +7,7 @@ import (
 
 	"github.com/Fesaa/CubepanionAPI/impl"
 	"github.com/Fesaa/CubepanionAPI/routes"
+	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -28,6 +29,10 @@ func main() {
 
 	app := fiber.New()
 
+	prometheus := fiberprometheus.New("cubepanion-api")
+	prometheus.RegisterAt(app, "/metrics")
+
+	app.Use(prometheus.Middleware)
 	app.Use(logger.New())
 	app.Use(limiter.New(limiter.Config{
 		Max:               10,
