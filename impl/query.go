@@ -24,6 +24,9 @@ var getGameLastSubmissions *sql.Stmt
 var getLeaderboard *sql.Stmt
 var getLeaderboardForPlayer *sql.Stmt
 
+var newSubmission *sql.Stmt
+var disableSubmission *sql.Stmt
+
 func loadQueries(db *sql.DB) error {
 	var err error
 
@@ -67,12 +70,12 @@ func loadQueries(db *sql.DB) error {
 		return fmt.Errorf("Error preparing getMapGenerators: %v", err)
 	}
 
-	getGames, err = db.Prepare("SELECT * FROM games")
+	getGames, err = db.Prepare("SELECT game,active,display_name,aliases,score_type FROM games")
 	if err != nil {
 		return fmt.Errorf("Error preparing getGames: %v", err)
 	}
 
-	getActiveGames, err = db.Prepare("SELECT * FROM games WHERE active = true")
+	getActiveGames, err = db.Prepare("SELECT game,active,display_name,aliases,score_type FROM games WHERE active = true")
 	if err != nil {
 		return fmt.Errorf("Error preparing getActiveGames: %v", err)
 	}
@@ -120,5 +123,14 @@ func loadQueries(db *sql.DB) error {
 		return fmt.Errorf("Error preparing getLeaderboardForPlayer: %v", err)
 	}
 
+	newSubmission, err = db.Prepare("INSERT INTO submissions (uuid, unix_time_stamp, game, valid) VALUES ($1, $2, $3, $4)")
+	if err != nil {
+		return fmt.Errorf("Error preparing newSubmission: %v", err)
+	}
+
+	disableSubmission, err = db.Prepare("UPDATE submissions SET valid = false WHERE uuid = $1 AND unix_time_stamp = $2")
+	if err != nil {
+		return fmt.Errorf("Error preparing disableSubmission: %v", err)
+	}
 	return nil
 }

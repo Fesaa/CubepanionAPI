@@ -74,21 +74,15 @@ func innerGetLeaderboardForPlayer(db *sql.DB, player string) ([]models.Leaderboa
 }
 
 func innerGetLeaderboardBounded(game string, start, end int) ([]models.LeaderboardRow, error) {
-	gameDisplayName, err := getGameDisplayName(game)
-	if err != nil {
-		slog.Error("Error getting game display name: %v", err)
-		return nil, err
-	}
-
-	unixRow := getLastSubmission.QueryRow(gameDisplayName)
+	unixRow := getLastSubmission.QueryRow(game)
 	var lastSubmission int64
-	err = unixRow.Scan(&lastSubmission)
+	err := unixRow.Scan(&lastSubmission)
 	if err != nil {
 		slog.Error("Error scanning last submission: %v", err)
 		return nil, err
 	}
 
-	rows, err := getLeaderboard.Query(lastSubmission, gameDisplayName, start, end)
+	rows, err := getLeaderboard.Query(lastSubmission, game, start, end)
 	if err != nil {
 		slog.Error("Error querying for leaderboard: %v", err)
 		return nil, err
@@ -138,18 +132,4 @@ func innerGetGames(active bool) ([]models.Game, error) {
 	}
 
 	return games, nil
-}
-
-func getGameDisplayName(game string) (string, error) {
-	gameRow := getGame.QueryRow(game)
-	var gameDisplayName string
-	err := gameRow.Scan(&gameDisplayName)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return "", fmt.Errorf("No game with name %s", game)
-		}
-		return "", err
-	}
-
-	return gameDisplayName, nil
 }

@@ -7,6 +7,7 @@ import (
 
 type holderImpl struct {
 	databaseProvider models.DatabaseProvider
+	gamesProvider    models.GamesProvider
 }
 
 func NewHolder(dbURL string) (models.Holder, error) {
@@ -15,8 +16,14 @@ func NewHolder(dbURL string) (models.Holder, error) {
 		return nil, err
 	}
 
+	games, err := newGamesImpl(db)
+	if err != nil {
+		return nil, err
+	}
+
 	return &holderImpl{
 		databaseProvider: db,
+		gamesProvider:    games,
 	}, nil
 }
 
@@ -29,4 +36,8 @@ func SetHolderMiddelware(h models.Holder) func(c *fiber.Ctx) error {
 
 func (h *holderImpl) GetDatabaseProvider() models.DatabaseProvider {
 	return h.databaseProvider
+}
+
+func (h *holderImpl) GetGamesProvider() models.GamesProvider {
+	return h.gamesProvider
 }

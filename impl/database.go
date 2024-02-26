@@ -65,3 +65,7 @@ func (db *databaseProviderImpl) GetLeaderboardBounded(game string, start int, en
 func (db *databaseProviderImpl) GetLeaderboardForPlayer(player string) ([]models.LeaderboardRow, error) {
 	return innerGetLeaderboardForPlayer(db.backingDB, player)
 }
+
+func (db *databaseProviderImpl) SubmitLeaderboard(submission models.LeaderboardSubmission) error {
+	return innerInsertLeaderboards(db.backingDB, submission)
+}

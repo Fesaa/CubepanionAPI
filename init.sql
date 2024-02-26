@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS seasons (
     season_name VARCHAR NOT NULL,
     running BOOLEAN NOT NULL,
     PRIMARY KEY (season_name)
-)
+);
 
 CREATE TABLE IF NOT EXISTS chest_locations (
     season_name VARCHAR NOT NULL,
@@ -62,10 +62,10 @@ CREATE TABLE IF NOT EXISTS generators (
 );
 
 CREATE TABLE IF NOT EXISTS games (
-    game VARCHAR NOT NULL,
-    display_name VARCHAR NOT NULL,
-    aliases VARCHAR NOT NULL DEFAULT "",
-    active NOT NULL BOOLEAN,
-    score_type VARCHAR NOT NULL,
+    game VARCHAR(255) NOT NULL,
+    display_name VARCHAR(255) NOT NULL,
+    aliases VARCHAR(255) NOT NULL DEFAULT '',
+    active BOOLEAN NOT NULL,
+    score_type VARCHAR(255) NOT NULL,
     PRIMARY KEY (game)
-)
+);

@@ -1,5 +1,12 @@
 package models
 
+import (
+	"database/sql/driver"
+	"fmt"
+)
+
+const LEADERBOARD_SIZE int = 200
+
 type Season string
 
 type ChestLocation struct {
@@ -64,4 +71,15 @@ type LeaderboardRow struct {
 	Position      int    `json:"position"`
 	Score         int    `json:"score"`
 	UnixTimeStamp int    `json:"unix_time_stamp"`
+}
+
+func (row *LeaderboardRow) Value() (driver.Value, error) {
+	return fmt.Sprintf("%s,%s,%d,%d,%d", row.Game, row.Player, row.Position, row.Score, row.UnixTimeStamp), nil
+}
+
+type Submission struct {
+	Uuid          string `json:"uuid"`
+	UnixTimeStamp int    `json:"unix_time_stamp"`
+	Game          string `json:"game"`
+	Valid         bool   `json:"valid"`
 }

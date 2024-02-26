@@ -19,6 +19,45 @@ func LeaderboardApi(app *fiber.App) {
 	g.Get("/leaderboard/:game/bounded", leaderboardAPI_game_bounded)
 	g.Get("/player/:name", leaderboardAPI_player)
 	g.Get("/games/:active", leaderboardAPI_games)
+	g.Post("/", leaderboardAPI_submit)
+}
+
+func leaderboardAPI_submit(c *fiber.Ctx) error {
+	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
+	db := holder.GetDatabaseProvider()
+	g := holder.GetGamesProvider()
+
+	var submission models.LeaderboardSubmission
+	err := c.BodyParser(&submission)
+	if err != nil {
+		return jsonError(c, 400, fmt.Sprintf("error parsing submission: %v", err))
+	}
+
+	if !gameRegex.MatchString(submission.Game) {
+		return jsonError(c, 400, "game must only contain letters, numbers, and underscores")
+	}
+	game := g.GetGameDisplayName(submission.Game)
+	if game == "" {
+		return jsonError(c, 400, fmt.Sprintf("game %s does not exist", submission.Game))
+	}
+
+	if len(submission.Entries) != models.LEADERBOARD_SIZE {
+		return jsonError(c, 400, "entries must contain exactly 200 elements")
+	}
+
+	for _, row := range submission.Entries {
+		if !playerRegex.MatchString(row.Player) {
+			return jsonError(c, 400, "player must only contain letters, numbers, and underscores")
+		}
+	}
+
+	submission.Game = game
+	err = db.SubmitLeaderboard(submission)
+	if err != nil {
+		return jsonError(c, 500, fmt.Sprintf("error submitting leaderboard: %v", err))
+	}
+
+	return c.SendStatus(202)
 }
 
 func leaderboardAPI_games(c *fiber.Ctx) error {
@@ -59,6 +98,7 @@ func leaderboardAPI_player(c *fiber.Ctx) error {
 func leaderboardAPI_game_bounded(c *fiber.Ctx) error {
 	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
+	g := holder.GetGamesProvider()
 
 	game := c.Params("game")
 	if game == "" {
@@ -66,6 +106,10 @@ func leaderboardAPI_game_bounded(c *fiber.Ctx) error {
 	}
 	if !gameRegex.MatchString(game) {
 		return jsonError(c, 400, "game must only contain letters, numbers, and underscores")
+	}
+	game = g.GetGameDisplayName(game)
+	if game == "" {
+		return jsonError(c, 400, fmt.Sprintf("game %s does not exist", game))
 	}
 
 	startS := c.Query("lower")
@@ -105,6 +149,7 @@ func leaderboardAPI_game_bounded(c *fiber.Ctx) error {
 func leaderboardAPI_game(c *fiber.Ctx) error {
 	holder, _ := c.Locals(models.HOLDER_KEY).(models.Holder)
 	db := holder.GetDatabaseProvider()
+	g := holder.GetGamesProvider()
 
 	game := c.Params("game")
 	if game == "" {
@@ -113,6 +158,12 @@ func leaderboardAPI_game(c *fiber.Ctx) error {
 	if !gameRegex.MatchString(game) {
 		return jsonError(c, 400, "game must only contain letters, numbers, and underscores")
 	}
+
+	game = g.GetGameDisplayName(game)
+	if game == "" {
+		return jsonError(c, 400, fmt.Sprintf("game %s does not exist", game))
+	}
+
 	leaderboard, err := db.GetLeaderboard(game)
 	if err != nil {
 		return jsonError(c, 500, err.Error())

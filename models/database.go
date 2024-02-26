@@ -26,4 +26,7 @@ type DatabaseProvider interface {
 	GetLeaderboardBounded(game string, start int, end int) ([]LeaderboardRow, error)
 	// GetLeaderboardForPlayer returns the leaderboard for the given player
 	GetLeaderboardForPlayer(player string) ([]LeaderboardRow, error)
+
+	// SubmitLeaderboard submits the given leaderboard submission to the database
+	SubmitLeaderboard(submission LeaderboardSubmission) error
 }
