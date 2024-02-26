@@ -8,6 +8,7 @@ import (
 
 	"github.com/Fesaa/CubepanionAPI/models"
 	"github.com/gofiber/fiber/v2"
+	"gopkg.in/validator.v2"
 )
 
 var playerRegex = regexp.MustCompile(`^[a-zA-Z0-9_]{3,16}$`)
@@ -33,22 +34,14 @@ func leaderboardAPI_submit(c *fiber.Ctx) error {
 		return jsonError(c, 400, fmt.Sprintf("error parsing submission: %v", err))
 	}
 
-	if !gameRegex.MatchString(submission.Game) {
-		return jsonError(c, 400, "game must only contain letters, numbers, and underscores")
+	err = validator.Validate(submission)
+	if err != nil {
+		return jsonError(c, 400, fmt.Sprintf("error validating submission: %v", err))
 	}
+
 	game := g.GetGameDisplayName(submission.Game)
 	if game == "" {
 		return jsonError(c, 400, fmt.Sprintf("game %s does not exist", submission.Game))
-	}
-
-	if len(submission.Entries) != models.LEADERBOARD_SIZE {
-		return jsonError(c, 400, "entries must contain exactly 200 elements")
-	}
-
-	for _, row := range submission.Entries {
-		if !playerRegex.MatchString(row.Player) {
-			return jsonError(c, 400, "player must only contain letters, numbers, and underscores")
-		}
 	}
 
 	submission.Game = game
@@ -80,9 +73,6 @@ func leaderboardAPI_player(c *fiber.Ctx) error {
 	db := holder.GetDatabaseProvider()
 
 	player := c.Params("name")
-	if player == "" {
-		return jsonError(c, 400, "name parameter is required")
-	}
 	if !playerRegex.MatchString(player) {
 		return jsonError(c, 400, "name must only contain letters, numbers, and underscores")
 	}

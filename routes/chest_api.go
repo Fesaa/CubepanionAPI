@@ -41,10 +41,6 @@ func chestAPI_season(c *fiber.Ctx) error {
 	db := holder.GetDatabaseProvider()
 
 	season := c.Params("season")
-	if season == "" {
-		return c.Status(400).SendString("No season specified")
-	}
-
 	seasons, err := db.GetChestLocations(season)
 	if err != nil {
 		return err
