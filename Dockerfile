@@ -1,19 +1,19 @@
-FROM rust:latest as builder
+FROM golang:latest as go-stage
 
 WORKDIR /app
 
 COPY . ./
 
-RUN cargo build --release
+RUN go mod download
+RUN go build -o /cubepanion_api
 
 FROM debian:stable-slim
 
 WORKDIR /app
 
-COPY --from=builder /app/target/release/cubepanion_api .
-
-RUN apt-get update && apt-get install -y libssl-dev && apt-get install -y libpq-dev
+RUN apt-get update && apt-get install -y ca-certificates libpq-dev
+COPY --from=go-stage /cubepanion_api /app/cubepanion_api
 
 EXPOSE 8000
 
-CMD ["./cubepanion_api"]
+CMD ["/app/cubepanion_api"]
