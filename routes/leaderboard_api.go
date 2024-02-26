@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"fmt"
+	"log/slog"
 	"regexp"
 	"strconv"
 
@@ -40,15 +42,15 @@ func leaderboardAPI_player(c *fiber.Ctx) error {
 
 	player := c.Params("name")
 	if player == "" {
-		return c.Status(400).JSON(fiber.Map{"error": "name parameter is required"})
+		return jsonError(c, 400, "name parameter is required")
 	}
 	if !playerRegex.MatchString(player) {
-		return c.Status(400).JSON(fiber.Map{"error": "name must be 3-16 characters long and only contain letters, numbers, and underscores"})
+		return jsonError(c, 400, "name must only contain letters, numbers, and underscores")
 	}
 
 	leaderboard, err := db.GetLeaderboardForPlayer(player)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return jsonError(c, 500, err.Error())
 	}
 
 	return c.JSON(leaderboard)
@@ -60,10 +62,10 @@ func leaderboardAPI_game_bounded(c *fiber.Ctx) error {
 
 	game := c.Params("game")
 	if game == "" {
-		return c.Status(400).JSON(fiber.Map{"error": "game parameter is required"})
+		return jsonError(c, 400, "game parameter is required")
 	}
 	if !gameRegex.MatchString(game) {
-		return c.Status(400).JSON(fiber.Map{"error": "game must only contain letters, numbers, and underscores"})
+		return jsonError(c, 400, "game must only contain letters, numbers, and underscores")
 	}
 
 	startS := c.Params("lower", "0")
@@ -71,26 +73,26 @@ func leaderboardAPI_game_bounded(c *fiber.Ctx) error {
 
 	start, err := strconv.Atoi(startS)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "start must be an integer"})
+		return jsonError(c, 400, "start must be an integer")
 	}
 
 	end, err := strconv.Atoi(endS)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "end must be an integer"})
+		return jsonError(c, 400, "end must be an integer")
 	}
 	if start > end {
-		return c.Status(400).JSON(fiber.Map{"error": "start must be less than end"})
+		return jsonError(c, 400, "start must be less than end")
 	}
 	if start < 0 {
-		return c.Status(400).JSON(fiber.Map{"error": "start must be greater than or equal to 0"})
+		return jsonError(c, 400, "start must be greater than or equal to 0")
 	}
 	if end > 200 {
-		return c.Status(400).JSON(fiber.Map{"error": "end must be less than or equal to 200"})
+		return jsonError(c, 400, "end must be less than or equal to 200")
 	}
 
 	leaderboard, err := db.GetLeaderboardBounded(game, start, end)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return jsonError(c, 500, err.Error())
 	}
 
 	return c.JSON(leaderboard)
@@ -102,15 +104,20 @@ func leaderboardAPI_game(c *fiber.Ctx) error {
 
 	game := c.Params("game")
 	if game == "" {
-		return c.Status(400).JSON(fiber.Map{"error": "game parameter is required"})
+		return jsonError(c, 400, "game parameter is required")
 	}
 	if !gameRegex.MatchString(game) {
-		return c.Status(400).JSON(fiber.Map{"error": "game must only contain letters, numbers, and underscores"})
+		return jsonError(c, 400, "game must only contain letters, numbers, and underscores")
 	}
 	leaderboard, err := db.GetLeaderboard(game)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return jsonError(c, 500, err.Error())
 	}
 
 	return c.JSON(leaderboard)
+}
+
+func jsonError(c *fiber.Ctx, status int, error string) error {
+	slog.Error(fmt.Sprintf("[%d] %s: %v", status, c.Path(), error))
+	return c.Status(status).JSON(fiber.Map{"error": error})
 }
