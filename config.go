@@ -7,9 +7,16 @@ import (
 )
 
 type Config struct {
-	DatabaseUrl string `yaml:"database_url"`
-	Port        int    `yaml:"port"`
-	Address     string `yaml:"address"`
+	DatabaseUrl string      `yaml:"database_url"`
+	Port        int         `yaml:"port"`
+	Address     string      `yaml:"address"`
+	RedisConfig RedisConfig `yaml:"redis"`
+}
+
+type RedisConfig struct {
+	Address  string `yaml:"address"`
+	PassWord string `yaml:"password"`
+	DB       int    `yaml:"db"`
 }
 
 func NewConfig(path string) (*Config, error) {
