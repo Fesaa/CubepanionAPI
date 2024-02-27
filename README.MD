@@ -9,7 +9,7 @@ Created as backend to make [Cubepanion](https://github.com/Fesaa/Cubepanion) mor
 
 # Usage
 
-The API is freely available on `https://ameliah.art/cubepanion_api/`, with a high rate limit. Documentation can be found [here](https://ameliah.art/cubepanion_api/rapidoc)
+The API is freely available on `https://ameliah.art/cubepanion_api/`, with a high rate limit.
 
 
 # Contribution & Bugs
