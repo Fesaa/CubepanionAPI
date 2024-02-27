@@ -69,3 +69,11 @@ CREATE TABLE IF NOT EXISTS games (
     score_type VARCHAR(255) NOT NULL,
     PRIMARY KEY (game)
 );
+
+CREATE TABLE IF NOT EXISTS player_locations (
+    uuid VARCHAR NOT NULL,
+    previous VARCHAR NOT NULL,
+    current VARCHAR NOT NULL,
+    in_pre_lobby BOOLEAN NOT NULL,
+    PRIMARY KEY (uuid)
+);

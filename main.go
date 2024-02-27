@@ -38,7 +38,7 @@ func main() {
 	app.Use(logger.New())
 	app.Use(limiter.New(limiter.Config{
 		Max:               10,
-		Expiration:        60 * time.Second,
+		Expiration:        10 * time.Second,
 		LimiterMiddleware: limiter.SlidingWindow{},
 	}))
 	app.Use(cache.New(cache.Config{

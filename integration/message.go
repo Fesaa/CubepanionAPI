@@ -3,7 +3,9 @@ package integration
 import (
 	"fmt"
 	"log/slog"
+	"time"
 
+	"github.com/Fesaa/CubepanionAPI/models"
 	"github.com/Fesaa/CubepanionAPI/proto/packets"
 	"google.golang.org/protobuf/proto"
 )
@@ -20,6 +22,10 @@ func (c *Connection) handlePacket(mt int, msg []byte) error {
 		err = c.handleUpdateLocation(packet.GetUpdateLocation())
 	case *packets.C2SPacket_UpdatePerk:
 		err = c.handleUpdatePerk(packet.GetUpdatePerk())
+	case *packets.C2SPacket_HelloPing:
+		err = c.handleHelloPing(packet.GetHelloPing())
+	case *packets.C2SPacket_Disconnect:
+		err = c.handleDisconnect(packet.GetDisconnect())
 	default:
 		slog.Debug(fmt.Sprintf("unsupported packet type: %T", packet.Packet))
 	}
@@ -27,12 +33,62 @@ func (c *Connection) handlePacket(mt int, msg []byte) error {
 	return err
 }
 
+func (c *Connection) handleHelloPing(packet *packets.C2SHelloPingPacket) error {
+	var p = packets.S2CHelloPacket{
+		Time: time.Now().UnixMilli(),
+	}
+	var out = packets.S2CPacket{
+		Packet: &packets.S2CPacket_Hello{
+			Hello: &p,
+		},
+	}
+
+	return c.WritePacket(&out)
+}
+
+func (c *Connection) handleDisconnect(packet *packets.C2SDisconnectPacket) error {
+	c.cleanup()
+	return nil
+}
+
 func (c *Connection) handleUpdateLocation(packet *packets.C2SUpdateLocationPacket) error {
-	slog.Info(fmt.Sprintf("update location: %v", packet))
+	c.holder.GetPlayerLocationProvider().SetPlayerLocation(c.Uuid, models.Location{
+		Current:    packet.Destination,
+		Previous:   packet.Origin,
+		InPreLobby: packet.PreLobby,
+	})
 	return nil
 }
 
 func (c *Connection) handleUpdatePerk(packet *packets.C2SPerkUpdatePacket) error {
-	slog.Info(fmt.Sprintf("update perk: %v", packet))
+	var p = packets.S2CPerkUpdatePacket{
+		Category: packet.Category,
+		Perks:    packet.Perks,
+		Uuid:     c.Uuid,
+	}
+
+	var out = packets.S2CPacket{
+		Packet: &packets.S2CPacket_UpdatePerk{
+			UpdatePerk: &p,
+		},
+	}
+
+	players, err := c.holder.GetPlayerLocationProvider().GetSharedPlayers(c.Uuid)
+	if err != nil {
+		return err
+	}
+
+	for _, player := range players {
+		mux.RLock()
+		conn, ok := connections[player]
+		mux.RUnlock()
+
+		if ok {
+			err = conn.WritePacket(&out)
+			if err != nil {
+				slog.Error(fmt.Sprintf("Failed to send perk update to %v: %v", player, err))
+			}
+		}
+	}
 	return nil
 }

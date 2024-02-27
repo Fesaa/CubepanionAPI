@@ -9,36 +9,45 @@ option java_outer_classname = "Packets";
 option go_package = "proto/packets";
 
 message S2CPacket {
-    oneof packet {
-        S2CPerkUpdatePacket updatePerk = 1;
-    }
+  oneof packet {
+    S2CPerkUpdatePacket updatePerk = 1;
+    S2CHelloPacket hello = 2;
+  }
 }
 
+message S2CHelloPacket { int64 time = 1; }
+
 message S2CPerkUpdatePacket {
-    PerkCategory category = 1;
-    repeated string perkTags = 2;
+  PerkCategory category = 1;
+  repeated string perks = 2;
+  string uuid = 3;
 }
 
 message C2SPacket {
-    oneof packet {
-        C2SUpdateLocationPacket updateLocation = 1;
-        C2SPerkUpdatePacket updatePerk = 2;
-    }
+  oneof packet {
+    C2SUpdateLocationPacket updateLocation = 1;
+    C2SPerkUpdatePacket updatePerk = 2;
+    C2SHelloPingPacket helloPing = 3;
+    C2SDisconnectPacket disconnect = 4;
+  }
 }
 
+message C2SHelloPingPacket { int64 time = 1; }
+message C2SDisconnectPacket { string reason = 1; }
+
 message C2SUpdateLocationPacket {
-    string origin = 1;
-    string destination = 2;
-    bool preLobby = 3;
+  string origin = 1;
+  string destination = 2;
+  bool preLobby = 3;
 }
 
 enum PerkCategory {
-    PERSONAL = 0;
-    TEAM = 1;
-    GAME = 2;
+  PERSONAL = 0;
+  TEAM = 1;
+  GAME = 2;
 }
 
 message C2SPerkUpdatePacket {
-    PerkCategory category = 1;
-    repeated string perkTags = 2;
+  PerkCategory category = 1;
+  repeated string perks = 2;
 }

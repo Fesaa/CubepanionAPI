@@ -6,8 +6,9 @@ import (
 )
 
 type holderImpl struct {
-	databaseProvider models.DatabaseProvider
-	gamesProvider    models.GamesProvider
+	databaseProvider       models.DatabaseProvider
+	gamesProvider          models.GamesProvider
+	playerLocationProvider models.PlayerLocationProvider
 }
 
 func NewHolder(dbURL string) (models.Holder, error) {
@@ -21,9 +22,15 @@ func NewHolder(dbURL string) (models.Holder, error) {
 		return nil, err
 	}
 
+	pl, err := newPlayerLocation(db.GetBackingDB())
+	if err != nil {
+		return nil, err
+	}
+
 	return &holderImpl{
-		databaseProvider: db,
-		gamesProvider:    games,
+		databaseProvider:       db,
+		gamesProvider:          games,
+		playerLocationProvider: pl,
 	}, nil
 }
 
@@ -40,4 +47,8 @@ func (h *holderImpl) GetDatabaseProvider() models.DatabaseProvider {
 
 func (h *holderImpl) GetGamesProvider() models.GamesProvider {
 	return h.gamesProvider
+}
+
+func (h *holderImpl) GetPlayerLocationProvider() models.PlayerLocationProvider {
+	return h.playerLocationProvider
 }
