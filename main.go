@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/Fesaa/CubepanionAPI/impl"
@@ -43,6 +44,9 @@ func main() {
 	}))
 	app.Use(cache.New(cache.Config{
 		Storage: redisCache(config.RedisConfig),
+		Next: func(c *fiber.Ctx) bool {
+			return strings.HasPrefix(c.Path(), "/ws/")
+		},
 	}))
 	app.Use(impl.SetHolderMiddelware(holder))
 
