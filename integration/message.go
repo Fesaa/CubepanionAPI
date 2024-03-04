@@ -3,7 +3,6 @@ package integration
 import (
 	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/Fesaa/CubepanionAPI/models"
 	"github.com/Fesaa/CubepanionAPI/proto/packets"
@@ -22,8 +21,8 @@ func (c *Connection) handlePacket(mt int, msg []byte) error {
 		err = c.handleUpdateLocation(packet.GetUpdateLocation())
 	case *packets.C2SPacket_UpdatePerk:
 		err = c.handleUpdatePerk(packet.GetUpdatePerk())
-	case *packets.C2SPacket_HelloPing:
-		err = c.handleHelloPing(packet.GetHelloPing())
+	case *packets.C2SPacket_Ping:
+		err = c.handlePing(packet.GetPing())
 	case *packets.C2SPacket_Disconnect:
 		err = c.handleDisconnect(packet.GetDisconnect())
 	default:
@@ -33,13 +32,10 @@ func (c *Connection) handlePacket(mt int, msg []byte) error {
 	return err
 }
 
-func (c *Connection) handleHelloPing(packet *packets.C2SHelloPingPacket) error {
-	var p = packets.S2CHelloPacket{
-		Time: time.Now().UnixMilli(),
-	}
+func (c *Connection) handlePing(packet *packets.C2SPingPacket) error {
 	var out = packets.S2CPacket{
-		Packet: &packets.S2CPacket_Hello{
-			Hello: &p,
+		Packet: &packets.S2CPacket_Ping{
+			Ping: &packets.S2CPingPacket{},
 		},
 	}
 

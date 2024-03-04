@@ -11,11 +11,11 @@ option go_package = "proto/packets";
 message S2CPacket {
   oneof packet {
     S2CPerkUpdatePacket updatePerk = 1;
-    S2CHelloPacket hello = 2;
+    S2CPingPacket ping = 3;
   }
 }
 
-message S2CHelloPacket { int64 time = 1; }
+message S2CPingPacket {}
 
 message S2CPerkUpdatePacket {
   PerkCategory category = 1;
@@ -27,12 +27,12 @@ message C2SPacket {
   oneof packet {
     C2SUpdateLocationPacket updateLocation = 1;
     C2SPerkUpdatePacket updatePerk = 2;
-    C2SHelloPingPacket helloPing = 3;
     C2SDisconnectPacket disconnect = 4;
+    C2SPingPacket ping = 5;
   }
 }
 
-message C2SHelloPingPacket { int64 time = 1; }
+message C2SPingPacket {}
 message C2SDisconnectPacket { string reason = 1; }
 
 message C2SUpdateLocationPacket {
