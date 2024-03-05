@@ -4,38 +4,52 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
+	"time"
 
 	"github.com/Fesaa/CubepanionAPI/models"
 )
 
 type GamesImpl struct {
 	games     map[string]*models.Game
-	gamesLock sync.RWMutex
+	gamesLock *sync.RWMutex
 
 	aliases     map[string]string
-	aliasesLock sync.RWMutex
+	aliasesLock *sync.RWMutex
 }
 
 func newGamesImpl(d models.DatabaseProvider) (models.GamesProvider, error) {
 	games := make(map[string]*models.Game)
 	aliases := make(map[string]string)
 
-	allGames, err := d.GetGames(false)
-	if err != nil {
-		return nil, err
-	}
+	g := &GamesImpl{games: games, aliases: aliases, gamesLock: &sync.RWMutex{}, aliasesLock: &sync.RWMutex{}}
+	go g.loadGames(d)
 
-	for _, game := range allGames {
-		games[game.DisplayName] = &game
-		aliases[game.DisplayName] = game.DisplayName
-		aliases[game.Game] = game.DisplayName
-		for _, alias := range game.Aliases {
-			slog.Debug(fmt.Sprintf("Adding alias %s for game %s", alias, game.DisplayName))
-			aliases[alias] = game.DisplayName
+	return g, nil
+}
+
+func (g *GamesImpl) loadGames(d models.DatabaseProvider) {
+	for range time.Tick(time.Duration(5) * time.Minute) {
+		allGames, err := d.GetGames(false)
+		if err != nil {
+			slog.Error(fmt.Sprintf("Error loading games: %s", err.Error()))
+			continue
 		}
+		g.gamesLock.Lock()
+		g.aliasesLock.Lock()
+		g.games = make(map[string]*models.Game)
+		g.aliases = make(map[string]string)
+		for _, game := range allGames {
+			g.games[game.DisplayName] = &game
+			g.aliases[game.DisplayName] = game.DisplayName
+			g.aliases[game.Game] = game.DisplayName
+			for _, alias := range game.Aliases {
+				slog.Debug(fmt.Sprintf("Adding alias %s for game %s", alias, game.DisplayName))
+				g.aliases[alias] = game.DisplayName
+			}
+		}
+		g.aliasesLock.Unlock()
+		g.gamesLock.Unlock()
 	}
-
-	return &GamesImpl{games: games, aliases: aliases}, nil
 }
 
 func (g *GamesImpl) GetGame(displayName string) *models.Game {
