@@ -1,0 +1,19 @@
+FROM golang:latest as go-stage
+
+WORKDIR /app
+
+COPY . .
+
+WORKDIR /app/games-service
+
+RUN go mod download
+RUN go build -o games-service -ldflags '-linkmode external -extldflags "-static"'
+
+FROM alpine:latest
+
+WORKDIR /app
+
+RUN apk --no-cache add ca-certificates libpq
+COPY --from=go-stage /app/games-service/games-service /app/games-service
+
+CMD ["/app/games-service"]
