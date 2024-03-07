@@ -74,7 +74,7 @@ func (d DefaultDatabaseConfig) AsConnectionString() string {
 }
 
 type DefaultRedisConfig struct {
-	YHost     string `yaml:"address"`
+	YHost     string `yaml:"host"`
 	YPassWord string `yaml:"password"`
 	YDB       int    `yaml:"db"`
 }

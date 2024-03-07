@@ -93,13 +93,13 @@ func (m *defaultMicroService[T]) UsePrometheus() {
 }
 
 func (m *defaultMicroService[T]) UseDefaults() {
+	m.UseLogger()
 	m.UsePrometheus()
 	m.UseLimiter(limiter.Config{
 		Max:               10,
 		Expiration:        10 * time.Second,
 		LimiterMiddleware: limiter.SlidingWindow{},
 	})
-	m.UseLogger()
 }
 
 func (m *defaultMicroService[T]) Start() error {
