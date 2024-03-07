@@ -24,7 +24,7 @@ func RequireUpgrade(c *fiber.Ctx) error {
 
 func Handler() fiber.Handler {
 	return ws.New(func(c *ws.Conn) {
-		uuid := utils.CopyString("uuid")
+		uuid := utils.CopyString(c.Params("uuid"))
 		client := &Client{
 			UUID: uuid,
 			c:    c,
