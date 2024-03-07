@@ -74,3 +74,9 @@ type Submission struct {
 	Game          string `json:"game"`
 	Valid         bool   `json:"valid"`
 }
+
+type Location struct {
+	Current    string `json:"current"`
+	Previous   string `json:"previous"`
+	InPreLobby bool   `json:"inPreLobby"`
+}
