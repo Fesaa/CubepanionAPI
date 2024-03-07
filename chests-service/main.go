@@ -23,8 +23,8 @@ func main() {
 	ms.UseDefaults()
 	ms.UseRedisCache()
 
-	ms.Get("/chests", CurrentChestLocations)
-	ms.Get("/chests/:season", ChestLocations)
+	ms.Get("/", CurrentChestLocations)
+	ms.Get("/:season", ChestLocations)
 	ms.Get("/seasons/:active", Seasons)
 
 	err = ms.Start()

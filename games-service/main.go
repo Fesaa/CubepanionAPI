@@ -23,7 +23,7 @@ func main() {
 	ms.UseDefaults()
 	ms.UseRedisCache()
 
-	ms.Get("/games/:active", games)
+	ms.Get("/:active", games)
 	ms.Get("/game/:game", game)
 
 	err = ms.Start()
