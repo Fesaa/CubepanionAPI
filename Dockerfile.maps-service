@@ -1,0 +1,20 @@
+
+FROM golang:latest as go-stage
+
+WORKDIR /app
+
+COPY . .
+
+WORKDIR /app/maps-service
+
+RUN go mod download
+RUN go build -o maps-service -ldflags '-linkmode external -extldflags "-static"'
+
+FROM alpine:latest
+
+WORKDIR /app
+
+RUN apk --no-cache add ca-certificates libpq
+COPY --from=go-stage /app/maps-service/maps-service /app/maps-service
+
+CMD ["/app/maps-service"]

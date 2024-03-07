@@ -1,0 +1,19 @@
+FROM golang:latest as go-stage
+
+WORKDIR /app
+
+COPY . .
+
+WORKDIR /app/chests-service
+
+RUN go mod download
+RUN go build -o chests-service -ldflags '-linkmode external -extldflags "-static"'
+
+FROM alpine:latest
+
+WORKDIR /app
+
+RUN apk --no-cache add ca-certificates libpq
+COPY --from=go-stage /app/chests-service/chests-service /app/chests-service
+
+CMD ["/app/chests-service"]
