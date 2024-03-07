@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/url"
+
 	"github.com/Fesaa/CubepanionAPI/core"
 	"github.com/Fesaa/CubepanionAPI/games-service/database"
 	"github.com/gofiber/fiber/v2"
@@ -25,6 +27,14 @@ func game(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
 	if game == "" {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "game name is required",
+		})
+	}
+
+	var err error
+	game, err = url.QueryUnescape(game)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "game name is invalid",
 		})
 	}
 
