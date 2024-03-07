@@ -90,6 +90,7 @@ func (m *defaultMicroService[T]) Use(args ...interface{}) fiber.Router {
 func (m *defaultMicroService[T]) UsePrometheus() {
 	p := fiberprometheus.New(m.Config().ServiceName())
 	p.RegisterAt(m.App(), "/metrics")
+	m.App().Use(p.Middleware)
 }
 
 func (m *defaultMicroService[T]) UseDefaults() {
