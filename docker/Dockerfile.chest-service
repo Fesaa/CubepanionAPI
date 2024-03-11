@@ -1,12 +1,9 @@
-FROM golang:latest as go-stage
-
-WORKDIR /app
-
-COPY . .
+FROM cubepanion-api-base as go-stage
 
 WORKDIR /app/chests-service
 
-RUN go mod download
+COPY chests-service /app/chests-service
+
 RUN go build -o chests-service -ldflags '-linkmode external -extldflags "-static"'
 
 FROM alpine:latest

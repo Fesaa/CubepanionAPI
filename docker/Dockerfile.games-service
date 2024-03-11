@@ -1,12 +1,9 @@
-FROM golang:latest as go-stage
-
-WORKDIR /app
-
-COPY . .
+FROM cubepanion-api-base as go-stage
 
 WORKDIR /app/games-service
 
-RUN go mod download
+COPY games-service /app/games-service
+
 RUN go build -o games-service -ldflags '-linkmode external -extldflags "-static"'
 
 FROM alpine:latest

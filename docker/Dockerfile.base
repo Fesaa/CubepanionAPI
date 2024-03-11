@@ -1,0 +1,27 @@
+FROM golang:latest as go-stage
+
+WORKDIR /app
+
+COPY go.work .
+COPY go.work.sum .
+
+COPY chests-service/go.mod /app/chests-service/
+COPY chests-service/go.sum /app/chests-service/
+
+COPY core/go.mod /app/core/
+COPY core/go.sum /app/core/
+
+COPY cubesocket/go.mod /app/cubesocket/
+COPY cubesocket/go.sum /app/cubesocket/
+
+COPY games-service/go.mod /app/games-service/
+COPY games-service/go.sum /app/games-service/
+
+COPY maps-service/go.mod /app/maps-service/
+
+COPY leaderboard-service/go.mod /app/leaderboard-service/
+COPY leaderboard-service/go.sum /app/leaderboard-service/
+
+RUN go mod download
+
+COPY core /app/core

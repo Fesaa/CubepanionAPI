@@ -1,13 +1,9 @@
-
-FROM golang:latest as go-stage
-
-WORKDIR /app
-
-COPY . .
+FROM cubepanion-api-base as go-stage
 
 WORKDIR /app/leaderboard-service
 
-RUN go mod download
+COPY leaderboard-service /app/leaderboard-service
+
 RUN go build -o leaderboard-service -ldflags '-linkmode external -extldflags "-static"'
 
 FROM alpine:latest

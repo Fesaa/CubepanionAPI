@@ -1,12 +1,9 @@
-FROM golang:latest as go-stage
-
-WORKDIR /app
-
-COPY . .
+FROM cubepanion-api-base as go-stage
 
 WORKDIR /app/cubesocket
 
-RUN go mod download
+COPY cubesocket /app/cubesocket
+
 RUN go build -o cubesocket -ldflags '-linkmode external -extldflags "-static"'
 
 FROM alpine:latest
