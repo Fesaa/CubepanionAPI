@@ -26,4 +26,4 @@ jobs:
         run: go test -v ./games-service
 
       - name: Run test Maps Service
-        run: go test -v ./map-service
+        run: go test -v ./maps-service
