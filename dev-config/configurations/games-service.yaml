@@ -1,0 +1,16 @@
+service_name: "chests-service"
+host: "0.0.0.0"
+port: 8000
+
+database:
+  host: "postgres-backend"
+  port: 5432
+  username: "dev"
+  password: "dev"
+  database: "leaderboard_api"
+  sslmode: "disable"
+
+redis:
+  host: "redis:6379"
+  password: ""
+  db: 0

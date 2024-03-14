@@ -1,0 +1,76 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    networks:
+      - backend
+    volumes:
+      - ./configurations/nginx.conf:/etc/nginx/conf.d/default.conf
+
+  chests-service:
+    image: chests-service
+    restart: always
+    networks:
+      - backend
+    volumes:
+      - ./configurations/chests-service.yaml:/app/config.yaml
+
+  cubesocket:
+    image: cubesocket
+    restart: always
+    networks:
+      - backend
+    volumes:
+      - ./configurations/cubesocket.yaml:/app/config.yaml
+
+  leaderboard-service:
+    image: leaderboard-service
+    restart: always
+    networks:
+      - backend
+    volumes:
+      - ./configurations/leaderboard-service.yaml:/app/config.yaml
+
+  games-service:
+    image: games-service
+    restart: always
+    networks:
+      - backend
+    volumes:
+      - ./configurations/games-service.yaml:/app/config.yaml
+
+  maps-service:
+    image: maps-service
+    restart: always
+    networks:
+      - backend
+    volumes:
+      - ./configurations/maps-service.yaml:/app/config.yaml
+
+  redis:
+    image: redis
+    networks:
+      - backend
+    volumes:
+      - redis-data:/data
+
+  postgres-backend:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  backend: {}
