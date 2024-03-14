@@ -16,6 +16,10 @@ func main() {
 	}
 
 	ms, err := core.NewMicroService(config, database.Connect)
+	if err != nil {
+		slog.Error("Failed to create microservice: ", "error", err)
+		return
+	}
 
 	ms.UseDefaults()
 	ms.UseRedisCache()
