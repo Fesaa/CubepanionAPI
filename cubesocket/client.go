@@ -49,7 +49,8 @@ wsLoop:
 		}
 
 		if err != nil {
-			slog.Error(fmt.Sprintf("error writing message: %v", err))
+			c.cleanup()
+			slog.Error("Error in client loop", "uuid", c.UUID, "error", err)
 			break
 		}
 	}
