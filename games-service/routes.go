@@ -8,11 +8,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func games(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
+func games(ms core.MicroService[core.MicroServiceConfig, database.Database], c *fiber.Ctx) error {
 	activeS := c.Params("active", "true")
 	active := activeS == "true"
 
-	games, err := database.GetGames(active)
+	games, err := ms.DB().GetGames(active)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -22,7 +22,7 @@ func games(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
 	return c.JSON(games)
 }
 
-func game(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
+func game(ms core.MicroService[core.MicroServiceConfig, database.Database], c *fiber.Ctx) error {
 	game := c.Params("game")
 	if game == "" {
 		return c.Status(400).JSON(fiber.Map{
@@ -38,7 +38,7 @@ func game(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
 		})
 	}
 
-	g, err := database.GetGame(game)
+	g, err := ms.DB().GetGame(game)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),

@@ -10,7 +10,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Connect(d core.DatabaseConfig) (*sql.DB, error) {
+type defaultDatabase struct {
+	db *sql.DB
+}
+
+func Connect(d core.DatabaseConfig) (Database, error) {
 	db, err := sql.Open("postgres", d.AsConnectionString())
 	if err != nil {
 		return nil, err
@@ -26,10 +30,10 @@ func Connect(d core.DatabaseConfig) (*sql.DB, error) {
 		return nil, err
 	}
 
-	return db, nil
+	return &defaultDatabase{db: db}, nil
 }
 
-func GetGames(active bool) ([]models.Game, error) {
+func (d *defaultDatabase) GetGames(active bool) ([]models.Game, error) {
 	var rows *sql.Rows
 	var err error
 
@@ -65,7 +69,7 @@ func GetGames(active bool) ([]models.Game, error) {
 	return games, nil
 }
 
-func GetGame(s string) (string, error) {
+func (d *defaultDatabase) GetGame(s string) (string, error) {
 	row := getGame.QueryRow(s)
 
 	var game string
