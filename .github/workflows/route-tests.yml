@@ -1,4 +1,4 @@
-name: Tests
+name: Route Tests
 
 on:
   push:
@@ -24,3 +24,6 @@ jobs:
 
       - name: Run test Games Service
         run: go test -v ./games-service
+
+      - name: Run test Maps Service
+        run: go test -v ./map-service
