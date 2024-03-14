@@ -8,7 +8,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Connect(d core.DatabaseConfig) (*sql.DB, error) {
+type defaultDatabase struct {
+	db *sql.DB
+}
+
+func Connect(d core.DatabaseConfig) (Database, error) {
 	db, err := sql.Open("postgres", d.AsConnectionString())
 	if err != nil {
 		return nil, err
@@ -24,17 +28,17 @@ func Connect(d core.DatabaseConfig) (*sql.DB, error) {
 		return nil, err
 	}
 
-	return db, nil
+	return &defaultDatabase{db: db}, nil
 }
 
-func GetSeasons(active bool) ([]models.Season, error) {
+func (d *defaultDatabase) GetSeasons(active bool) ([]models.Season, error) {
 	return innerGetSeasons(active)
 }
 
-func GetChests(season string) ([]models.ChestLocation, error) {
+func (d *defaultDatabase) GetChests(season string) ([]models.ChestLocation, error) {
 	return innerGetChestLocations(season)
 }
 
-func GetCurrentChests() ([]models.ChestLocation, error) {
+func (d *defaultDatabase) GetCurrentChests() ([]models.ChestLocation, error) {
 	return innerGetCurrentChestLocations()
 }

@@ -1,7 +1,5 @@
 package core
 
-import "database/sql"
-
 type MicroServiceConfig interface {
 	ServiceName() string
 	Host() string
@@ -28,4 +26,4 @@ type RedisConfig interface {
 	Password() string
 }
 
-type DatabaseProvider func(config DatabaseConfig) (*sql.DB, error)
+type DatabaseProvider[D any] func(config DatabaseConfig) (D, error)

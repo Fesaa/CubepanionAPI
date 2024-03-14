@@ -1,0 +1,32 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - "master"
+  pull_request:
+    branches:
+      - "master"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.22.1"
+
+      - name: CD to Chest Service
+        run: cd chests-service
+
+      - name: Run test Chest Service
+        run: go test -v .
+
+      - name: CD to Games Service
+        run: cd ../games-service
+
+      - name: Run test Games Service
+        run: go test -v .

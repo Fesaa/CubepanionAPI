@@ -91,6 +91,27 @@ func (c DefaultRedisConfig) DB() int {
 	return c.YDB
 }
 
+func LoadDefaultConfigFromEnv() MicroServiceConfig {
+	return &DefaultConfig{
+		YServiceName: os.Getenv("SERVICE_NAME"),
+		YHost:        os.Getenv("HOST"),
+		YPort:        8080,
+		YDatabase: DefaultDatabaseConfig{
+			YHost:     os.Getenv("DB_HOST"),
+			YPort:     5432,
+			YUsername: os.Getenv("DB_USERNAME"),
+			YPassword: os.Getenv("DB_PASSWORD"),
+			YDatabase: os.Getenv("DB_NAME"),
+			YSslmode:  "disable",
+		},
+		YRedis: DefaultRedisConfig{
+			YHost:     os.Getenv("REDIS_HOST"),
+			YPassWord: os.Getenv("REDIS_PASSWORD"),
+			YDB:       0,
+		},
+	}
+}
+
 func LoadDefaultConfig(path string) (MicroServiceConfig, error) {
 	config := DefaultConfig{}
 	err := LoadConfig(path, &config)

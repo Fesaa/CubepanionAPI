@@ -6,8 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Maps(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
-	maps, err := database.GetAllMaps()
+func Maps(ms core.MicroService[core.MicroServiceConfig, database.Database], c *fiber.Ctx) error {
+	maps, err := ms.DB().GetAllMaps()
 	if err != nil {
 		return c.JSON(fiber.Map{"error": err.Error()})
 	}
@@ -15,9 +15,9 @@ func Maps(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
 	return c.JSON(maps)
 }
 
-func Map(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
+func Map(ms core.MicroService[core.MicroServiceConfig, database.Database], c *fiber.Ctx) error {
 	name := c.Params("mapName")
-	maps, err := database.GetMap(name)
+	maps, err := ms.DB().GetMap(name)
 	if err != nil {
 		return c.JSON(fiber.Map{"error": err.Error()})
 	}

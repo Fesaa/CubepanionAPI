@@ -6,7 +6,6 @@ import (
 
 	"github.com/Fesaa/CubepanionAPI/core/models"
 	"github.com/Fesaa/CubepanionAPI/core/proto/packets"
-	"github.com/Fesaa/CubepanionAPI/cubesocket/database"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -49,7 +48,7 @@ func (c *Client) handleDisconnect(packet *packets.C2SDisconnectPacket) error {
 }
 
 func (c *Client) handleUpdateLocation(packet *packets.C2SUpdateLocationPacket) error {
-	database.SetPlayerLocation(c.UUID, models.Location{
+	c.ms.DB().SetPlayerLocation(c.UUID, models.Location{
 		Current:    packet.Destination,
 		Previous:   packet.Origin,
 		InPreLobby: packet.PreLobby,
@@ -70,7 +69,7 @@ func (c *Client) handleUpdatePerk(packet *packets.C2SPerkUpdatePacket) error {
 		},
 	}
 
-	players, err := database.GetSharedPlayers(c.UUID)
+	players, err := c.ms.DB().GetSharedPlayers(c.UUID)
 	if err != nil {
 		return err
 	}

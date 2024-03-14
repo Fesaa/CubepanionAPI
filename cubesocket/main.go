@@ -23,7 +23,7 @@ func main() {
 	ms.UseDefaults()
 
 	ms.Use("/ws", RequireUpgrade)
-	ms.App().Get("/ws/:uuid", Handler())
+	ms.App().Get("/ws/:uuid", Handler(ms))
 
 	err = ms.Start()
 	if err != nil {

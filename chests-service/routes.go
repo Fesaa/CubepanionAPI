@@ -6,27 +6,27 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Seasons(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
+func Seasons(ms core.MicroService[core.MicroServiceConfig, database.Database], c *fiber.Ctx) error {
 	activeS := c.Params("active", "false")
 	active := activeS == "true"
-	seasons, err := database.GetSeasons(active)
+	seasons, err := ms.DB().GetSeasons(active)
 	if err != nil {
 		return c.JSON(fiber.Map{"error": err.Error()})
 	}
 	return c.JSON(seasons)
 }
 
-func ChestLocations(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
+func ChestLocations(ms core.MicroService[core.MicroServiceConfig, database.Database], c *fiber.Ctx) error {
 	season := c.Params("season")
-	seasons, err := database.GetChests(season)
+	seasons, err := ms.DB().GetChests(season)
 	if err != nil {
 		return c.JSON(fiber.Map{"error": err.Error()})
 	}
 	return c.JSON(seasons)
 }
 
-func CurrentChestLocations(ms core.MicroService[core.MicroServiceConfig], c *fiber.Ctx) error {
-	seasons, err := database.GetCurrentChests()
+func CurrentChestLocations(ms core.MicroService[core.MicroServiceConfig, database.Database], c *fiber.Ctx) error {
+	seasons, err := ms.DB().GetCurrentChests()
 	if err != nil {
 		return c.JSON(fiber.Map{"error": err.Error()})
 	}

@@ -8,7 +8,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Connect(d core.DatabaseConfig) (*sql.DB, error) {
+type defaultDatabase struct {
+	db *sql.DB
+}
+
+func Connect(d core.DatabaseConfig) (Database, error) {
 	db, err := sql.Open("postgres", d.AsConnectionString())
 	if err != nil {
 		return nil, err
@@ -24,10 +28,10 @@ func Connect(d core.DatabaseConfig) (*sql.DB, error) {
 		return nil, err
 	}
 
-	return db, nil
+	return &defaultDatabase{db: db}, nil
 }
 
-func GetPlayerLocation(uuid string) (*models.Location, error) {
+func (d *defaultDatabase) GetPlayerLocation(uuid string) (*models.Location, error) {
 	row := getPlayerLocation.QueryRow(uuid)
 	var location models.Location
 	err := row.Scan(&location.Current, &location.Previous, &location.InPreLobby)
@@ -38,17 +42,17 @@ func GetPlayerLocation(uuid string) (*models.Location, error) {
 	return &location, nil
 }
 
-func SetPlayerLocation(uuid string, location models.Location) error {
+func (d *defaultDatabase) SetPlayerLocation(uuid string, location models.Location) error {
 	_, err := setPlayerLocation.Exec(uuid, location.Current, location.Previous, location.InPreLobby)
 	return err
 }
 
-func RemovePlayerLocation(uuid string) error {
+func (d *defaultDatabase) RemovePlayerLocation(uuid string) error {
 	_, err := removePlayerLocation.Exec(uuid)
 	return err
 }
 
-func GetSharedPlayers(uuid string) ([]string, error) {
+func (d *defaultDatabase) GetSharedPlayers(uuid string) ([]string, error) {
 	rows, err := getSharedPlayers.Query(uuid)
 	if err != nil {
 		return nil, err

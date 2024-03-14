@@ -16,7 +16,7 @@ import (
 var playerRegex = regexp.MustCompile(`^[a-zA-Z0-9_]{3,16}$`)
 var gameRegex = regexp.MustCompile(`^[a-zA-Z0-9_ ]`)
 
-func PlayerLeaderboard(ms core.MicroService[LeaderboardServiceConfig], c *fiber.Ctx) error {
+func PlayerLeaderboard(ms core.MicroService[LeaderboardServiceConfig, database.Database], c *fiber.Ctx) error {
 	player := c.Params("name")
 	if !playerRegex.MatchString(player) {
 		return c.Status(400).JSON(fiber.Map{
@@ -24,7 +24,7 @@ func PlayerLeaderboard(ms core.MicroService[LeaderboardServiceConfig], c *fiber.
 		})
 	}
 
-	leaderboard, err := database.GetLeaderboardForPlayer(player)
+	leaderboard, err := ms.DB().GetLeaderboardForPlayer(player)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -34,7 +34,7 @@ func PlayerLeaderboard(ms core.MicroService[LeaderboardServiceConfig], c *fiber.
 	return c.JSON(leaderboard)
 }
 
-func GameLeaderboardBounded(ms core.MicroService[LeaderboardServiceConfig], c *fiber.Ctx) error {
+func GameLeaderboardBounded(ms core.MicroService[LeaderboardServiceConfig, database.Database], c *fiber.Ctx) error {
 	gameDisplayName, err := convertGame(ms, c.Params("game"))
 	if err != nil {
 		slog.Error("Could not convert game", "error", err)
@@ -71,7 +71,7 @@ func GameLeaderboardBounded(ms core.MicroService[LeaderboardServiceConfig], c *f
 		})
 	}
 
-	leaderboard, err := database.GetLeaderboardBounded(gameDisplayName, start, end)
+	leaderboard, err := ms.DB().GetLeaderboardBounded(gameDisplayName, start, end)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -81,7 +81,7 @@ func GameLeaderboardBounded(ms core.MicroService[LeaderboardServiceConfig], c *f
 	return c.JSON(leaderboard)
 }
 
-func GameLeaderboard(ms core.MicroService[LeaderboardServiceConfig], c *fiber.Ctx) error {
+func GameLeaderboard(ms core.MicroService[LeaderboardServiceConfig, database.Database], c *fiber.Ctx) error {
 	gameDisplayName, err := convertGame(ms, c.Params("game"))
 	if err != nil {
 		slog.Error("Could not convert game", "error", err)
@@ -90,7 +90,7 @@ func GameLeaderboard(ms core.MicroService[LeaderboardServiceConfig], c *fiber.Ct
 		})
 	}
 
-	leaderboard, err := database.GetLeaderboard(gameDisplayName)
+	leaderboard, err := ms.DB().GetLeaderboard(gameDisplayName)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": err.Error(),
@@ -100,7 +100,7 @@ func GameLeaderboard(ms core.MicroService[LeaderboardServiceConfig], c *fiber.Ct
 	return c.JSON(leaderboard)
 }
 
-func Submit(ms core.MicroService[LeaderboardServiceConfig], c *fiber.Ctx) error {
+func Submit(ms core.MicroService[LeaderboardServiceConfig, database.Database], c *fiber.Ctx) error {
 	var submission models.LeaderboardSubmission
 	err := c.BodyParser(&submission)
 	if err != nil {
@@ -125,7 +125,7 @@ func Submit(ms core.MicroService[LeaderboardServiceConfig], c *fiber.Ctx) error 
 
 	submission.Game = game
 
-	err = database.SubmitLeaderboard(submission)
+	err = ms.DB().SubmitLeaderboard(submission)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": fmt.Sprintf("error submitting leaderboard: %v", err),
@@ -135,7 +135,7 @@ func Submit(ms core.MicroService[LeaderboardServiceConfig], c *fiber.Ctx) error 
 	return c.SendStatus(202)
 }
 
-func convertGame(ms core.MicroService[LeaderboardServiceConfig], game string) (string, error) {
+func convertGame(ms core.MicroService[LeaderboardServiceConfig, database.Database], game string) (string, error) {
 	if game == "" {
 		return "", fmt.Errorf("game name is required")
 	}

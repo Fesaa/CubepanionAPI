@@ -5,9 +5,10 @@ import (
 	"net/http"
 
 	"github.com/Fesaa/CubepanionAPI/core"
+	"github.com/Fesaa/CubepanionAPI/leaderboard-service/database"
 )
 
-func getGame(ms core.MicroService[LeaderboardServiceConfig], s string) (string, error) {
+func getGame(ms core.MicroService[LeaderboardServiceConfig, database.Database], s string) (string, error) {
 	url := ms.Config().GamesService()
 	url += "/game/" + s
 

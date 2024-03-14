@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/Fesaa/CubepanionAPI/core"
 	"github.com/Fesaa/CubepanionAPI/core/proto/packets"
 	"github.com/Fesaa/CubepanionAPI/cubesocket/database"
 	ws "github.com/gofiber/contrib/websocket"
@@ -17,6 +18,7 @@ var (
 type Client struct {
 	UUID string
 	c    *ws.Conn
+	ms   core.MicroService[core.MicroServiceConfig, database.Database]
 }
 
 func (c *Client) Start() {
@@ -60,7 +62,7 @@ func (c *Client) cleanup() {
 	if err != nil {
 		slog.Error(fmt.Sprintf("error closing connection: %v", err))
 	}
-	err = database.RemovePlayerLocation(c.UUID)
+	err = c.ms.DB().RemovePlayerLocation(c.UUID)
 	if err != nil {
 		slog.Error(fmt.Sprintf("error removing player location: %v", err))
 	}

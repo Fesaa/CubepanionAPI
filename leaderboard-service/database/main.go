@@ -8,11 +8,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var db *sql.DB
+type defaultDatabase struct {
+	db *sql.DB
+}
 
-func Connect(d core.DatabaseConfig) (*sql.DB, error) {
-	var err error
-	db, err = sql.Open("postgres", d.AsConnectionString())
+func Connect(d core.DatabaseConfig) (Database, error) {
+	db, err := sql.Open("postgres", d.AsConnectionString())
 	if err != nil {
 		return nil, err
 	}
@@ -27,21 +28,21 @@ func Connect(d core.DatabaseConfig) (*sql.DB, error) {
 		return nil, err
 	}
 
-	return db, nil
+	return &defaultDatabase{db: db}, nil
 }
 
-func GetLeaderboard(game string) ([]models.LeaderboardRow, error) {
+func (d *defaultDatabase) GetLeaderboard(game string) ([]models.LeaderboardRow, error) {
 	return innerGetLeaderboardBounded(game, 0, models.LEADERBOARD_SIZE)
 }
 
-func GetLeaderboardBounded(game string, start, end int) ([]models.LeaderboardRow, error) {
+func (d *defaultDatabase) GetLeaderboardBounded(game string, start, end int) ([]models.LeaderboardRow, error) {
 	return innerGetLeaderboardBounded(game, start, end)
 }
 
-func GetLeaderboardForPlayer(player string) ([]models.LeaderboardRow, error) {
-	return innerGetLeaderboardForPlayer(db, player)
+func (d *defaultDatabase) GetLeaderboardForPlayer(player string) ([]models.LeaderboardRow, error) {
+	return innerGetLeaderboardForPlayer(d.db, player)
 }
 
-func SubmitLeaderboard(req models.LeaderboardSubmission) error {
-	return innerInsertLeaderboards(db, req)
+func (d *defaultDatabase) SubmitLeaderboard(req models.LeaderboardSubmission) error {
+	return innerInsertLeaderboards(d.db, req)
 }

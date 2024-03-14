@@ -3,6 +3,8 @@ package main
 import (
 	"sync"
 
+	"github.com/Fesaa/CubepanionAPI/core"
+	"github.com/Fesaa/CubepanionAPI/cubesocket/database"
 	ws "github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
@@ -22,12 +24,13 @@ func RequireUpgrade(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusUpgradeRequired)
 }
 
-func Handler() fiber.Handler {
+func Handler(ms core.MicroService[core.MicroServiceConfig, database.Database]) fiber.Handler {
 	return ws.New(func(c *ws.Conn) {
 		uuid := utils.CopyString(c.Params("uuid"))
 		client := &Client{
 			UUID: uuid,
 			c:    c,
+			ms:   ms,
 		}
 
 		mux.Lock()

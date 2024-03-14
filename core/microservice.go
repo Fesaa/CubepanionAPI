@@ -1,7 +1,6 @@
 package core
 
 import (
-	"database/sql"
 	"fmt"
 	"log/slog"
 	"time"
@@ -13,14 +12,14 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-type defaultMicroService[T MicroServiceConfig] struct {
+type defaultMicroService[T MicroServiceConfig, D interface{}] struct {
 	config T
-	db     *sql.DB
+	db     D
 
 	app *fiber.App
 }
 
-func NewMicroService[T MicroServiceConfig](config T, d DatabaseProvider, fiberConfig ...fiber.Config) (MicroService[T], error) {
+func NewMicroService[T MicroServiceConfig, D interface{}](config T, d DatabaseProvider[D], fiberConfig ...fiber.Config) (MicroService[T, D], error) {
 	if d == nil {
 		return nil, fmt.Errorf("Database provider is nil")
 	}
@@ -32,7 +31,7 @@ func NewMicroService[T MicroServiceConfig](config T, d DatabaseProvider, fiberCo
 		return nil, fmt.Errorf("Failed to open database: %w", err)
 	}
 
-	m := &defaultMicroService[T]{
+	m := &defaultMicroService[T, D]{
 		config: config,
 		app:    app,
 		db:     db,
@@ -41,59 +40,59 @@ func NewMicroService[T MicroServiceConfig](config T, d DatabaseProvider, fiberCo
 	return m, nil
 }
 
-func (m *defaultMicroService[T]) Config() T {
+func (m *defaultMicroService[T, D]) Config() T {
 	return m.config
 }
 
-func (m *defaultMicroService[T]) DB() *sql.DB {
+func (m *defaultMicroService[T, D]) DB() D {
 	return m.db
 }
 
-func (m *defaultMicroService[T]) App() *fiber.App {
+func (m *defaultMicroService[T, D]) App() *fiber.App {
 	return m.app
 }
 
-func (m *defaultMicroService[T]) UseLogger(config ...logger.Config) {
+func (m *defaultMicroService[T, D]) UseLogger(config ...logger.Config) {
 	m.app.Use(logger.New(config...))
 }
 
-func (m *defaultMicroService[T]) UseLimiter(config ...limiter.Config) {
+func (m *defaultMicroService[T, D]) UseLimiter(config ...limiter.Config) {
 	m.app.Use(limiter.New(config...))
 }
 
-func (m *defaultMicroService[T]) UseCache(config ...cache.Config) {
+func (m *defaultMicroService[T, D]) UseCache(config ...cache.Config) {
 	m.app.Use(cache.New(config...))
 }
 
-func (m *defaultMicroService[T]) UseRedisCache() {
+func (m *defaultMicroService[T, D]) UseRedisCache() {
 	m.UseCache(cache.Config{
 		Storage: redisCache(m.Config()),
 	})
 }
 
-func (m *defaultMicroService[T]) Get(path string, handlers ...Handler[T]) fiber.Router {
+func (m *defaultMicroService[T, D]) Get(path string, handlers ...Handler[T, D]) fiber.Router {
 	return m.app.Get(path, m.conv(handlers...)...)
 }
 
-func (m *defaultMicroService[T]) Post(path string, handlers ...Handler[T]) fiber.Router {
+func (m *defaultMicroService[T, D]) Post(path string, handlers ...Handler[T, D]) fiber.Router {
 	return m.app.Post(path, m.conv(handlers...)...)
 }
 
-func (m *defaultMicroService[T]) Put(path string, handlers ...Handler[T]) fiber.Router {
+func (m *defaultMicroService[T, D]) Put(path string, handlers ...Handler[T, D]) fiber.Router {
 	return m.app.Put(path, m.conv(handlers...)...)
 }
 
-func (m *defaultMicroService[T]) Use(args ...interface{}) fiber.Router {
+func (m *defaultMicroService[T, D]) Use(args ...interface{}) fiber.Router {
 	return m.app.Use(args...)
 }
 
-func (m *defaultMicroService[T]) UsePrometheus() {
+func (m *defaultMicroService[T, D]) UsePrometheus() {
 	p := fiberprometheus.New(m.Config().ServiceName())
 	p.RegisterAt(m.App(), "/metrics")
 	m.App().Use(p.Middleware)
 }
 
-func (m *defaultMicroService[T]) UseDefaults() {
+func (m *defaultMicroService[T, D]) UseDefaults() {
 	m.UseLogger()
 	m.UsePrometheus()
 	m.UseLimiter(limiter.Config{
@@ -103,12 +102,12 @@ func (m *defaultMicroService[T]) UseDefaults() {
 	})
 }
 
-func (m *defaultMicroService[T]) Start() error {
+func (m *defaultMicroService[T, D]) Start() error {
 	slog.Info("Starting microservice", "host", m.Config().Host(), "port", m.Config().Port())
 	return m.app.Listen(fmt.Sprintf("%s:%d", m.Config().Host(), m.Config().Port()))
 }
 
-func (m *defaultMicroService[T]) conv(handlers ...Handler[T]) []fiber.Handler {
+func (m *defaultMicroService[T, D]) conv(handlers ...Handler[T, D]) []fiber.Handler {
 	h := make([]fiber.Handler, len(handlers))
 	for i, v := range handlers {
 		h[i] = func(c *fiber.Ctx) error {
