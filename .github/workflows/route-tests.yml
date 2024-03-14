@@ -27,3 +27,6 @@ jobs:
 
       - name: Run test Maps Service
         run: go test -v ./maps-service
+
+      - name: Run test Leaderboard Service
+        run: go test -v ./leaderboard-service

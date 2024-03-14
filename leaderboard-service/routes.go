@@ -39,7 +39,7 @@ func GameLeaderboardBounded(ms core.MicroService[LeaderboardServiceConfig, datab
 	if err != nil {
 		slog.Error("Could not convert game", "error", err)
 		return c.Status(400).JSON(fiber.Map{
-			"error": fmt.Sprintf("Could not convert game", c.Params("game")),
+			"error": fmt.Sprintf("Could not convert game %s", c.Params("game")),
 		})
 	}
 
@@ -86,7 +86,7 @@ func GameLeaderboard(ms core.MicroService[LeaderboardServiceConfig, database.Dat
 	if err != nil {
 		slog.Error("Could not convert game", "error", err)
 		return c.Status(400).JSON(fiber.Map{
-			"error": fmt.Sprintf("Could not convert game", c.Params("game")),
+			"error": fmt.Sprintf("Could not convert game %s", c.Params("game")),
 		})
 	}
 
