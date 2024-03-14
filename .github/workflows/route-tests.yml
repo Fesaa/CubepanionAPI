@@ -19,14 +19,8 @@ jobs:
         with:
           go-version: "1.22.1"
 
-      - name: CD to Chest Service
-        run: cd chests-service
-
       - name: Run test Chest Service
-        run: go test -v .
-
-      - name: CD to Games Service
-        run: cd ../games-service
+        run: go test -v ./chests-service
 
       - name: Run test Games Service
-        run: go test -v .
+        run: go test -v ./games-service
