@@ -13,3 +13,17 @@ Returns an array of (active) `Game`s.
 ### GET /game/:game
 
 Returns a `Game` object for the specified game.
+
+## Models
+
+### Game
+
+```json
+{
+  "game": "",
+  "display_name": "",
+  "aliases": [""],
+  "active": true,
+  "score_type": ""
+}
+```
