@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
 type defaultMicroService[T MicroServiceConfig, D interface{}] struct {
@@ -61,7 +62,18 @@ func (m *defaultMicroService[T, D]) UseLimiter(config ...limiter.Config) {
 }
 
 func (m *defaultMicroService[T, D]) UseCache(config ...cache.Config) {
-	m.app.Use(cache.New(config...))
+	if len(config) == 0 {
+		config = append(config, cache.Config{})
+	}
+
+	c := config[0]
+	if c.KeyGenerator == nil {
+		c.KeyGenerator = func(c *fiber.Ctx) string {
+			return m.Config().ServiceName() + utils.CopyString(c.Path())
+		}
+	}
+
+	m.app.Use(cache.New(c))
 }
 
 func (m *defaultMicroService[T, D]) UseRedisCache() {

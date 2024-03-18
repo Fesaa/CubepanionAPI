@@ -26,6 +26,7 @@ type MicroService[T MicroServiceConfig, D interface{}] interface {
 	UsePrometheus()
 	UseLogger(...logger.Config)
 	UseLimiter(...limiter.Config)
+	// Registers the cache middleware with the given config, adds a custom key generator to the config if not present
 	UseCache(...cache.Config)
 
 	// Registers the redis cache, will automatically fall back to in-memory cache if redis is not available
