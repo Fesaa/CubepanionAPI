@@ -6,11 +6,13 @@ on:
       - "master"
     paths:
       - "leaderboard-service/**"
+      - "core/**"
   pull_request:
     branches:
       - "master"
     paths:
       - "leaderboard-service/**"
+      - "core/**"
 
 jobs:
   test:

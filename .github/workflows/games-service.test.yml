@@ -6,11 +6,13 @@ on:
       - "master"
     paths:
       - "games-service/**"
+      - "core/**"
   pull_request:
     branches:
       - "master"
     paths:
       - "games-service/**"
+      - "core/**"
 
 jobs:
   test:

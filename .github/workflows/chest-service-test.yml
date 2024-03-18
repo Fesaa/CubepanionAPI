@@ -6,11 +6,13 @@ on:
       - "master"
     paths:
       - "chests-service/**"
+      - "core/**"
   pull_request:
     branches:
       - "master"
     paths:
       - "chests-service/**"
+      - "core/**"
 
 jobs:
   test:

@@ -6,11 +6,13 @@ on:
       - "master"
     paths:
       - "maps-service/**"
+      - "core/**"
   pull_request:
     branches:
       - "master"
     paths:
       - "maps-service/**"
+      - "core/**"
 
 jobs:
   test:
