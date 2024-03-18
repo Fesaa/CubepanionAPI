@@ -1,0 +1,27 @@
+name: Maps Service Tests
+
+on:
+  push:
+    branches:
+      - "master"
+    paths:
+      - "maps-service/**"
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - "maps-service/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.22.1"
+
+      - name: Run test Maps Service
+        run: go test -v ./maps-service
