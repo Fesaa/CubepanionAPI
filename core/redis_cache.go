@@ -11,7 +11,7 @@ import (
 
 var ctx = context.Background()
 
-type RedisWrapper struct {
+type redisWrapper struct {
 	rdb *redis.Client
 }
 
@@ -29,25 +29,25 @@ func redisCache(c MicroServiceConfig) fiber.Storage {
 		return nil
 	}
 
-	return &RedisWrapper{rdb}
+	return &redisWrapper{rdb}
 }
 
-func (rw *RedisWrapper) Get(key string) ([]byte, error) {
+func (rw *redisWrapper) Get(key string) ([]byte, error) {
 	return rw.rdb.Get(ctx, key).Bytes()
 }
 
-func (rw *RedisWrapper) Set(key string, val []byte, exp time.Duration) error {
+func (rw *redisWrapper) Set(key string, val []byte, exp time.Duration) error {
 	return rw.rdb.Set(ctx, key, val, exp).Err()
 }
 
-func (rw *RedisWrapper) Delete(key string) error {
+func (rw *redisWrapper) Delete(key string) error {
 	return rw.rdb.Del(ctx, key).Err()
 }
 
-func (rw *RedisWrapper) Reset() error {
+func (rw *redisWrapper) Reset() error {
 	return rw.rdb.FlushDB(ctx).Err()
 }
 
-func (rw *RedisWrapper) Close() error {
+func (rw *redisWrapper) Close() error {
 	return rw.rdb.Close()
 }

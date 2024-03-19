@@ -26,4 +26,4 @@ type RedisConfig interface {
 	Password() string
 }
 
-type DatabaseProvider[D any] func(config DatabaseConfig) (D, error)
+type DatabaseProvider[D Database] func(config DatabaseConfig) (D, error)

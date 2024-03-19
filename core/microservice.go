@@ -20,7 +20,7 @@ type defaultMicroService[T MicroServiceConfig, D interface{}] struct {
 	app *fiber.App
 }
 
-func NewMicroService[T MicroServiceConfig, D interface{}](config T, d DatabaseProvider[D], fiberConfig ...fiber.Config) (MicroService[T, D], error) {
+func NewMicroService[T MicroServiceConfig, D Database](config T, d DatabaseProvider[D], fiberConfig ...fiber.Config) (MicroService[T, D], error) {
 	if d == nil {
 		return nil, fmt.Errorf("Database provider is nil")
 	}
@@ -62,11 +62,13 @@ func (m *defaultMicroService[T, D]) UseLimiter(config ...limiter.Config) {
 }
 
 func (m *defaultMicroService[T, D]) UseCache(config ...cache.Config) {
-	if len(config) == 0 {
-		config = append(config, cache.Config{})
+	var c cache.Config
+	if len(config) > 0 {
+		c = config[0]
+	} else {
+		c = cache.Config{}
 	}
 
-	c := config[0]
 	if c.KeyGenerator == nil {
 		c.KeyGenerator = func(c *fiber.Ctx) string {
 			return m.Config().ServiceName() + utils.CopyString(c.Path())

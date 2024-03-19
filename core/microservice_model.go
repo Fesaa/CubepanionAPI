@@ -7,9 +7,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-type Handler[T MicroServiceConfig, D interface{}] func(MicroService[T, D], *fiber.Ctx) error
+type Database interface{}
 
-type MicroService[T MicroServiceConfig, D interface{}] interface {
+type Handler[T MicroServiceConfig, D Database] func(MicroService[T, D], *fiber.Ctx) error
+
+type MicroService[T MicroServiceConfig, D Database] interface {
 	Config() T
 	DB() D
 
