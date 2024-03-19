@@ -59,11 +59,15 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get-gamegamebounded">GET /game/:game/bounded</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-batch">GET /batch</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#models">Models</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#leaderboardrow">LeaderboardRow</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#batchrequest">BatchRequest</a>
     </li>
         </ul>
     </li>
@@ -106,6 +110,9 @@
 <p>Returns an array <code>LeaderboardRow</code>s for the specified game. The array will be 200 long.</p>
 <h3 id="get-gamegamebounded">GET /game/:game/bounded</h3>
 <p>Returns an array <code>LeaderboardRow</code>s for the specified game. The array will be 200 long. You must provide a <code>start</code> and <code>end</code> query parameter.</p>
+<h3 id="get-batch">GET /batch</h3>
+<p>Body must be <code>BatchRequest</code></p>
+<p>Returns an array of <code>LeaderboardRow</code>s for the passed players, in a specific game. This is used for checking which players in a game, are on that games leaderboard in the addon.</p>
 <h2 id="models">Models</h2>
 <h3 id="leaderboardrow">LeaderboardRow</h3>
 <pre><code class="language-json">{
@@ -117,6 +124,12 @@
 }
 </code></pre>
 <p>The score type should be loaded from the games-service. Load these once, on application startup and then periodically if needed. Don't make a new request each time. They hardly update.</p>
+<h3 id="batchrequest">BatchRequest</h3>
+<pre><code class="language-json">{
+  &quot;game&quot;: &quot;&quot;,
+  &quot;players&quot;: [&quot;&quot;]
+}
+</code></pre>
               
             </div>
           </div><footer>
