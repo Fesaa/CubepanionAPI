@@ -70,6 +70,18 @@ func (m *MockDatbase) SubmitLeaderboard(req models.LeaderboardSubmission) error 
 	return nil
 }
 
+func (m *MockDatbase) GetLeaderboardForPlayers(req models.GamePlayersRequest) ([]models.LeaderboardRow, error) {
+	rows := []models.LeaderboardRow{}
+	for _, row := range leaderboards {
+		for _, player := range req.Players {
+			if row.Player == player && row.Game == req.Game {
+				rows = append(rows, row)
+			}
+		}
+	}
+	return rows, nil
+}
+
 func testConfig() LeaderboardServiceConfig {
 	c := core.LoadDefaultConfigFromEnv()
 	return LeaderboardServiceConfig{
