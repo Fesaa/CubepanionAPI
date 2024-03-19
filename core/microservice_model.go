@@ -32,7 +32,7 @@ type MicroService[T MicroServiceConfig, D Database] interface {
 	UseCache(...cache.Config)
 
 	// Registers the redis cache, will automatically fall back to in-memory cache if redis is not available
-	UseRedisCache()
+	UseRedisCache(...cache.Config)
 
 	Start() error
 }

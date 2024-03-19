@@ -5,6 +5,8 @@ import (
 
 	"github.com/Fesaa/CubepanionAPI/core"
 	"github.com/Fesaa/CubepanionAPI/leaderboard-service/database"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cache"
 )
 
 func main() {
@@ -22,13 +24,18 @@ func main() {
 	}
 
 	ms.UseDefaults()
-	ms.UseRedisCache()
+	ms.UseRedisCache(cache.Config{
+		Next: func(c *fiber.Ctx) bool {
+			return c.Method() != "GET" && c.Path() != "/batch"
+		},
+		Methods: []string{fiber.MethodGet, fiber.MethodPost},
+	})
 
 	ms.Post("/", Submit)
 	ms.Get("/player/:name", PlayerLeaderboard)
 	ms.Get("/game/:game", GameLeaderboard)
 	ms.Get("/game/:game/bounded", GameLeaderboardBounded)
-	ms.Get("/batch", BatchPlayerLeaderboard)
+	ms.Post("/batch", BatchPlayerLeaderboard)
 
 	err = ms.Start()
 	if err != nil {

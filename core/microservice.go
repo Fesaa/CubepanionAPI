@@ -78,10 +78,16 @@ func (m *defaultMicroService[T, D]) UseCache(config ...cache.Config) {
 	m.app.Use(cache.New(c))
 }
 
-func (m *defaultMicroService[T, D]) UseRedisCache() {
-	m.UseCache(cache.Config{
-		Storage: redisCache(m.Config()),
-	})
+func (m *defaultMicroService[T, D]) UseRedisCache(config ...cache.Config) {
+	var c cache.Config
+	if len(config) > 0 {
+		c = config[0]
+	} else {
+		c = cache.Config{}
+	}
+
+	c.Storage = redisCache(m.Config())
+	m.UseCache(c)
 }
 
 func (m *defaultMicroService[T, D]) Get(path string, handlers ...Handler[T, D]) fiber.Router {
