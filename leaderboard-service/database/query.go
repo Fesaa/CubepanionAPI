@@ -5,9 +5,8 @@ import (
 	"fmt"
 )
 
-var getLastSubmission *sql.Stmt
-var getGameLastSubmissions *sql.Stmt
 var getLeaderboard *sql.Stmt
+var getLeaderboardForPlayer *sql.Stmt
 var getLeaderboardForPlayers *sql.Stmt
 
 var newSubmission *sql.Stmt
@@ -16,26 +15,37 @@ var disableSubmission *sql.Stmt
 func load(db *sql.DB) error {
 	var err error
 
-	getLastSubmission, err = db.Prepare("SELECT MAX(unix_time_stamp) FROM submissions WHERE game = $1 AND valid = true")
-	if err != nil {
-		return fmt.Errorf("Error preparing lastSubmission: %v", err)
-	}
-
-	getGameLastSubmissions, err = db.Prepare("SELECT game, MAX(unix_time_stamp) FROM submissions WHERE valid = true GROUP BY game")
-	if err != nil {
-		return fmt.Errorf("Error preparing getGameLastSubmissions: %v", err)
-	}
-
 	getLeaderboard, err = db.Prepare(`
 		SELECT *
 		FROM leaderboards
-		WHERE unix_time_stamp = $1
-			AND game = $2
-			AND position >= $3
-			AND position <= $4
+		WHERE unix_time_stamp = (
+			SELECT MAX(unix_time_stamp)
+			FROM submissions
+			WHERE valid = true
+				AND game = $1
+			)
+			AND game = $1
+			AND position >= $2
+			AND position <= $3
 		ORDER BY position`)
 	if err != nil {
 		return fmt.Errorf("Error preparing getLeaderboard: %v", err)
+	}
+
+	getLeaderboardForPlayer, err = db.Prepare(`
+		SELECT *
+		FROM leaderboards
+		WHERE UPPER(player) = UPPER($1)
+		AND (unix_time_stamp, game) = ANY(
+			SELECT MAX(unix_time_stamp), game
+			FROM submissions
+			WHERE valid = true
+			GROUP BY game
+			)
+		ORDER BY position
+		`)
+	if err != nil {
+		return fmt.Errorf("Error preparing getLeaderboardForPlayer: %v", err)
 	}
 
 	getLeaderboardForPlayers, err = db.Prepare(`
