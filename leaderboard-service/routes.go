@@ -151,3 +151,37 @@ func convertGame(ms core.MicroService[LeaderboardServiceConfig, database.Databas
 
 	return gameDisplayName, nil
 }
+
+func BatchPlayerLeaderboard(ms core.MicroService[LeaderboardServiceConfig, database.Database], c *fiber.Ctx) error {
+	var req models.GamePlayersRequest
+	err := c.BodyParser(&req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": fmt.Sprintf("error parsing request: %v", err),
+		})
+	}
+
+	err = validator.Validate(req)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": fmt.Sprintf("error validating request: %v", err),
+		})
+	}
+
+	gameDisplayName, err := convertGame(ms, req.Game)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": fmt.Sprintf("Could not convert game %s", req.Game),
+		})
+	}
+
+	req.Game = gameDisplayName
+	rows, err := ms.DB().GetLeaderboardForPlayers(req)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(rows)
+}

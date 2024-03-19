@@ -8,6 +8,7 @@ import (
 var getLastSubmission *sql.Stmt
 var getGameLastSubmissions *sql.Stmt
 var getLeaderboard *sql.Stmt
+var getLeaderboardForPlayers *sql.Stmt
 
 var newSubmission *sql.Stmt
 var disableSubmission *sql.Stmt
@@ -35,6 +36,22 @@ func load(db *sql.DB) error {
 		ORDER BY position`)
 	if err != nil {
 		return fmt.Errorf("Error preparing getLeaderboard: %v", err)
+	}
+
+	getLeaderboardForPlayers, err = db.Prepare(`
+		SELECT *
+		FROM leaderboards
+		WHERE game = $1
+			AND UPPER(player) = ANY(SELECT UPPER(unnest($2::text[])))
+			AND unix_time_stamp = (
+				SELECT MAX(unix_time_stamp)
+				FROM submissions
+				WHERE game = $1
+				AND valid = true
+				)
+		ORDER BY position`)
+	if err != nil {
+		return fmt.Errorf("Error preparing getLeaderboardForPlayers: %v", err)
 	}
 
 	newSubmission, err = db.Prepare("INSERT INTO submissions (uuid, unix_time_stamp, game, valid) VALUES ($1, $2, $3, $4)")

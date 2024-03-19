@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Fesaa/CubepanionAPI/core/models"
+	"github.com/lib/pq"
 )
 
 type gameSubmission struct {
@@ -98,5 +99,27 @@ func innerGetLeaderboardBounded(game string, start, end int) ([]models.Leaderboa
 		}
 		leaderboard = append(leaderboard, row)
 	}
+	return leaderboard, nil
+}
+
+func innerGetLeaderboardForPlayers(req models.GamePlayersRequest) ([]models.LeaderboardRow, error) {
+	rows, err := getLeaderboardForPlayers.Query(req.Game, pq.Array(req.Players))
+	if err != nil {
+		slog.Error("Error querying for leaderboard for players in a game: ", "error", err)
+		return nil, err
+	}
+
+	defer rows.Close()
+	var leaderboard []models.LeaderboardRow = make([]models.LeaderboardRow, 0)
+	for rows.Next() {
+		var row models.LeaderboardRow
+		err = rows.Scan(&row.Game, &row.Player, &row.Position, &row.Score, &row.UnixTimeStamp)
+		if err != nil {
+			slog.Error(fmt.Sprintf("Error scanning leaderboard row: ", "error", err))
+			return nil, err
+		}
+		leaderboard = append(leaderboard, row)
+	}
+
 	return leaderboard, nil
 }

@@ -6,5 +6,6 @@ type Database interface {
 	GetLeaderboard(game string) ([]models.LeaderboardRow, error)
 	GetLeaderboardBounded(game string, start, end int) ([]models.LeaderboardRow, error)
 	GetLeaderboardForPlayer(player string) ([]models.LeaderboardRow, error)
+	GetLeaderboardForPlayers(req models.GamePlayersRequest) ([]models.LeaderboardRow, error)
 	SubmitLeaderboard(req models.LeaderboardSubmission) error
 }

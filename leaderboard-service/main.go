@@ -28,6 +28,7 @@ func main() {
 	ms.Get("/player/:name", PlayerLeaderboard)
 	ms.Get("/game/:game", GameLeaderboard)
 	ms.Get("/game/:game/bounded", GameLeaderboardBounded)
+	ms.Post("/batch", BatchPlayerLeaderboard)
 
 	err = ms.Start()
 	if err != nil {

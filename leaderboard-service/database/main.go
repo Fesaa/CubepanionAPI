@@ -46,3 +46,7 @@ func (d *defaultDatabase) GetLeaderboardForPlayer(player string) ([]models.Leade
 func (d *defaultDatabase) SubmitLeaderboard(req models.LeaderboardSubmission) error {
 	return innerInsertLeaderboards(d.db, req)
 }
+
+func (d *defaultDatabase) GetLeaderboardForPlayers(req models.GamePlayersRequest) ([]models.LeaderboardRow, error) {
+	return innerGetLeaderboardForPlayers(req)
+}
