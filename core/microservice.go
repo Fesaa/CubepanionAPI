@@ -107,8 +107,8 @@ func (m *defaultMicroService[T, D]) UsePrometheus() {
 }
 
 func (m *defaultMicroService[T, D]) UseDefaults() {
-	m.UseLogger()
 	m.UsePrometheus()
+	m.UseLogger()
 	m.UseLimiter(limiter.Config{
 		Max:               10,
 		Expiration:        10 * time.Second,
