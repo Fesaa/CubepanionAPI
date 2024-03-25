@@ -12,7 +12,6 @@ COPY core/go.mod /app/core/
 COPY core/go.sum /app/core/
 
 COPY cubesocket/go.mod /app/cubesocket/
-COPY cubesocket/go.sum /app/cubesocket/
 
 COPY games-service/go.mod /app/games-service/
 COPY games-service/go.sum /app/games-service/
