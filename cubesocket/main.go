@@ -33,12 +33,13 @@ func main() {
 
 	childInitialize := func(channel netty.Channel) {
 		channel.Pipeline().
+			AddLast(pipeline.EOFFilter{}).
 			AddLast(netty.ReadIdleHandler(time.Second * 30)).
 			AddLast(netty.WriteIdleHandler(time.Second * 30)).
-			AddLast(&pipeline.PacketSplitter{}).
-			AddLast(&pipeline.PacketDecoder{}).
-			AddLast(&pipeline.PacketPrepender{}).
-			AddLast(&pipeline.PacketEncoder{}).
+			AddLast(pipeline.PacketSplitter{}).
+			AddLast(pipeline.PacketDecoder{}).
+			AddLast(pipeline.PacketPrepender{}).
+			AddLast(pipeline.PacketEncoder{}).
 			AddLast(protocol.NewPacketHandler(db))
 	}
 
