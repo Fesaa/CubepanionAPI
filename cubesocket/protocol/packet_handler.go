@@ -1,7 +1,6 @@
 package protocol
 
 import (
-	"fmt"
 	"log/slog"
 	"time"
 
@@ -25,7 +24,6 @@ func (h *PacketHandler) HandleActive(ctx netty.ActiveContext) {
 }
 
 func (h *PacketHandler) HandleInactive(ctx netty.InactiveContext, ex netty.Exception) {
-	fmt.Println("???")
 	slog.Info(format(FORMAT_DISCONNECT, ctx.Channel()), "id", ctx.Channel().ID(), "reason", ex)
 	conn, ok := clients.Get(ctx.Channel().ID())
 	if ok {
