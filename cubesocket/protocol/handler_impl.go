@@ -62,18 +62,6 @@ func (h *PacketHandler) HandlePerkUpdate(ctx netty.InboundContext, packet *packe
 }
 
 func (h *PacketHandler) HandleDisconnection(ctx netty.InboundContext, packet *packets.PacketDisconnection) error {
-	conn, ok := clients.Get(ctx.Channel().ID())
-	if ok {
-		err := h.db.RemovePlayerLocation(conn.UUID())
-		if err != nil {
-			slog.Error("Unable to remove player location", "uuid", conn.UUID, "error", err)
-		}
-	}
-
-	clients.Remove(ctx.Channel().ID())
-	idMapping.RemoveByValue(ctx.Channel().ID())
-
-	// Special case, closing is not becaus of an error
 	ctx.Close(nil)
 	return nil
 }
