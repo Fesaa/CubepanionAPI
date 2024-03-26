@@ -1,9 +1,12 @@
 package protocol
 
 import (
+	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/Fesaa/CubepanionAPI/cubesocket/database"
+	"github.com/Fesaa/CubepanionAPI/cubesocket/prometheus"
 	"github.com/Fesaa/CubepanionAPI/cubesocket/protocol/packets"
 	"github.com/go-netty/go-netty"
 )
@@ -22,11 +25,15 @@ func (h *PacketHandler) HandleActive(ctx netty.ActiveContext) {
 }
 
 func (h *PacketHandler) HandleInactive(ctx netty.InactiveContext, ex netty.Exception) {
+	fmt.Println("???")
+	slog.Info(format(FORMAT_DISCONNECT, ctx.Channel()), "id", ctx.Channel().ID(), "reason", ex)
 	conn, ok := clients.Get(ctx.Channel().ID())
 	if ok {
+		prometheus.EndSession()
 		if err := h.db.RemovePlayerLocation(conn.UUID()); err != nil {
 			slog.Warn("Unable to remove player location", "uuid", conn.UUID(), "error", err)
 		}
+		prometheus.SessionDuration(time.Since(conn.start))
 	}
 
 	clients.Remove(ctx.Channel().ID())
@@ -39,13 +46,6 @@ func (h *PacketHandler) HandleRead(ctx netty.InboundContext, msg netty.Message) 
 
 func (h *PacketHandler) Handle(ctx netty.InboundContext, packet packets.Packet) {
 	if err := packet.Handle(ctx, h); err != nil {
-		conn, ok := clients.Get(ctx.Channel().ID())
-		if ok {
-			h.db.RemovePlayerLocation(conn.UUID())
-		}
-
-		clients.Remove(ctx.Channel().ID())
-		idMapping.RemoveByValue(ctx.Channel().ID())
 		ctx.Close(err)
 	}
 }

@@ -3,18 +3,21 @@ package protocol
 import (
 	"fmt"
 	"log/slog"
+	"time"
 
+	"github.com/Fesaa/CubepanionAPI/cubesocket/prometheus"
 	"github.com/Fesaa/CubepanionAPI/cubesocket/protocol/packets"
 	"github.com/go-netty/go-netty"
 )
 
 const (
-	FORMAT_LOGIN = "[%s] [LOGIN]"
-	FORMAT_HELLO = "[%s] [HELLO]"
+	FORMAT_LOGIN      = "[%s] [LOGIN]"
+	FORMAT_HELLO      = "[%s] [HELLO]"
+	FORMAT_DISCONNECT = "[%s] [DISCONNECT]"
 )
 
 func (h *PacketHandler) HandleHelloPing(ctx netty.InboundContext, packet *packets.PacketHelloPing) error {
-	slog.Info(format(FORMAT_HELLO, ctx), "id", ctx.Channel().ID(), "time", packet.Timestamp())
+	slog.Info(format(FORMAT_HELLO, ctx.Channel()), "id", ctx.Channel().ID(), "time", packet.Timestamp())
 	ctx.Write(&packets.PacketHelloPong{})
 	return nil
 }
@@ -93,11 +96,16 @@ func (h *PacketHandler) HandleLocationUpdate(ctx netty.InboundContext, packet *p
 }
 
 func (h *PacketHandler) HandleLogin(ctx netty.InboundContext, packet *packets.PacketLogin) error {
-	slog.Info(format(FORMAT_LOGIN, ctx), "id", ctx.Channel().ID(), "uuid", packet.UUID())
+	defer func() {
+		prometheus.NewSessions()
+		prometheus.StartSession()
+	}()
+	slog.Info(format(FORMAT_LOGIN, ctx.Channel()), "id", ctx.Channel().ID(), "uuid", packet.UUID())
 
 	clients.Put(ctx.Channel().ID(), Connection{
-		ctx:  ctx,
-		uuid: packet.UUID(),
+		ctx:   ctx,
+		uuid:  packet.UUID(),
+		start: time.Now(),
 	})
 	idMapping.Put(packet.UUID(), ctx.Channel().ID())
 
@@ -105,6 +113,6 @@ func (h *PacketHandler) HandleLogin(ctx netty.InboundContext, packet *packets.Pa
 	return nil
 }
 
-func format(format string, ctx netty.InboundContext) string {
-	return fmt.Sprintf(format, ctx.Channel().RemoteAddr())
+func format(format string, ch netty.Channel) string {
+	return fmt.Sprintf(format, ch.RemoteAddr())
 }

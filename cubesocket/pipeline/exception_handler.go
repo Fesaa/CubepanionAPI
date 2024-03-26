@@ -12,6 +12,7 @@ type EOFFilter struct{}
 func (f *EOFFilter) HandleException(ctx netty.ExceptionContext, ex netty.Exception) {
 	if ex == io.EOF {
 		slog.Debug("Connection closed by peer, ignoring EOF", "addr", ctx.Channel().RemoteAddr())
+		ctx.Close(io.EOF)
 		return
 	}
 

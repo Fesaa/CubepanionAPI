@@ -1,6 +1,8 @@
 package protocol
 
 import (
+	"time"
+
 	"github.com/Fesaa/CubepanionAPI/cubesocket/utils"
 	"github.com/go-netty/go-netty"
 )
@@ -11,8 +13,9 @@ var (
 )
 
 type Connection struct {
-	ctx  netty.HandlerContext
-	uuid string
+	ctx   netty.HandlerContext
+	uuid  string
+	start time.Time
 }
 
 func (c *Connection) Ctx() netty.HandlerContext {

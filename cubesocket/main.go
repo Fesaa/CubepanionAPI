@@ -9,6 +9,7 @@ import (
 	"github.com/Fesaa/CubepanionAPI/core"
 	"github.com/Fesaa/CubepanionAPI/cubesocket/database"
 	"github.com/Fesaa/CubepanionAPI/cubesocket/pipeline"
+	"github.com/Fesaa/CubepanionAPI/cubesocket/prometheus"
 	"github.com/Fesaa/CubepanionAPI/cubesocket/protocol"
 	"github.com/go-netty/go-netty"
 )
@@ -33,13 +34,13 @@ func main() {
 
 	childInitialize := func(channel netty.Channel) {
 		channel.Pipeline().
-			AddLast(pipeline.EOFFilter{}).
+			AddLast(&pipeline.EOFFilter{}).
 			AddLast(netty.ReadIdleHandler(time.Second * 30)).
 			AddLast(netty.WriteIdleHandler(time.Second * 30)).
-			AddLast(pipeline.PacketSplitter{}).
-			AddLast(pipeline.PacketDecoder{}).
-			AddLast(pipeline.PacketPrepender{}).
-			AddLast(pipeline.PacketEncoder{}).
+			AddLast(&pipeline.PacketSplitter{}).
+			AddLast(&pipeline.PacketDecoder{}).
+			AddLast(&pipeline.PacketPrepender{}).
+			AddLast(&pipeline.PacketEncoder{}).
 			AddLast(protocol.NewPacketHandler(db))
 	}
 
@@ -49,6 +50,7 @@ func main() {
 	slog.Info("Starting server", "address", address)
 	start := time.Now()
 
+	go prometheus.StartServer()
 	err = bootstrap.Listen(address).Sync()
 	if err != nil {
 		panic(err)
