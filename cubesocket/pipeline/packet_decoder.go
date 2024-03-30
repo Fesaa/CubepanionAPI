@@ -10,7 +10,14 @@ import (
 	"github.com/go-netty/go-netty"
 )
 
+const (
+	FORMAT_UNKNOWN_ID_COUNT_REACHED = "Reached unknown ID count limit. Closing connection."
+
+	UNKNOWN_ID_LIMIT = 5
+)
+
 type PacketDecoder struct {
+	unknownIDCount int
 }
 
 func (p *PacketDecoder) HandleRead(ctx netty.InboundContext, msg netty.Message) {
@@ -19,6 +26,10 @@ func (p *PacketDecoder) HandleRead(ctx netty.InboundContext, msg netty.Message) 
 	packet := protocol.PacketFromId(int(id))
 	if packet == nil {
 		slog.Warn("Ignoring packet", "id", id)
+		p.unknownIDCount++
+		if p.unknownIDCount > UNKNOWN_ID_LIMIT {
+			panic(FORMAT_UNKNOWN_ID_COUNT_REACHED)
+		}
 		return
 	}
 
