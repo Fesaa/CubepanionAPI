@@ -19,6 +19,22 @@ const (
 func (h *PacketHandler) HandleHelloPing(ctx netty.InboundContext, packet *packets.PacketHelloPing) error {
 	slog.Info(format(FORMAT_HELLO, ctx.Channel()), "id", ctx.Channel().ID(), "time", packet.Timestamp())
 	ctx.Write(&packets.PacketHelloPong{})
+
+	clients.Put(ctx.Channel().ID(), &Connection{
+		ctx:   ctx,
+		state: LOGIN,
+	})
+
+	go func(ctx netty.InboundContext) {
+		<-time.After(5 * time.Second)
+		conn := mustConnection(ctx.Channel())
+		if conn.state == LOGIN {
+			slog.Warn("Client didn't send login packet in time. Disconnecting...", "id", ctx.Channel().ID())
+			ctx.Write(packets.DisconnectWithReason("Login timeout"))
+			ctx.Close(nil)
+		}
+	}(ctx)
+
 	return nil
 }
 
@@ -28,10 +44,7 @@ func (h *PacketHandler) HandlePing(ctx netty.InboundContext, packet *packets.Pac
 }
 
 func (h *PacketHandler) HandlePerkUpdate(ctx netty.InboundContext, packet *packets.PacketPerkUpdate) error {
-	conn, ok := clients.Get(ctx.Channel().ID())
-	if !ok {
-		return fmt.Errorf("unknown connection")
-	}
+	conn := mustConnection(ctx.Channel())
 
 	players, err := h.db.GetSharedPlayers(conn.UUID())
 	if err != nil {
@@ -62,13 +75,13 @@ func (h *PacketHandler) HandlePerkUpdate(ctx netty.InboundContext, packet *packe
 }
 
 func (h *PacketHandler) HandleDisconnection(ctx netty.InboundContext, packet *packets.PacketDisconnection) error {
-	ctx.Close(nil)
+	ctx.Close(fmt.Errorf("Client disconnected %s", packet.Reason()))
 	return nil
 }
 
 func (h *PacketHandler) HandleLocationUpdate(ctx netty.InboundContext, packet *packets.PacketLocationUpdate) error {
-	conn, ok := clients.Get(ctx.Channel().ID())
-	if !ok {
+	conn := getConnection(ctx.Channel())
+	if conn == nil {
 		slog.Error("Received location update from unknown player", "id", ctx.Channel().ID())
 		return fmt.Errorf("unknown connection")
 	}
@@ -84,17 +97,18 @@ func (h *PacketHandler) HandleLocationUpdate(ctx netty.InboundContext, packet *p
 }
 
 func (h *PacketHandler) HandleLogin(ctx netty.InboundContext, packet *packets.PacketLogin) error {
+	conn := mustConnection(ctx.Channel())
+
 	defer func() {
 		prometheus.NewSessions()
 		prometheus.StartSession()
 	}()
 	slog.Info(format(FORMAT_LOGIN, ctx.Channel()), "id", ctx.Channel().ID(), "uuid", packet.UUID())
 
-	clients.Put(ctx.Channel().ID(), Connection{
-		ctx:   ctx,
-		uuid:  packet.UUID(),
-		start: time.Now(),
-	})
+	conn.uuid = packet.UUID()
+	conn.start = time.Now()
+	conn.state = CONNECTED
+
 	idMapping.Put(packet.UUID(), ctx.Channel().ID())
 
 	ctx.Write(&packets.PacketLoginComplete{})
