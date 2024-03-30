@@ -21,7 +21,7 @@ func main() {
 		return
 	}
 
-	if (len(os.Args) > 2 && os.Args[1] == "--debug") || os.Getenv("DEBUG") == "true" {
+	if (len(os.Args) > 1 && os.Args[1] == "--debug") || os.Getenv("DEBUG") == "true" {
 		slog.Info("Changing log level to debug")
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
