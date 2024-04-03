@@ -32,7 +32,7 @@ func (p *PacketSplitter) HandleRead(ctx netty.InboundContext, msg netty.Message)
 	n, err := r.Read(bs)
 	utils.Assert(err)
 	if n != length {
-		panic(fmt.Sprintf(FORMAT_WRONG_LENGTH, length, n))
+		ctx.Close(fmt.Errorf(FORMAT_WRONG_LENGTH, length, n))
 	}
 	ctx.HandleRead(buf.NewPacketBuffer(bs))
 }
