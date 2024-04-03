@@ -27,7 +27,12 @@ func (h *PacketHandler) HandleHelloPing(ctx netty.InboundContext, packet *packet
 
 	go func(ctx netty.InboundContext) {
 		<-time.After(5 * time.Second)
-		conn := mustConnection(ctx.Channel())
+		conn := getConnection(ctx.Channel())
+		if conn == nil {
+			slog.Warn("Connection already closed before State check", "id", ctx.Channel().ID())
+			ctx.Close(nil)
+			return
+		}
 		if conn.state == LOGIN {
 			slog.Warn("Client didn't send login packet in time. Disconnecting...", "id", ctx.Channel().ID())
 			ctx.Write(packets.DisconnectWithReason("Login timeout"))
