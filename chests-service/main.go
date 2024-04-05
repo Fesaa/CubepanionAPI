@@ -2,9 +2,11 @@ package main
 
 import (
 	"log/slog"
+	"time"
 
 	"github.com/Fesaa/CubepanionAPI/chests-service/database"
 	"github.com/Fesaa/CubepanionAPI/core"
+	"github.com/gofiber/fiber/v2/middleware/cache"
 )
 
 func main() {
@@ -21,7 +23,9 @@ func main() {
 	}
 
 	ms.UseDefaults()
-	ms.UseRedisCache()
+	ms.UseRedisCache(cache.Config{
+		Expiration: 1 * time.Hour,
+	})
 
 	ms.Get("/", CurrentChestLocations)
 	ms.Get("/:season", ChestLocations)
