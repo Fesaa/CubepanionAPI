@@ -26,7 +26,7 @@ func (h *PacketHandler) HandleActive(ctx netty.ActiveContext) {
 func (h *PacketHandler) HandleInactive(ctx netty.InactiveContext, ex netty.Exception) {
 	slog.Info(format(FORMAT_DISCONNECT, ctx.Channel()), "id", ctx.Channel().ID(), "reason", ex)
 	conn, ok := clients.Get(ctx.Channel().ID())
-	if ok {
+	if ok && conn.state == CONNECTED {
 		prometheus.EndSession()
 		if err := h.db.RemovePlayerLocation(conn.UUID()); err != nil {
 			slog.Warn("Unable to remove player location", "uuid", conn.UUID(), "error", err)

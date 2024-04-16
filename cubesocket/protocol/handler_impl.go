@@ -90,6 +90,10 @@ func (h *PacketHandler) HandleLocationUpdate(ctx netty.InboundContext, packet *p
 		slog.Error("Received location update from unknown player", "id", ctx.Channel().ID())
 		return fmt.Errorf("unknown connection")
 	}
+	if conn.state != CONNECTED {
+		slog.Warn("Received location update from player not in connected state", "uuid", conn.UUID(), "state", conn.state)
+		return nil
+	}
 
 	err := h.db.SetPlayerLocation(conn.UUID(), packet.Location())
 	if err != nil {
