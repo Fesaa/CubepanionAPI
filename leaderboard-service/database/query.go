@@ -16,7 +16,7 @@ func load(db *sql.DB) error {
 	var err error
 
 	getLeaderboard, err = db.Prepare(`
-		SELECT *
+		SELECT game, player, position, score, unix_time_stamp
 		FROM leaderboards
 		WHERE unix_time_stamp = (
 			SELECT MAX(unix_time_stamp)
@@ -33,9 +33,9 @@ func load(db *sql.DB) error {
 	}
 
 	getLeaderboardForPlayer, err = db.Prepare(`
-		SELECT *
+		SELECT game, player, position, score, unix_time_stamp
 		FROM leaderboards
-		WHERE UPPER(player) = UPPER($1)
+		WHERE normalized_player_name = UPPER($1)
 		AND (unix_time_stamp, game) = ANY(
 			SELECT MAX(unix_time_stamp), game
 			FROM submissions
@@ -49,10 +49,10 @@ func load(db *sql.DB) error {
 	}
 
 	getLeaderboardForPlayers, err = db.Prepare(`
-		SELECT *
+		SELECT game, player, position, score, unix_time_stamp
 		FROM leaderboards
 		WHERE game = $1
-			AND UPPER(player) = ANY(SELECT UPPER(unnest($2::text[])))
+			AND normalized_player_name = ANY(SELECT UPPER(unnest($2::text[])))
 			AND unix_time_stamp = (
 				SELECT MAX(unix_time_stamp)
 				FROM submissions

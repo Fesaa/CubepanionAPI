@@ -71,7 +71,7 @@ func (m *defaultMicroService[T, D]) UseCache(config ...cache.Config) {
 
 	if c.KeyGenerator == nil {
 		c.KeyGenerator = func(c *fiber.Ctx) string {
-			return m.Config().ServiceName() + utils.CopyString(c.Path())
+			return m.Config().ServiceName() + utils.CopyString(c.Context().URI().String())
 		}
 	}
 
