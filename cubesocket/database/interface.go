@@ -7,4 +7,5 @@ type Database interface {
 	SetPlayerLocation(uuid string, location models.Location) error
 	RemovePlayerLocation(uuid string) error
 	GetSharedPlayers(uuid string) ([]string, error)
+	SetProtocolVersion(uuid string, version int) error
 }

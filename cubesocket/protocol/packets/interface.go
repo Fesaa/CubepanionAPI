@@ -20,4 +20,5 @@ type Handler interface {
 	HandlePerkUpdate(ctx netty.InboundContext, packet *PacketPerkUpdate) error
 	HandleDisconnection(ctx netty.InboundContext, packet *PacketDisconnection) error
 	HandleLogin(ctx netty.InboundContext, packet *PacketLogin) error
+	HandleSetProtocol(ctx netty.InboundContext, packet *PacketSetProtocolVersion) error
 }

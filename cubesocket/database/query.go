@@ -7,6 +7,7 @@ var (
 	setPlayerLocation    *sql.Stmt
 	removePlayerLocation *sql.Stmt
 	getSharedPlayers     *sql.Stmt
+	setProtocolVersion   *sql.Stmt
 )
 
 func load(db *sql.DB) error {
@@ -27,7 +28,12 @@ func load(db *sql.DB) error {
 		return err
 	}
 
-	getSharedPlayers, err = db.Prepare("SELECT uuid FROM player_locations WHERE current = (SELECT current FROM player_locations WHERE uuid = $1) AND uuid != $1")
+	getSharedPlayers, err = db.Prepare("SELECT uuid FROM player_locations WHERE current = (SELECT current FROM player_locations WHERE uuid = $1) AND uuid != $1 AND version = (SELECT version FROM player_locations WHERE uuid = $1)")
+	if err != nil {
+		return err
+	}
+
+	setProtocolVersion, err = db.Prepare("INSERT INTO player_locations (uuid, version) VALUES ($1, $2) ON CONFLICT (uuid) DO UPDATE SET version = $2")
 	if err != nil {
 		return err
 	}

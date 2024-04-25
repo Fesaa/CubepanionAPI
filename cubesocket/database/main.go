@@ -70,3 +70,8 @@ func (d *defaultDatabase) GetSharedPlayers(uuid string) ([]string, error) {
 
 	return sharedPlayers, nil
 }
+
+func (d *defaultDatabase) SetProtocolVersion(uuid string, version int) error {
+	_, err := setProtocolVersion.Exec(uuid, version)
+	return err
+}

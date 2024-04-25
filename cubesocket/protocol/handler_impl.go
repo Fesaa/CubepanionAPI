@@ -124,6 +124,13 @@ func (h *PacketHandler) HandleLogin(ctx netty.InboundContext, packet *packets.Pa
 	return nil
 }
 
+func (h *PacketHandler) HandleSetProtocol(ctx netty.InboundContext, packet *packets.PacketSetProtocolVersion) error {
+	conn := mustConnection(ctx.Channel())
+	// Having no / the wrong protocol version means that you'll get invalid perk packets
+	// as this is currently the only actual use of the socket, we should just disconnect the client
+	return h.db.SetProtocolVersion(conn.UUID(), packet.ProtocolVersion())
+}
+
 func format(format string, ch netty.Channel) string {
 	return fmt.Sprintf(format, ch.RemoteAddr())
 }

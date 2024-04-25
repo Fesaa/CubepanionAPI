@@ -75,5 +75,6 @@ CREATE TABLE IF NOT EXISTS player_locations (
     previous VARCHAR NOT NULL,
     current VARCHAR NOT NULL,
     in_pre_lobby BOOLEAN NOT NULL,
+    version INT,
     PRIMARY KEY (uuid)
 );
