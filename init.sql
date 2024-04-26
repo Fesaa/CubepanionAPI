@@ -72,9 +72,9 @@ CREATE TABLE IF NOT EXISTS games (
 
 CREATE TABLE IF NOT EXISTS player_locations (
     uuid VARCHAR NOT NULL,
-    previous VARCHAR NOT NULL,
-    current VARCHAR NOT NULL,
-    in_pre_lobby BOOLEAN NOT NULL,
+    previous VARCHAR,
+    current VARCHAR,
+    in_pre_lobby BOOLEAN,
     version INT,
     PRIMARY KEY (uuid)
 );
