@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	var config LeaderboardServiceConfig = LeaderboardServiceConfig{}
 	err := core.LoadConfig("config.yaml", &config)
 	if err != nil {
