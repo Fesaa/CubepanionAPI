@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Fesaa/CubepanionAPI/core/log"
 	"io"
 	"net/http"
 
@@ -17,7 +18,11 @@ func getGame(ms core.MicroService[LeaderboardServiceConfig, database.Database], 
 		return "", err
 	}
 
-	defer res.Body.Close()
+	defer func(Body io.ReadCloser) {
+		if err = Body.Close(); err != nil {
+			log.Warn("Error closing response body", "error", err)
+		}
+	}(res.Body)
 	bytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", err

@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -14,6 +15,7 @@ type DefaultConfig struct {
 
 	YDatabase DefaultDatabaseConfig `yaml:"database"`
 	YRedis    DefaultRedisConfig    `yaml:"redis"`
+	YLogging  DefaultLoggingConfig  `yaml:"logging"`
 }
 
 func (c DefaultConfig) ServiceName() string {
@@ -34,6 +36,33 @@ func (c DefaultConfig) Database() DatabaseConfig {
 
 func (c DefaultConfig) Redis() RedisConfig {
 	return c.YRedis
+}
+
+func (c DefaultConfig) LoggingConfig() LoggingConfig {
+	return &c.YLogging
+}
+
+type DefaultLoggingConfig struct {
+	YLogLevel slog.Level `yaml:"log_level"`
+	YSource   bool       `yaml:"source"`
+	YHandler  string     `yaml:"handler"`
+	YLogHttp  bool       `yaml:"log_http"`
+}
+
+func (c DefaultLoggingConfig) LogLevel() slog.Level {
+	return c.YLogLevel
+}
+
+func (c DefaultLoggingConfig) Source() bool {
+	return c.YSource
+}
+
+func (c DefaultLoggingConfig) Handler() string {
+	return c.YHandler
+}
+
+func (c DefaultLoggingConfig) LogHttp() bool {
+	return c.YLogHttp
 }
 
 type DefaultDatabaseConfig struct {
@@ -69,8 +98,8 @@ func (c DefaultDatabaseConfig) SSLMode() string {
 	return c.YSslmode
 }
 
-func (d DefaultDatabaseConfig) AsConnectionString() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", d.Username(), d.Password(), d.Host(), d.Port(), d.Database(), d.SSLMode())
+func (c DefaultDatabaseConfig) AsConnectionString() string {
+	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", c.Username(), c.Password(), c.Host(), c.Port(), c.Database(), c.SSLMode())
 }
 
 type DefaultRedisConfig struct {

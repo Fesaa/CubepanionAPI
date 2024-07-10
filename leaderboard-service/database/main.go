@@ -40,7 +40,7 @@ func (d *defaultDatabase) GetLeaderboardBounded(game string, start, end int) ([]
 }
 
 func (d *defaultDatabase) GetLeaderboardForPlayer(player string) ([]models.LeaderboardRow, error) {
-	return innerGetLeaderboardForPlayer(d.db, player)
+	return innerGetLeaderboardForPlayer(player)
 }
 
 func (d *defaultDatabase) SubmitLeaderboard(req models.LeaderboardSubmission) error {

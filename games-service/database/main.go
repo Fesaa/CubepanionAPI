@@ -2,7 +2,8 @@ package database
 
 import (
 	"database/sql"
-	"log/slog"
+	"errors"
+	"github.com/Fesaa/CubepanionAPI/core/log"
 	"strings"
 
 	"github.com/Fesaa/CubepanionAPI/core"
@@ -44,18 +45,22 @@ func (d *defaultDatabase) GetGames(active bool) ([]models.Game, error) {
 	}
 
 	if err != nil {
-		slog.Error("Error querying for games: ", "error", err)
+		log.Error("Error querying for games: ", "error", err)
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		if err = rows.Close(); err != nil {
+			log.Warn("Error closing rows: ", "error", err)
+		}
+	}(rows)
 	var games []models.Game = make([]models.Game, 0)
 	for rows.Next() {
 		var game models.Game
 		var aliases string
 		err = rows.Scan(&game.Game, &game.Active, &game.DisplayName, &aliases, &game.ScoreType)
 		if err != nil {
-			slog.Error("Error scanning game: ", "error", err)
+			log.Error("Error scanning game: ", "error", err)
 			return nil, err
 		}
 		if aliases == "" {
@@ -75,11 +80,11 @@ func (d *defaultDatabase) GetGame(s string) (string, error) {
 	var game string
 	err := row.Scan(&game)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return "", nil
 		}
 
-		slog.Error("Error scanning game: ", "error", err)
+		log.Error("Error scanning game: ", "error", err)
 		return "", err
 	}
 

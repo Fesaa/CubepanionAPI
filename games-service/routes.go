@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/Fesaa/CubepanionAPI/core/errors"
+	"github.com/Fesaa/CubepanionAPI/core/log"
 	"net/url"
 
 	"github.com/Fesaa/CubepanionAPI/core"
@@ -14,9 +16,8 @@ func games(ms core.MicroService[core.MicroServiceConfig, database.Database], c *
 
 	games, err := ms.DB().GetGames(active)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		log.Error("Error getting games: ", "error", err)
+		return c.Status(500).JSON(errors.AsFiberMap(errors.DBError))
 	}
 
 	return c.JSON(games)
@@ -40,9 +41,8 @@ func game(ms core.MicroService[core.MicroServiceConfig, database.Database], c *f
 
 	g, err := ms.DB().GetGame(game)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		log.Error("Error getting game: ", "error", err)
+		return c.Status(500).JSON(errors.AsFiberMap(errors.DBError))
 	}
 
 	return c.SendString(g)
