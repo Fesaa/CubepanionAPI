@@ -1,11 +1,11 @@
-name: '[Chest Service] Push Docker image to Docker Hub'
+name: '[Leaderboard Service] Push Docker image to Docker Hub'
 
 on:
   push:
     branches:
       - "master"
     paths:
-      - "chests-service/**"
+      - "leaderboard-service/**"
   workflow_run:
     workflows: [ "[Base] Push Docker image to Docker Hub" ]
     types:
@@ -16,7 +16,7 @@ jobs:
     uses: './.github/workflows/chest-service-test.yml'
 
   push_to_registry:
-    name: '[Chest Service] Push Docker image to Docker Hub'
+    name: '[Leaderboard Service] Push Docker image to Docker Hub'
     needs: [tests]
     runs-on: ubuntu-latest
     permissions:
@@ -39,6 +39,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile.chest-service
+          file: ./docker/Dockerfile.leaderboard-service
           push: true
-          tags: ameliaah/cubepanion-services:chests
+          tags: ameliaah/cubepanion-services:leaderboard

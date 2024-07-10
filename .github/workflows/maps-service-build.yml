@@ -1,4 +1,4 @@
-name: '[Chest Service] Push Docker image to Docker Hub'
+name: '[Maps Service] Push Docker image to Docker Hub'
 
 on:
   push:
@@ -13,10 +13,10 @@ on:
 
 jobs:
   tests:
-    uses: './.github/workflows/chest-service-test.yml'
+    uses: './.github/workflows/maps-service-test.yml'
 
   push_to_registry:
-    name: '[Chest Service] Push Docker image to Docker Hub'
+    name: '[Maps Service] Push Docker image to Docker Hub'
     needs: [tests]
     runs-on: ubuntu-latest
     permissions:
@@ -39,6 +39,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile.chest-service
+          file: ./docker/Dockerfile.maps-service
           push: true
-          tags: ameliaah/cubepanion-services:chests
+          tags: ameliaah/cubepanion-services:maps
