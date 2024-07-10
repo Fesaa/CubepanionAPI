@@ -16,13 +16,14 @@ Returns an array `LeaderboardRow`s for the specified game. The array will be 200
 
 ### GET /game/:game/bounded
 
-Returns an array `LeaderboardRow`s for the specified game. The array will be 200 long. You must provide a `lower` and `upper` query parameter.
+Returns an array `LeaderboardRow`s for the specified game. You must provide a `lower` and `upper` query parameter, the array will be as long as their difference.
+The endpoint above is generally faster by ~15%, just use whatever is easier for your use case.
 
 ### GET /batch
 
 Body must be `BatchRequest`
 
-Returns an array of `LeaderboardRow`s for the passed players, in a specific game. This is used for checking which players in a game, are on that games leaderboard in the addon.
+Returns an array of `LeaderboardRow`s for the passed players, in a specific game. Not guaranteed to be ordered in any specific way
 
 ## Models
 

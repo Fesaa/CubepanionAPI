@@ -12,7 +12,7 @@ Returns an array of (active) `Game`s.
 
 ### GET /game/:game
 
-Returns a `Game` object for the specified game.
+Returns a `Game` object for the specified game. This may be the display, game, or any of the aliases. 
 
 ## Models
 
