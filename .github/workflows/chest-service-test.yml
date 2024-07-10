@@ -1,12 +1,6 @@
 name: Chest Service Tests
 
 on:
-  push:
-    branches:
-      - "master"
-    paths:
-      - "chests-service/**"
-      - "core/**"
   pull_request:
     branches:
       - "master"

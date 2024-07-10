@@ -1,4 +1,4 @@
-FROM cubepanion-api-base as go-stage
+FROM cubepanion-services:base as go-stage
 
 WORKDIR /app/leaderboard-service
 
