@@ -181,3 +181,13 @@ func BatchPlayerLeaderboard(ms core.MicroService[LeaderboardServiceConfig, datab
 
 	return c.JSON(rows)
 }
+
+func GetAllPlayers(ms core.MicroService[LeaderboardServiceConfig, database.Database], c *fiber.Ctx) error {
+	players, err := ms.DB().GetAllPlayers()
+	if err != nil {
+		log.Error("Error getting all players", "error", err)
+		return c.Status(500).JSON(errors.AsFiberMap(errors.DBError))
+	}
+
+	return c.JSON(players)
+}

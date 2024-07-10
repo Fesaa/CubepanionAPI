@@ -8,4 +8,5 @@ type Database interface {
 	GetLeaderboardForPlayer(player string) ([]models.LeaderboardRow, error)
 	GetLeaderboardForPlayers(req models.GamePlayersRequest) ([]models.LeaderboardRow, error)
 	SubmitLeaderboard(req models.LeaderboardSubmission) error
+	GetAllPlayers() ([]string, error)
 }

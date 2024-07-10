@@ -12,6 +12,8 @@ var getLeaderboardForPlayers *sql.Stmt
 var newSubmission *sql.Stmt
 var disableSubmission *sql.Stmt
 
+var getAllPlayers *sql.Stmt
+
 func load(db *sql.DB) error {
 	var err error
 
@@ -73,5 +75,19 @@ func load(db *sql.DB) error {
 	if err != nil {
 		return fmt.Errorf("Error preparing disableSubmission: %v", err)
 	}
+
+	getAllPlayers, err = db.Prepare(`
+			SELECT DISTINCT player
+				FROM leaderboards
+				WHERE (unix_time_stamp, game) = ANY(
+					SELECT MAX(unix_time_stamp), game
+					FROM submissions
+					WHERE valid = true
+					GROUP BY game)
+			;`)
+	if err != nil {
+		return fmt.Errorf("Error preparing getAllPlayers: %v", err)
+	}
+
 	return nil
 }

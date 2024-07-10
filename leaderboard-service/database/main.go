@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"github.com/Fesaa/CubepanionAPI/core/log"
 
 	"github.com/Fesaa/CubepanionAPI/core"
 	"github.com/Fesaa/CubepanionAPI/core/models"
@@ -49,4 +50,29 @@ func (d *defaultDatabase) SubmitLeaderboard(req models.LeaderboardSubmission) er
 
 func (d *defaultDatabase) GetLeaderboardForPlayers(req models.GamePlayersRequest) ([]models.LeaderboardRow, error) {
 	return innerGetLeaderboardForPlayers(req)
+}
+
+func (d *defaultDatabase) GetAllPlayers() ([]string, error) {
+	rows, err := getAllPlayers.Query()
+	if err != nil {
+		return nil, err
+	}
+
+	defer func(rows *sql.Rows) {
+		if err = rows.Close(); err != nil {
+			log.Warn("Error closing rows: ", "error", err)
+		}
+	}(rows)
+
+	players := make([]string, 0)
+	for rows.Next() {
+		var player string
+		err = rows.Scan(&player)
+		if err != nil {
+			return nil, err
+		}
+		players = append(players, player)
+	}
+
+	return players, nil
 }
