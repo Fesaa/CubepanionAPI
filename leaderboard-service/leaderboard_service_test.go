@@ -82,6 +82,14 @@ func (m *MockDatbase) GetLeaderboardForPlayers(req models.GamePlayersRequest) ([
 	return rows, nil
 }
 
+func (m *MockDatbase) GetAllPlayers() ([]string, error) {
+	players := []string{}
+	for _, row := range leaderboards {
+		players = append(players, row.Player)
+	}
+	return players, nil
+}
+
 func testConfig() LeaderboardServiceConfig {
 	c := core.LoadDefaultConfigFromEnv()
 	return LeaderboardServiceConfig{
