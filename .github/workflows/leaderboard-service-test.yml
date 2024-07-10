@@ -1,12 +1,6 @@
 name: Leaderboard Service Tests
 
 on:
-  push:
-    branches:
-      - "master"
-    paths:
-      - "leaderboard-service/**"
-      - "core/**"
   pull_request:
     branches:
       - "master"
