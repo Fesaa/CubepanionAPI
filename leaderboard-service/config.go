@@ -12,6 +12,7 @@ type LeaderboardServiceConfig struct {
 
 	YDatabase core.DefaultDatabaseConfig `yaml:"database"`
 	YRedis    core.DefaultRedisConfig    `yaml:"redis"`
+	YLogging  core.DefaultLoggingConfig  `yaml:"logging"`
 }
 
 func (c LeaderboardServiceConfig) ServiceName() string {
@@ -36,4 +37,8 @@ func (c LeaderboardServiceConfig) Database() core.DatabaseConfig {
 
 func (c LeaderboardServiceConfig) Redis() core.RedisConfig {
 	return c.YRedis
+}
+
+func (c LeaderboardServiceConfig) LoggingConfig() core.LoggingConfig {
+	return c.YLogging
 }

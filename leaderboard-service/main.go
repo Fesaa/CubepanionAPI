@@ -1,9 +1,8 @@
 package main
 
 import (
-	"log/slog"
-
 	"github.com/Fesaa/CubepanionAPI/core"
+	"github.com/Fesaa/CubepanionAPI/core/log"
 	"github.com/Fesaa/CubepanionAPI/leaderboard-service/database"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
@@ -13,13 +12,13 @@ func main() {
 	var config LeaderboardServiceConfig = LeaderboardServiceConfig{}
 	err := core.LoadConfig("config.yaml", &config)
 	if err != nil {
-		slog.Error("Failed to load config", "error", err)
+		log.Error("Failed to load config", "error", err)
 		return
 	}
 
 	ms, err := core.NewMicroService(config, database.Connect)
 	if err != nil {
-		slog.Error("Failed to create microservice: ", "error", err)
+		log.Error("Failed to create microservice: ", "error", err)
 		return
 	}
 
@@ -39,6 +38,6 @@ func main() {
 
 	err = ms.Start()
 	if err != nil {
-		slog.Error("Failed to start microservice", "error", err)
+		log.Error("Failed to start microservice", "error", err)
 	}
 }

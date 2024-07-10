@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log/slog"
+	"github.com/Fesaa/CubepanionAPI/core/errors"
+	"github.com/Fesaa/CubepanionAPI/core/log"
 	"regexp"
 	"strconv"
 
@@ -26,9 +27,8 @@ func PlayerLeaderboard(ms core.MicroService[LeaderboardServiceConfig, database.D
 
 	leaderboard, err := ms.DB().GetLeaderboardForPlayer(player)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		log.Error("Error getting leaderboard for player", "error", err)
+		return c.Status(500).JSON(errors.AsFiberMap(errors.DBError))
 	}
 
 	return c.JSON(leaderboard)
@@ -37,7 +37,7 @@ func PlayerLeaderboard(ms core.MicroService[LeaderboardServiceConfig, database.D
 func GameLeaderboardBounded(ms core.MicroService[LeaderboardServiceConfig, database.Database], c *fiber.Ctx) error {
 	gameDisplayName, err := convertGame(ms, c.Params("game"))
 	if err != nil {
-		slog.Error("Could not convert game", "error", err)
+		log.Error("Could not convert game", "error", err)
 		return c.Status(400).JSON(fiber.Map{
 			"error": fmt.Sprintf("Could not convert game %s", c.Params("game")),
 		})
@@ -73,9 +73,8 @@ func GameLeaderboardBounded(ms core.MicroService[LeaderboardServiceConfig, datab
 
 	leaderboard, err := ms.DB().GetLeaderboardBounded(gameDisplayName, start, end)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		log.Error("Error getting bounded leaderboard", "error", err)
+		return c.Status(500).JSON(errors.AsFiberMap(errors.DBError))
 	}
 
 	return c.JSON(leaderboard)
@@ -84,7 +83,7 @@ func GameLeaderboardBounded(ms core.MicroService[LeaderboardServiceConfig, datab
 func GameLeaderboard(ms core.MicroService[LeaderboardServiceConfig, database.Database], c *fiber.Ctx) error {
 	gameDisplayName, err := convertGame(ms, c.Params("game"))
 	if err != nil {
-		slog.Error("Could not convert game", "error", err)
+		log.Error("Could not convert game", "error", err)
 		return c.Status(400).JSON(fiber.Map{
 			"error": fmt.Sprintf("Could not convert game %s", c.Params("game")),
 		})
@@ -92,9 +91,8 @@ func GameLeaderboard(ms core.MicroService[LeaderboardServiceConfig, database.Dat
 
 	leaderboard, err := ms.DB().GetLeaderboard(gameDisplayName)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		log.Error("Error getting leaderboard", "error", err)
+		return c.Status(500).JSON(errors.AsFiberMap(errors.DBError))
 	}
 
 	return c.JSON(leaderboard)
@@ -127,9 +125,8 @@ func Submit(ms core.MicroService[LeaderboardServiceConfig, database.Database], c
 
 	err = ms.DB().SubmitLeaderboard(submission)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": fmt.Sprintf("error submitting leaderboard: %v", err),
-		})
+		log.Error("Error submitting leaderboard", "error", err)
+		return c.Status(500).JSON(errors.AsFiberMap(errors.DBError))
 	}
 
 	return c.SendStatus(202)
@@ -178,9 +175,8 @@ func BatchPlayerLeaderboard(ms core.MicroService[LeaderboardServiceConfig, datab
 	req.Game = gameDisplayName
 	rows, err := ms.DB().GetLeaderboardForPlayers(req)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		log.Error("Error getting leaderboard for players", "error", err)
+		return c.Status(500).JSON(errors.AsFiberMap(errors.DBError))
 	}
 
 	return c.JSON(rows)

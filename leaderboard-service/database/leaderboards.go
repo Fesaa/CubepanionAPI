@@ -2,32 +2,31 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"log/slog"
 
+	"github.com/Fesaa/CubepanionAPI/core/log"
 	"github.com/Fesaa/CubepanionAPI/core/models"
 	"github.com/lib/pq"
 )
 
-type gameSubmission struct {
-	game           string
-	lastSubmission int64
-}
-
-func innerGetLeaderboardForPlayer(db *sql.DB, player string) ([]models.LeaderboardRow, error) {
-	var leaderboard []models.LeaderboardRow = make([]models.LeaderboardRow, 0)
+func innerGetLeaderboardForPlayer(player string) ([]models.LeaderboardRow, error) {
+	var leaderboard = make([]models.LeaderboardRow, 0)
 	rows, err := getLeaderboardForPlayer.Query(player)
 	if err != nil {
-		slog.Error(fmt.Sprintf("Error querying for leaderboard: %v", err))
+		log.Error("Error querying for leaderboard for player: ", "error, err")
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		if err = rows.Close(); err != nil {
+			log.Warn("Error closing rows: ", "error", err)
+		}
+	}(rows)
 	for rows.Next() {
 		var row models.LeaderboardRow
 		err = rows.Scan(&row.Game, &row.Player, &row.Position, &row.Score, &row.UnixTimeStamp)
 		if err != nil {
-			slog.Error(fmt.Sprintf("Error scanning leaderboard row: %v", err))
+			log.Error("Error scanning leaderboard row", "error", err)
 			return nil, err
 		}
 		leaderboard = append(leaderboard, row)
@@ -43,13 +42,17 @@ func innerGetLeaderboardBounded(game string, start, end int) ([]models.Leaderboa
 		return nil, err
 	}
 
-	defer rows.Close()
-	var leaderboard []models.LeaderboardRow = make([]models.LeaderboardRow, 0)
+	defer func(rows *sql.Rows) {
+		if err = rows.Close(); err != nil {
+			log.Warn("Error closing rows: ", "error", err)
+		}
+	}(rows)
+	var leaderboard = make([]models.LeaderboardRow, 0)
 	for rows.Next() {
 		var row models.LeaderboardRow
 		err = rows.Scan(&row.Game, &row.Player, &row.Position, &row.Score, &row.UnixTimeStamp)
 		if err != nil {
-			slog.Error(fmt.Sprintf("Error scanning leaderboard row: %v", err))
+			log.Error("Error scanning leaderboard row", "error", err)
 			return nil, err
 		}
 		leaderboard = append(leaderboard, row)
@@ -60,17 +63,21 @@ func innerGetLeaderboardBounded(game string, start, end int) ([]models.Leaderboa
 func innerGetLeaderboardForPlayers(req models.GamePlayersRequest) ([]models.LeaderboardRow, error) {
 	rows, err := getLeaderboardForPlayers.Query(req.Game, pq.Array(req.Players))
 	if err != nil {
-		slog.Error("Error querying for leaderboard for players in a game: ", "error", err)
+		log.Error("Error querying for leaderboard for players in a game: ", "error", err)
 		return nil, err
 	}
 
-	defer rows.Close()
-	var leaderboard []models.LeaderboardRow = make([]models.LeaderboardRow, 0)
+	defer func(rows *sql.Rows) {
+		if err = rows.Close(); err != nil {
+			log.Warn("Error closing rows: ", "error", err)
+		}
+	}(rows)
+	var leaderboard = make([]models.LeaderboardRow, 0)
 	for rows.Next() {
 		var row models.LeaderboardRow
 		err = rows.Scan(&row.Game, &row.Player, &row.Position, &row.Score, &row.UnixTimeStamp)
 		if err != nil {
-			slog.Error(fmt.Sprintf("Error scanning leaderboard row: ", "error", err))
+			log.Error("Error scanning leaderboard row: ", "error", err)
 			return nil, err
 		}
 		leaderboard = append(leaderboard, row)

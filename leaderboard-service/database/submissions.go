@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"log/slog"
+	"github.com/Fesaa/CubepanionAPI/core/log"
 	"strings"
 
 	"github.com/Fesaa/CubepanionAPI/core/models"
@@ -35,7 +35,7 @@ func generateLeaderboardInsertSQL(unix uint64, game string, rows []models.Leader
 
 func innerInsertLeaderboards(db *sql.DB, req models.LeaderboardSubmission) error {
 	if len(req.Entries) != models.LEADERBOARD_SIZE {
-		return fmt.Errorf("Leaderboard submission must have 200 entries")
+		return fmt.Errorf("leaderboard submission must have 200 entries")
 	}
 
 	err := innerInsertSubmission(req.Uuid, req.Game, req.UnixTimeStamp)
@@ -47,7 +47,7 @@ func innerInsertLeaderboards(db *sql.DB, req models.LeaderboardSubmission) error
 	if err != nil {
 		err2 := innerDisableSubmission(req.Uuid, req.UnixTimeStamp)
 		if err2 != nil {
-			slog.Error(fmt.Sprintf("Error disabling submission after failed leaderboard insert: %v", err2))
+			log.Error("Error disabling submission after failed leaderboard insert", "error", err2)
 		}
 		return err
 	}

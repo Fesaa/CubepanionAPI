@@ -2,7 +2,10 @@ package core
 
 import (
 	"fmt"
+	"github.com/Fesaa/CubepanionAPI/core/log"
 	"log/slog"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/ansrivas/fiberprometheus/v2"
@@ -32,6 +35,24 @@ func NewMicroService[T MicroServiceConfig, D Database](config T, d DatabaseProvi
 		return nil, fmt.Errorf("Failed to open database: %w", err)
 	}
 
+	opt := &slog.HandlerOptions{
+		AddSource:   config.LoggingConfig().Source(),
+		Level:       config.LoggingConfig().LogLevel(),
+		ReplaceAttr: nil,
+	}
+	var h slog.Handler
+	switch strings.ToUpper(config.LoggingConfig().Handler()) {
+	case "TEXT":
+		h = slog.NewTextHandler(os.Stdout, opt)
+	case "JSON":
+		h = slog.NewJSONHandler(os.Stdout, opt)
+	default:
+		panic("Invalid logging handler: " + config.LoggingConfig().Handler())
+	}
+	_log := slog.New(h)
+	slog.SetDefault(_log)
+	log.SetDefault(_log)
+
 	m := &defaultMicroService[T, D]{
 		config: config,
 		app:    app,
@@ -54,7 +75,20 @@ func (m *defaultMicroService[T, D]) App() *fiber.App {
 }
 
 func (m *defaultMicroService[T, D]) UseLogger(config ...logger.Config) {
-	m.app.Use(logger.New(config...))
+	var c logger.Config
+	if len(config) > 0 {
+		c = config[0]
+	} else {
+		c = logger.Config{}
+	}
+
+	if c.Next == nil {
+		c.Next = func(c *fiber.Ctx) bool {
+			return !m.Config().LoggingConfig().LogHttp()
+		}
+	}
+
+	m.app.Use(logger.New(c))
 }
 
 func (m *defaultMicroService[T, D]) UseLimiter(config ...limiter.Config) {

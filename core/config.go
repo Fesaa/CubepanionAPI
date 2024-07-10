@@ -1,5 +1,7 @@
 package core
 
+import "log/slog"
+
 type MicroServiceConfig interface {
 	ServiceName() string
 	Host() string
@@ -7,6 +9,14 @@ type MicroServiceConfig interface {
 
 	Database() DatabaseConfig
 	Redis() RedisConfig
+	LoggingConfig() LoggingConfig
+}
+
+type LoggingConfig interface {
+	LogLevel() slog.Level
+	Source() bool
+	Handler() string
+	LogHttp() bool
 }
 
 type DatabaseConfig interface {

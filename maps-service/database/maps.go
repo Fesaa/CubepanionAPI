@@ -2,9 +2,9 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
-	"log/slog"
-
+	"github.com/Fesaa/CubepanionAPI/core/log"
 	"github.com/Fesaa/CubepanionAPI/core/models"
 )
 
@@ -14,26 +14,30 @@ func innerGetEggWarsMap(name string) (*models.EggWarsMap, error) {
 	var emap models.EggWarsMap
 	err := em.Scan(&emap.UniqueName, &emap.MapName, &emap.TeamSize, &emap.BuildLimit, &emap.Colours, &emap.Layout)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("No eggwars map with unique name %s", name)
 		}
-		slog.Error("Error scanning eggwars map: %v", err)
+		log.Error("Error scanning eggwars map", "error", err)
 		return nil, err
 	}
 
 	emap.Generators = make([]models.Generator, 0)
 	gens, err := getMapGenerators.Query(name)
 	if err != nil {
-		slog.Error("Error querying for generators: %v", err)
+		log.Error("Error querying for generators", "error", err)
 		return nil, err
 	}
 
-	defer gens.Close()
+	defer func(rows *sql.Rows) {
+		if err = rows.Close(); err != nil {
+			log.Error("Error closing rows: ", "error", err)
+		}
+	}(gens)
 	for gens.Next() {
 		var eg models.Generator
 		err = gens.Scan(&eg.UniqueName, &eg.Ordering, &eg.Type, &eg.Location, &eg.Level, &eg.Count)
 		if err != nil {
-			slog.Error("Error scanning generator: %v", err)
+			log.Error("Error scanning generator", "error", err)
 			return nil, err
 		}
 		emap.Generators = append(emap.Generators, eg)
@@ -45,18 +49,22 @@ func innerGetEggWarsMap(name string) (*models.EggWarsMap, error) {
 func innerGetEggWarsMaps() ([]models.EggWarsMap, error) {
 	maps, err := getEggWarsMaps.Query()
 	if err != nil {
-		slog.Error("Error querying for eggwars maps: %v", err)
+		log.Error("Error querying for eggwars maps", "errors", err)
 		return nil, err
 	}
 
-	defer maps.Close()
-	var mapsMap map[string]models.EggWarsMap = make(map[string]models.EggWarsMap)
+	defer func(rows *sql.Rows) {
+		if err = rows.Close(); err != nil {
+			log.Error("Error closing rows: ", "error", err)
+		}
+	}(maps)
+	var mapsMap = make(map[string]models.EggWarsMap)
 
 	for maps.Next() {
 		var em models.EggWarsMap
 		err = maps.Scan(&em.UniqueName, &em.MapName, &em.TeamSize, &em.BuildLimit, &em.Colours, &em.Layout)
 		if err != nil {
-			slog.Error("Error scanning eggwars map: %v", err)
+			log.Error("Error scanning eggwars map", "errors", err)
 			return nil, err
 		}
 
@@ -66,22 +74,26 @@ func innerGetEggWarsMaps() ([]models.EggWarsMap, error) {
 
 	gens, err := getGenerators.Query()
 	if err != nil {
-		slog.Error("Error querying for generators: %v", err)
+		log.Error("Error querying for generators", "errors", err)
 		return nil, err
 	}
 
-	defer gens.Close()
+	defer func(rows *sql.Rows) {
+		if err = rows.Close(); err != nil {
+			log.Error("Error closing rows: ", "error", err)
+		}
+	}(gens)
 	for gens.Next() {
 		var eg models.Generator
 		err = gens.Scan(&eg.UniqueName, &eg.Ordering, &eg.Type, &eg.Location, &eg.Level, &eg.Count)
 		if err != nil {
-			slog.Error("Error scanning generator: %v", err)
+			log.Error("Error scanning generator", "errors", err)
 			return nil, err
 		}
 
 		em, ok := mapsMap[eg.UniqueName]
 		if !ok {
-			slog.Error(fmt.Sprintf("Generator %s does not have a corresponding map", eg.UniqueName))
+			log.Error(fmt.Sprintf("Generator %s does not have a corresponding map", eg.UniqueName))
 			continue
 		}
 		em.Generators = append(em.Generators, eg)
