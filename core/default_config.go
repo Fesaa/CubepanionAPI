@@ -120,6 +120,8 @@ func (c DefaultRedisConfig) DB() int {
 	return c.YDB
 }
 
+// LoadDefaultConfigFromEnv loads the default configuration from environment variables.
+// Logging level is set to info, source is set to true, handler is set to text, and log http is set to true.
 func LoadDefaultConfigFromEnv() MicroServiceConfig {
 	return &DefaultConfig{
 		YServiceName: os.Getenv("SERVICE_NAME"),
@@ -137,6 +139,12 @@ func LoadDefaultConfigFromEnv() MicroServiceConfig {
 			YHost:     os.Getenv("REDIS_HOST"),
 			YPassWord: os.Getenv("REDIS_PASSWORD"),
 			YDB:       0,
+		},
+		YLogging: DefaultLoggingConfig{
+			YLogLevel: slog.LevelInfo,
+			YSource:   true,
+			YHandler:  "text",
+			YLogHttp:  true,
 		},
 	}
 }
