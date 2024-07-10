@@ -109,10 +109,11 @@
 <h3 id="get-gamegame">GET /game/:game</h3>
 <p>Returns an array <code>LeaderboardRow</code>s for the specified game. The array will be 200 long.</p>
 <h3 id="get-gamegamebounded">GET /game/:game/bounded</h3>
-<p>Returns an array <code>LeaderboardRow</code>s for the specified game. The array will be 200 long. You must provide a <code>lower</code> and <code>upper</code> query parameter.</p>
+<p>Returns an array <code>LeaderboardRow</code>s for the specified game. You must provide a <code>lower</code> and <code>upper</code> query parameter, the array will be as long as their difference.
+The endpoint above is generally faster by ~15%, just use whatever is easier for your use case.</p>
 <h3 id="get-batch">GET /batch</h3>
 <p>Body must be <code>BatchRequest</code></p>
-<p>Returns an array of <code>LeaderboardRow</code>s for the passed players, in a specific game. This is used for checking which players in a game, are on that games leaderboard in the addon.</p>
+<p>Returns an array of <code>LeaderboardRow</code>s for the passed players, in a specific game. Not guaranteed to be ordered in any specific way</p>
 <h2 id="models">Models</h2>
 <h3 id="leaderboardrow">LeaderboardRow</h3>
 <pre><code class="language-json">{
