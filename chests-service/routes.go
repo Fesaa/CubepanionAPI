@@ -21,6 +21,7 @@ func Seasons(ms core.MicroService[core.MicroServiceConfig, database.Database], c
 
 func ChestLocations(ms core.MicroService[core.MicroServiceConfig, database.Database], c *fiber.Ctx) error {
 	season := c.Params("season")
+
 	seasons, err := ms.DB().GetChests(season)
 	if err != nil {
 		log.Error("Error getting chest locations: ", "error", err)

@@ -6,7 +6,6 @@ on:
       - "master"
     paths:
       - "chests-service/**"
-      - 'core/**'
   workflow_run:
     workflows: [ "[Base] Push Docker image to Docker Hub" ]
     types:
@@ -45,7 +44,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
