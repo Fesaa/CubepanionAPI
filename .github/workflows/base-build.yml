@@ -7,12 +7,8 @@ on:
       - "core/**"
 
 jobs:
-  tests:
-    uses: './.github/workflows/chest-service-test.yml'
   push_to_registry:
     name: '[Base] Push Docker image to Docker Hub'
-    needs:
-      - tests
     runs-on: ubuntu-latest
     permissions:
       packages: write

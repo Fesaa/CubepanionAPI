@@ -5,7 +5,6 @@ on:
       - "master"
     paths:
       - "chests-service/**"
-    paths-ignore:
       - 'core/**'
   workflow_run:
     workflows: [ "[Base] Push Docker image to Docker Hub" ]
@@ -15,10 +14,30 @@ on:
 jobs:
   tests:
     uses: './.github/workflows/chest-service-test.yml'
+
+  check_core_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      core_changed: ${{ steps.core_check.outputs.core_changed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Check for core changes
+        id: core_check
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^core/'; then
+            echo "core_changed=true" >> $GITHUB_ENV
+          else
+            echo "core_changed=false" >> $GITHUB_ENV
+        outputs:
+          core_changed: ${{ env.core_changed }}
+
   push_to_registry:
     name: '[Chest Service] Push Docker image to Docker Hub'
     needs:
       - tests
+      - check_core_changes
+    if: needs.check_core_changes.outputs.core_changed == 'false'
     runs-on: ubuntu-latest
     permissions:
       packages: write
