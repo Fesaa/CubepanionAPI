@@ -16,7 +16,7 @@ Returns an array `LeaderboardRow`s for the specified game. The array will be 200
 
 ### GET /game/:game/bounded
 
-Returns an array `LeaderboardRow`s for the specified game. The array will be 200 long. You must provide a `start` and `end` query parameter.
+Returns an array `LeaderboardRow`s for the specified game. The array will be 200 long. You must provide a `lower` and `upper` query parameter.
 
 ### GET /batch
 
