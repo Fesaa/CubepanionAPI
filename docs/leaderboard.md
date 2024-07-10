@@ -25,6 +25,10 @@ Body must be `BatchRequest`
 
 Returns an array of `LeaderboardRow`s for the passed players, in a specific game. Not guaranteed to be ordered in any specific way
 
+### GET /players
+
+Returns an array of strings, containing all names of the players on the latest leaderboards
+
 ## Models
 
 ### LeaderboardRow
