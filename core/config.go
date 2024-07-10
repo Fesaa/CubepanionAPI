@@ -37,3 +37,8 @@ type RedisConfig interface {
 }
 
 type DatabaseProvider[D Database] func(config DatabaseConfig) (D, error)
+
+type a interface {
+	Open() error
+	Close() error
+}
