@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+
 	config, err := core.LoadDefaultConfig("config.yaml")
 	if err != nil {
 		log.Error("Failed to load config", "error", err)
