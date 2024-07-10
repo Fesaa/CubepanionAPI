@@ -90,6 +90,7 @@ func testConfig() LeaderboardServiceConfig {
 		YGamesServiceURL: os.Getenv("GAMES_SERVICE_URL"),
 		YDatabase:        *c.Database().(*core.DefaultDatabaseConfig),
 		YRedis:           c.Redis().(core.DefaultRedisConfig),
+		YLogging:         *c.LoggingConfig().(*core.DefaultLoggingConfig),
 	}
 }
 
