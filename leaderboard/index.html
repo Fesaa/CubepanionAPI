@@ -61,6 +61,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get-batch">GET /batch</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-players">GET /players</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#models">Models</a>
@@ -114,6 +116,8 @@ The endpoint above is generally faster by ~15%, just use whatever is easier for 
 <h3 id="get-batch">GET /batch</h3>
 <p>Body must be <code>BatchRequest</code></p>
 <p>Returns an array of <code>LeaderboardRow</code>s for the passed players, in a specific game. Not guaranteed to be ordered in any specific way</p>
+<h3 id="get-players">GET /players</h3>
+<p>Returns an array of strings, containing all names of the players on the latest leaderboards</p>
 <h2 id="models">Models</h2>
 <h3 id="leaderboardrow">LeaderboardRow</h3>
 <pre><code class="language-json">{
