@@ -39,7 +39,7 @@ func load(db *sql.DB) error {
 		return err
 	}
 
-	setGameStat, err = db.Prepare("INSERT INTO game_stats (unix_time_stamp, game, player_count) VALUES ($1, $2, $3) ON CONFLICT (uuid, game, stat) DO NOTHING")
+	setGameStat, err = db.Prepare("INSERT INTO game_stats (unix_time_stamp, game, player_count, uuid) VALUES ($1, $2, $3, $4)")
 	if err != nil {
 		return err
 	}

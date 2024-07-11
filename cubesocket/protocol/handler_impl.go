@@ -134,7 +134,7 @@ func (h *PacketHandler) HandleSetProtocol(ctx netty.InboundContext, packet *pack
 func (h *PacketHandler) HandleGameStatUpdate(ctx netty.InboundContext, packet *packets.PacketGameStatUpdate) error {
 	conn := mustConnection(ctx.Channel())
 	stat := packet.GameStat()
-	if err := h.db.SetGameStat(stat); err != nil {
+	if err := h.db.SetGameStat(stat, conn.UUID()); err != nil {
 		slog.Error("Unable to set game stat", "error", err, "uuid", conn.UUID())
 	} else {
 		slog.Info("Game stat updated", "uuid", conn.UUID(), "game", stat.Game, "playerCount", stat.PlayerCount)

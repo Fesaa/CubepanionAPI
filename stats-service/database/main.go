@@ -6,6 +6,7 @@ import (
 	"github.com/Fesaa/CubepanionAPI/core"
 	"github.com/Fesaa/CubepanionAPI/core/log"
 	"github.com/Fesaa/CubepanionAPI/core/models"
+	_ "github.com/lib/pq"
 )
 
 type defaultDatabase struct {
