@@ -1,4 +1,4 @@
-name: '[Maps Service] Push Docker image to Docker Hub'
+name: '[Cubesocket] Push Docker image to Docker Hub'
 
 on:
   push:
