@@ -21,6 +21,8 @@ COPY maps-service/go.mod /app/maps-service/
 COPY leaderboard-service/go.mod /app/leaderboard-service/
 COPY leaderboard-service/go.sum /app/leaderboard-service/
 
+COPY stats-service/go.mod /app/stats-service/
+
 RUN go mod download
 
 COPY core /app/core
