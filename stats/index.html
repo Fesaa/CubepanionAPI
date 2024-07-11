@@ -5,15 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Maps Service - Cubepanion API documentation</title>
+    <title>Stats Service - Cubepanion API documentation</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Maps Service";
-        var mkdocs_page_input_path = "maps.md";
+        var mkdocs_page_name = "Stats Service";
+        var mkdocs_page_input_path = "stats.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -51,27 +51,25 @@
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../leaderboard/">Leaderboard Service</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Maps Service</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../maps/">Maps Service</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Stats Service</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#endpoints">Endpoints</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#get">GET /</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get-gamegame">GET /game/:game</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get-mapname">GET /:mapName</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get-games">GET /games</a>
     </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#models">Models</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#map">Map</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#generator">Generator</a>
+    <li class="toctree-l3"><a class="reference internal" href="#gamestat">GameStat</a>
     </li>
         </ul>
     </li>
     </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../stats/">Stats Service</a>
                   </li>
               </ul>
       </div>
@@ -89,7 +87,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
           <li class="breadcrumb-item">API Reference</li>
-      <li class="breadcrumb-item active">Maps Service</li>
+      <li class="breadcrumb-item active">Stats Service</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -98,43 +96,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="maps-service">Maps Service</h1>
-<p>Provides information about EggWars maps on the CubeCraft Games network.</p>
-<p>This service is served under <code>/cubepanion/maps</code></p>
+                <h1 id="stats-service">Stats service</h1>
+<p>Provides information about the player count of CubeCraft, and games currently in the lobby. Data is read by the <a href="https://github.com/Fesaa/Cubepanion">Laby addon</a>.</p>
+<p>This service is served under <code>/cubepanion/stats</code></p>
 <h2 id="endpoints">Endpoints</h2>
-<h3 id="get">GET /</h3>
-<p>Returns an array of <code>Map</code>s.</p>
-<h3 id="get-mapname">GET /:mapName</h3>
-<p>Returns a <code>Map</code> object for the specified map.</p>
+<h3 id="get-gamegame">GET /game/:game</h3>
+<p>Returns the latest <code>GameStat</code> object related to the pasted game. </p>
+<h3 id="get-games">GET /games</h3>
+<p>Returns an array of the latest <code>GameStat</code> objects for each game.</p>
 <h2 id="models">Models</h2>
-<h3 id="map">Map</h3>
+<h4 id="gamestat">GameStat</h4>
 <pre><code class="language-json">{
-  &quot;unique_name&quot;: &quot;&quot;,
-  &quot;map_name&quot;: &quot;&quot;,
-  &quot;team_size&quot;: 0,
-  &quot;layout&quot;: &quot;&quot;, //double_cross, cross, triple_cross, or square
-  &quot;colours&quot;: &quot;&quot;,
-  &quot;build_limit&quot;: 0,
-  &quot;generators&quot;: [`Generator`]
-}
-</code></pre>
-<p>Converting the map colours may be a bit tricky, it's a stringed array. <a href="https://github.com/Fesaa/Cubepanion/blob/main/core/src/main/java/art/ameliah/laby/addons/cubepanion/core/utils/Utils.java#L93-L111">Addon code</a></p>
-<h3 id="generator">Generator</h3>
-<pre><code class="language-json">{
-  &quot;unique_name&quot;: &quot;&quot;, // The map name
-  &quot;ordering&quot;: 0,
-  &quot;gen_type&quot;: &quot;&quot;, // diamond, gold, or iron
-  &quot;gen_location&quot;: &quot;&quot;, // middle, semimiddle, or base
-  &quot;level&quot;: 0,
-  &quot;count&quot;: 0
+    &quot;game&quot;: &quot;&quot;,
+    &quot;player_count&quot;: 0,
+    &quot;unix_time_stamp&quot;: 0
 }
 </code></pre>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../leaderboard/" class="btn btn-neutral float-left" title="Leaderboard Service"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../stats/" class="btn btn-neutral float-right" title="Stats Service">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../maps/" class="btn btn-neutral float-left" title="Maps Service"><span class="icon icon-circle-arrow-left"></span> Previous</a>
     </div>
 
   <hr/>
@@ -157,10 +139,8 @@
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../leaderboard/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../maps/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
-    
-      <span><a href="../stats/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
