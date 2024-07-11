@@ -29,7 +29,7 @@ func load(db *sql.DB) error {
 	    		    SELECT MAX(unix_time_stamp)
 	    		    FROM game_stats
 	    		    GROUP BY game
-	    		))`)
+	    		)`)
 	if err != nil {
 		return err
 	}
