@@ -131,6 +131,19 @@ func (h *PacketHandler) HandleSetProtocol(ctx netty.InboundContext, packet *pack
 	return h.db.SetProtocolVersion(conn.UUID(), packet.ProtocolVersion())
 }
 
+func (h *PacketHandler) HandleGameStatUpdate(ctx netty.InboundContext, packet *packets.PacketGameStatUpdate) error {
+	conn := mustConnection(ctx.Channel())
+	stat := packet.GameStat()
+	if err := h.db.SetGameStat(stat); err != nil {
+		slog.Error("Unable to set game stat", "error", err, "uuid", conn.UUID())
+	} else {
+		slog.Info("Game stat updated", "uuid", conn.UUID(), "game", stat.Game, "playerCount", stat.PlayerCount)
+	}
+
+	// Don't disconnect the client if this fails,
+	return nil
+}
+
 func format(format string, ch netty.Channel) string {
 	return fmt.Sprintf(format, ch.RemoteAddr())
 }

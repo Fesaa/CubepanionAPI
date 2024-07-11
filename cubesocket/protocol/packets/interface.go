@@ -21,4 +21,5 @@ type Handler interface {
 	HandleDisconnection(ctx netty.InboundContext, packet *PacketDisconnection) error
 	HandleLogin(ctx netty.InboundContext, packet *PacketLogin) error
 	HandleSetProtocol(ctx netty.InboundContext, packet *PacketSetProtocolVersion) error
+	HandleGameStatUpdate(ctx netty.InboundContext, packet *PacketGameStatUpdate) error
 }

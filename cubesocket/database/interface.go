@@ -8,4 +8,5 @@ type Database interface {
 	RemovePlayerLocation(uuid string) error
 	GetSharedPlayers(uuid string) ([]string, error)
 	SetProtocolVersion(uuid string, version int) error
+	SetGameStat(stats models.GameStat) error
 }

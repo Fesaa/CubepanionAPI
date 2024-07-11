@@ -8,6 +8,7 @@ var (
 	removePlayerLocation *sql.Stmt
 	getSharedPlayers     *sql.Stmt
 	setProtocolVersion   *sql.Stmt
+	setGameStat          *sql.Stmt
 )
 
 func load(db *sql.DB) error {
@@ -34,6 +35,11 @@ func load(db *sql.DB) error {
 	}
 
 	setProtocolVersion, err = db.Prepare("INSERT INTO player_locations (uuid, version) VALUES ($1, $2) ON CONFLICT (uuid) DO UPDATE SET version = $2")
+	if err != nil {
+		return err
+	}
+
+	setGameStat, err = db.Prepare("INSERT INTO game_stats (unix_time_stamp, game, player_count) VALUES ($1, $2, $3) ON CONFLICT (uuid, game, stat) DO NOTHING")
 	if err != nil {
 		return err
 	}

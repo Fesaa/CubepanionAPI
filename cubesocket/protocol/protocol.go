@@ -17,6 +17,7 @@ func init() {
 	RegisterPacket(7, &packets.PacketLogin{})
 	RegisterPacket(8, &packets.PacketLoginComplete{})
 	RegisterPacket(9, &packets.PacketSetProtocolVersion{})
+	RegisterPacket(10, &packets.PacketGameStatUpdate{})
 }
 
 func RegisterPacket(id int, packet packets.Packet) {
