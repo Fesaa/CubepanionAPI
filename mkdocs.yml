@@ -8,5 +8,6 @@ nav:
       - Games Service: games.md
       - Leaderboard Service: leaderboard.md
       - Maps Service: maps.md
+      - Stats Service: stats.md
 
 theme: readthedocs
