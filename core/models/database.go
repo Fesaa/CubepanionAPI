@@ -80,3 +80,9 @@ type Location struct {
 	Previous   string `json:"previous"`
 	InPreLobby bool   `json:"inPreLobby"`
 }
+
+type GameStat struct {
+	Game          string `json:"game"`
+	PlayerCount   int    `json:"player_count"`
+	UnixTimeStamp int64  `json:"unix_time_stamp"`
+}
