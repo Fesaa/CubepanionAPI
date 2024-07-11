@@ -6,6 +6,7 @@ on:
       - "master"
     paths:
       - "chests-service/**"
+      - "docker/Dockerfile.chest-service"
   workflow_run:
     workflows: [ "[Base] Push Docker image to Docker Hub" ]
     types:

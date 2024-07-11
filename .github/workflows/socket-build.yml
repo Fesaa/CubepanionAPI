@@ -1,24 +1,16 @@
-name: '[Games Service] Push Docker image to Docker Hub'
+name: '[Maps Service] Push Docker image to Docker Hub'
 
 on:
   push:
     branches:
       - "master"
     paths:
-      - "games-service/**"
-      - "docker/Dockerfile.games-service"
-  workflow_run:
-    workflows: [ "[Base] Push Docker image to Docker Hub" ]
-    types:
-      - completed
+      - "cubesocket/**"
+      - "docker/Dockerfile.cubesocket"
 
 jobs:
-  tests:
-    uses: './.github/workflows/chest-service-test.yml'
-
   push_to_registry:
-    name: '[Games Service] Push Docker image to Docker Hub'
-    needs: [tests]
+    name: '[CubeSocket] Push Docker image to Docker Hub'
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -40,6 +32,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile.games-service
+          file: ./docker/Dockerfile.cubesocket
           push: true
-          tags: ameliaah/cubepanion-services:games
+          tags: ameliaah/cubepanion-services:cubesocket

@@ -6,6 +6,7 @@ on:
       - "master"
     paths:
       - "leaderboard-service/**"
+      - "docker/Dockerfile.leaderboard-service"
   workflow_run:
     workflows: [ "[Base] Push Docker image to Docker Hub" ]
     types:

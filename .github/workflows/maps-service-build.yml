@@ -5,7 +5,8 @@ on:
     branches:
       - "master"
     paths:
-      - "chests-service/**"
+      - "maps-service/**"
+      - "docker/Dockerfile.maps-service"
   workflow_run:
     workflows: [ "[Base] Push Docker image to Docker Hub" ]
     types:
