@@ -16,6 +16,7 @@ type redisWrapper struct {
 }
 
 func redisCache(c MicroServiceConfig) fiber.Storage {
+
 	rdb := redis.NewClient(&redis.Options{
 		Addr:           c.Redis().Host(),
 		Password:       c.Redis().Password(),

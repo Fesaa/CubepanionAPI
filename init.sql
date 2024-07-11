@@ -78,3 +78,11 @@ CREATE TABLE IF NOT EXISTS player_locations (
     version INT,
     PRIMARY KEY (uuid)
 );
+
+CREATE TABLE IF NOT EXISTS game_stats (
+    game VARCHAR NOT NULL,
+    player_count INT NOT NULL,
+    unix_time_stamp BIGINT NOT NULL,
+    FOREIGN KEY (game)
+        REFERENCES games(display_name)
+);
