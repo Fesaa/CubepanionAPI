@@ -5,8 +5,9 @@ import (
 )
 
 type StatsServiceConfig struct {
-	YHost string `yaml:"host"`
-	YPort int    `yaml:"port"`
+	YService string `yaml:"service_name"`
+	YHost    string `yaml:"host"`
+	YPort    int    `yaml:"port"`
 
 	YGamesServiceURL string `yaml:"games_service"`
 
@@ -16,7 +17,7 @@ type StatsServiceConfig struct {
 }
 
 func (c StatsServiceConfig) ServiceName() string {
-	return "leaderboard-service"
+	return c.YService
 }
 
 func (c StatsServiceConfig) Host() string {
