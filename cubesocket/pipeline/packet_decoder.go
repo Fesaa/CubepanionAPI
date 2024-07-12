@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"fmt"
+	"github.com/Fesaa/CubepanionAPI/cubesocket/prometheus"
 	"log/slog"
 
 	"github.com/Fesaa/CubepanionAPI/cubesocket/protocol"
@@ -39,6 +40,7 @@ func (p *PacketDecoder) HandleRead(ctx netty.InboundContext, msg netty.Message) 
 
 	packet.Read(buffer)
 	ctx.HandleRead(packet)
+	prometheus.PacketsIn(packet.Name(), fmt.Sprintf("%d", packet.ID()))
 }
 
 const formatString = "[%s] [IN] %d %s"

@@ -34,4 +34,22 @@ var (
 		Help:        "Number of active sessions",
 		ConstLabels: constLabels,
 	}, []string{})
+
+	packetsIn = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name:        prometheus.BuildFQName(namespace, subsystem, "packets_in_total"),
+		Help:        "Total number of packets received",
+		ConstLabels: constLabels,
+	}, []string{"packet", "packetId"})
+
+	packetsOut = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name:        prometheus.BuildFQName(namespace, subsystem, "packets_out_total"),
+		Help:        "Total number of packets sent",
+		ConstLabels: constLabels,
+	}, []string{"packet", "packetId"})
+
+	disconnects = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name:        prometheus.BuildFQName(namespace, subsystem, "disconnects_total"),
+		Help:        "Total number of disconnects",
+		ConstLabels: constLabels,
+	}, []string{"reason"})
 )

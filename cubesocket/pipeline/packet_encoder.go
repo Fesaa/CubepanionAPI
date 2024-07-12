@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"fmt"
+	"github.com/Fesaa/CubepanionAPI/cubesocket/prometheus"
 	"log/slog"
 
 	"github.com/Fesaa/CubepanionAPI/cubesocket/protocol/buf"
@@ -24,6 +25,7 @@ func (e *PacketEncoder) HandleWrite(ctx netty.OutboundContext, msg netty.Message
 		buffer.WriteVarInt(int(packet.ID()))
 		packet.Write(buffer)
 		ctx.HandleWrite(buffer)
+		prometheus.PacketsOut(packet.Name(), fmt.Sprintf("%d", packet.ID()))
 	default:
 		utils.Assert(fmt.Errorf("unexpected message type: %T", packet))
 	}
