@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"github.com/Fesaa/CubepanionAPI/core/log"
 
 	"github.com/Fesaa/CubepanionAPI/core"
 	"github.com/Fesaa/CubepanionAPI/core/models"
@@ -26,6 +27,12 @@ func Connect(d core.DatabaseConfig) (Database, error) {
 	err = load(db)
 	if err != nil {
 		return nil, err
+	}
+
+	// As this is currently a single instance setup, left over player locations are no longer valid until the player reconnects
+	// TODO: Change this when eventually moving to K8s
+	if _, err = db.Exec("DELETE FROM player_locations;"); err != nil {
+		log.Warn("Failed to clear player locations", "error", err)
 	}
 
 	return &defaultDatabase{db: db}, nil
