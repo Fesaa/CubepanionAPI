@@ -10,7 +10,7 @@ The project aims to make the addon more dynamic and less dependent on updates to
 - `games` - Provides information about the avaible games
 - `leaderboards` - Provides information about game, and player leaderboards
 - `maps` - Provides information about EggWars maps
-- `docs` - Provides information about player counts
+- `stats` - Provides information about player counts
 
 ## Project layout & deployment
 

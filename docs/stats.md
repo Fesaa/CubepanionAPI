@@ -27,3 +27,8 @@ Returns an array of the latest `GameStat` objects for each game.
     "unix_time_stamp": 0
 }
 ```
+
+## Notes
+
+The `GameStat` with `game` equal to `Main Lobby`, does not represent the total amount of players in all lobbies, but rather all players on CubeCraft. It is read from the scoreboard.
+Other player counts are read from the game compass.
