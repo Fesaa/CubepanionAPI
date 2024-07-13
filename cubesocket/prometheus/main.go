@@ -46,10 +46,4 @@ var (
 		Help:        "Total number of packets sent",
 		ConstLabels: constLabels,
 	}, []string{"packet", "packetId"})
-
-	disconnects = promauto.NewCounterVec(prometheus.CounterOpts{
-		Name:        prometheus.BuildFQName(namespace, subsystem, "disconnects_total"),
-		Help:        "Total number of disconnects",
-		ConstLabels: constLabels,
-	}, []string{"reason"})
 )

@@ -25,7 +25,6 @@ func (h *PacketHandler) HandleActive(ctx netty.ActiveContext) {
 
 func (h *PacketHandler) HandleInactive(ctx netty.InactiveContext, ex netty.Exception) {
 	slog.Info(format(FORMAT_DISCONNECT, ctx.Channel()), "id", ctx.Channel().ID(), "reason", ex)
-	prometheus.Disconnect(ex.Error())
 	conn, ok := clients.Get(ctx.Channel().ID())
 	if ok && conn.state == CONNECTED {
 		prometheus.EndSession()

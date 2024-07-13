@@ -25,7 +25,3 @@ func PacketsIn(packet string, packetId string) {
 func PacketsOut(packet string, packetId string) {
 	packetsOut.WithLabelValues(packet, packetId).Inc()
 }
-
-func Disconnect(reason string) {
-	disconnects.WithLabelValues(reason).Inc()
-}
