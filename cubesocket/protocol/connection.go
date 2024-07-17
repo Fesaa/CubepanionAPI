@@ -20,10 +20,11 @@ const (
 )
 
 type Connection struct {
-	ctx   netty.HandlerContext
-	uuid  string
-	start time.Time
-	state ConnectionState
+	ctx      netty.HandlerContext
+	uuid     string
+	start    time.Time
+	state    ConnectionState
+	protocol int
 }
 
 func (c *Connection) Ctx() netty.HandlerContext {

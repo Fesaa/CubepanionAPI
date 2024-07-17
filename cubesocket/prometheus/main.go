@@ -46,4 +46,10 @@ var (
 		Help:        "Total number of packets sent",
 		ConstLabels: constLabels,
 	}, []string{"packet", "packetId"})
+
+	versions = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name:        prometheus.BuildFQName(namespace, subsystem, "players_version"),
+		Help:        "Players per version",
+		ConstLabels: constLabels,
+	}, []string{"version"})
 )

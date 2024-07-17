@@ -1,6 +1,9 @@
 package prometheus
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 func NewSessions() {
 	sessionsTotal.WithLabelValues().Inc()
@@ -24,4 +27,12 @@ func PacketsIn(packet string, packetId string) {
 
 func PacketsOut(packet string, packetId string) {
 	packetsOut.WithLabelValues(packet, packetId).Inc()
+}
+
+func VersionInc(version int) {
+	versions.WithLabelValues(fmt.Sprintf("%d", version)).Inc()
+}
+
+func VersionDec(version int) {
+	versions.WithLabelValues(fmt.Sprintf("%d", version)).Dec()
 }

@@ -128,6 +128,8 @@ func (h *PacketHandler) HandleSetProtocol(ctx netty.InboundContext, packet *pack
 	conn := mustConnection(ctx.Channel())
 	// Having no / the wrong protocol version means that you'll get invalid perk packets
 	// as this is currently the only actual use of the socket, we should just disconnect the client
+	prometheus.VersionInc(packet.ProtocolVersion())
+	conn.protocol = packet.ProtocolVersion()
 	return h.db.SetProtocolVersion(conn.UUID(), packet.ProtocolVersion())
 }
 
