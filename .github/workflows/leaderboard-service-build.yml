@@ -14,7 +14,7 @@ on:
 
 jobs:
   tests:
-    uses: './.github/workflows/chest-service-test.yml'
+    uses: './.github/workflows/leaderboard-service-test.yml'
 
   push_to_registry:
     name: '[Leaderboard Service] Push Docker image to Docker Hub'
