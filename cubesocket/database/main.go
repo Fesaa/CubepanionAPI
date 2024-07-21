@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"github.com/Fesaa/CubepanionAPI/core/log"
+	"time"
 
 	"github.com/Fesaa/CubepanionAPI/core"
 	"github.com/Fesaa/CubepanionAPI/core/models"
@@ -84,6 +85,6 @@ func (d *defaultDatabase) SetProtocolVersion(uuid string, version int) error {
 }
 
 func (d *defaultDatabase) SetGameStat(stats models.GameStat, uuid string) error {
-	_, err := setGameStat.Exec(stats.UnixTimeStamp, stats.Game, stats.PlayerCount, uuid)
+	_, err := setGameStat.Exec(time.Now().Unix(), stats.Game, stats.PlayerCount, uuid)
 	return err
 }

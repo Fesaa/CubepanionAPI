@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Fesaa/CubepanionAPI/core/log"
 	"strings"
+	"time"
 
 	"github.com/Fesaa/CubepanionAPI/core/models"
 )
@@ -21,7 +22,7 @@ func innerDisableSubmission(uuid string, unix uint64) error {
 
 // Aware this is rather unsafe, but we can assume it's fine as game is provided by the server
 // And player has been checked against a regex
-func generateLeaderboardInsertSQL(unix uint64, game string, rows []models.LeaderboardRow) string {
+func generateLeaderboardInsertSQL(unix int64, game string, rows []models.LeaderboardRow) string {
 	s := "INSERT INTO leaderboards (game, player, normalized_player_name, position, score, unix_time_stamp) VALUES "
 	for i, row := range rows {
 		if i != 0 {
@@ -43,7 +44,7 @@ func innerInsertLeaderboards(db *sql.DB, req models.LeaderboardSubmission) error
 		return err
 	}
 
-	_, err = db.Exec(generateLeaderboardInsertSQL(req.UnixTimeStamp, req.Game, req.Entries))
+	_, err = db.Exec(generateLeaderboardInsertSQL(time.Now().UnixMilli(), req.Game, req.Entries))
 	if err != nil {
 		err2 := innerDisableSubmission(req.Uuid, req.UnixTimeStamp)
 		if err2 != nil {
