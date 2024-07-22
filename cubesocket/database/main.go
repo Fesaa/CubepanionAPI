@@ -85,6 +85,6 @@ func (d *defaultDatabase) SetProtocolVersion(uuid string, version int) error {
 }
 
 func (d *defaultDatabase) SetGameStat(stats models.GameStat, uuid string) error {
-	_, err := setGameStat.Exec(time.Now().Unix(), stats.Game, stats.PlayerCount, uuid)
+	_, err := setGameStat.Exec(time.Now().UnixMilli(), stats.Game, stats.PlayerCount, uuid)
 	return err
 }
