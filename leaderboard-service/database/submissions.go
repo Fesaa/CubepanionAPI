@@ -10,12 +10,12 @@ import (
 	"github.com/Fesaa/CubepanionAPI/core/models"
 )
 
-func innerInsertSubmission(uuid, game string, unix uint64) error {
+func innerInsertSubmission(uuid, game string, unix int64) error {
 	_, err := newSubmission.Exec(uuid, unix, game, true)
 	return err
 }
 
-func innerDisableSubmission(uuid string, unix uint64) error {
+func innerDisableSubmission(uuid string, unix int64) error {
 	_, err := disableSubmission.Exec(uuid, unix)
 	return err
 }
@@ -47,14 +47,15 @@ func innerInsertLeaderboards(db *sql.DB, req models.LeaderboardSubmission) error
 		return fmt.Errorf("leaderboard submission must have 200 entries")
 	}
 
-	err := innerInsertSubmission(req.Uuid, req.Game, req.UnixTimeStamp)
+	unix := time.Now().UnixMilli()
+	err := innerInsertSubmission(req.Uuid, req.Game, unix)
 	if err != nil {
 		return err
 	}
 
-	_, err = db.Exec(generateLeaderboardInsertSQL(time.Now().UnixMilli(), req.Game, req.Entries))
+	_, err = db.Exec(generateLeaderboardInsertSQL(unix, req.Game, req.Entries))
 	if err != nil {
-		err2 := innerDisableSubmission(req.Uuid, req.UnixTimeStamp)
+		err2 := innerDisableSubmission(req.Uuid, unix)
 		if err2 != nil {
 			log.Error("Error disabling submission after failed leaderboard insert", "error", err2)
 		}
