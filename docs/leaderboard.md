@@ -39,6 +39,7 @@ Returns an array of strings, containing all names of the players on the latest l
   "player": "",
   "position": 0,
   "score": 0,
+  "texture": "",
   "unix_time_stamp": 0
 }
 ```
@@ -53,3 +54,15 @@ The score type should be loaded from the games-service. Load these once, on appl
   "players": [""]
 }
 ```
+
+## Notes
+
+### Texture field
+
+The texture field in `LeaderboardRow` is a base64 encoding of a (partial) `UUID to Profile and Skin/Cape` response from the Mojang API. 
+You may find the JSON structure on the [Protocol Wiki](https://wiki.vg/Mojang_API#UUID_to_Profile_and_Skin.2FCape). You'll most likely be  interested in the `textures.SKIN.url` field, keep in mind that this is an url for the complete skin.
+But you may find the players UUID in this url as well.
+
+This is a new field, not all responses will include this just yet.
+
+
