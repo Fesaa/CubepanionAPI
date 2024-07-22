@@ -65,6 +65,7 @@ type LeaderboardRow struct {
 	Player        string `json:"player" validate:"nonzero,regexp=[a-zA-Z0-9_]{3\\,16}"`
 	Position      int    `json:"position" validate:"nonzero,min=1,max=200"`
 	Score         int    `json:"score" validate:"nonzero"`
+	Texture       string `json:"texture,omitempty"`
 	UnixTimeStamp int    `json:"unix_time_stamp"`
 }
 
