@@ -23,12 +23,20 @@ func innerDisableSubmission(uuid string, unix uint64) error {
 // Aware this is rather unsafe, but we can assume it's fine as game is provided by the server
 // And player has been checked against a regex
 func generateLeaderboardInsertSQL(unix int64, game string, rows []models.LeaderboardRow) string {
-	s := "INSERT INTO leaderboards (game, player, normalized_player_name, position, score, unix_time_stamp) VALUES "
+	s := "INSERT INTO leaderboards (game, player, normalized_player_name, position, score, texture, unix_time_stamp) VALUES "
 	for i, row := range rows {
 		if i != 0 {
 			s += ", "
 		}
-		s += fmt.Sprintf("('%s', '%s', '%s', %d, %d, %d)", game, row.Player, strings.ToUpper(row.Player), row.Position, row.Score, unix)
+
+		var texture string
+		if row.Texture == "" {
+			texture = "NULL"
+		} else {
+			texture = fmt.Sprintf("'%s'", row.Texture)
+		}
+
+		s += fmt.Sprintf("('%s', '%s', '%s', %d, %d, %s, %d)", game, row.Player, strings.ToUpper(row.Player), row.Position, row.Score, texture, unix)
 	}
 
 	return s

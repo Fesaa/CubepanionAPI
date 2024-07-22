@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS leaderboards (
     player VARCHAR NOT NULL,
     position INT NOT NULL,
     score INT NOT NULL,
+    texture VARCHAR,
     unix_time_stamp BIGINT NOT NULL,
     FOREIGN KEY (unix_time_stamp)
         REFERENCES submissions(unix_time_stamp)
