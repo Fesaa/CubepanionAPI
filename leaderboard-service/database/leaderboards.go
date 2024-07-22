@@ -24,11 +24,13 @@ func innerGetLeaderboardForPlayer(player string) ([]models.LeaderboardRow, error
 	}(rows)
 	for rows.Next() {
 		var row models.LeaderboardRow
-		err = rows.Scan(&row.Game, &row.Player, &row.Position, &row.Score, &row.Texture, &row.UnixTimeStamp)
+		var texture sql.NullString
+		err = rows.Scan(&row.Game, &row.Player, &row.Position, &row.Score, texture, &row.UnixTimeStamp)
 		if err != nil {
 			log.Error("Error scanning leaderboard row", "error", err)
 			return nil, err
 		}
+		row.Texture = texture.String
 		leaderboard = append(leaderboard, row)
 	}
 
@@ -50,11 +52,13 @@ func innerGetLeaderboardBounded(game string, start, end int) ([]models.Leaderboa
 	var leaderboard = make([]models.LeaderboardRow, 0)
 	for rows.Next() {
 		var row models.LeaderboardRow
-		err = rows.Scan(&row.Game, &row.Player, &row.Position, &row.Score, &row.Texture, &row.UnixTimeStamp)
+		var texture sql.NullString
+		err = rows.Scan(&row.Game, &row.Player, &row.Position, &row.Score, texture, &row.UnixTimeStamp)
 		if err != nil {
 			log.Error("Error scanning leaderboard row", "error", err)
 			return nil, err
 		}
+		row.Texture = texture.String
 		leaderboard = append(leaderboard, row)
 	}
 	return leaderboard, nil
@@ -75,11 +79,13 @@ func innerGetLeaderboardForPlayers(req models.GamePlayersRequest) ([]models.Lead
 	var leaderboard = make([]models.LeaderboardRow, 0)
 	for rows.Next() {
 		var row models.LeaderboardRow
-		err = rows.Scan(&row.Game, &row.Player, &row.Position, &row.Score, &row.Texture, &row.UnixTimeStamp)
+		var texture sql.NullString
+		err = rows.Scan(&row.Game, &row.Player, &row.Position, &row.Score, texture, &row.UnixTimeStamp)
 		if err != nil {
 			log.Error("Error scanning leaderboard row: ", "error", err)
 			return nil, err
 		}
+		row.Texture = texture.String
 		leaderboard = append(leaderboard, row)
 	}
 
