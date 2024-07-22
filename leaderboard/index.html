@@ -73,6 +73,12 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#texture-field">Texture field</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../maps/">Maps Service</a>
@@ -127,6 +133,7 @@ The endpoint above is generally faster by ~15%, just use whatever is easier for 
   &quot;player&quot;: &quot;&quot;,
   &quot;position&quot;: 0,
   &quot;score&quot;: 0,
+  &quot;texture&quot;: &quot;&quot;,
   &quot;unix_time_stamp&quot;: 0
 }
 </code></pre>
@@ -137,6 +144,12 @@ The endpoint above is generally faster by ~15%, just use whatever is easier for 
   &quot;players&quot;: [&quot;&quot;]
 }
 </code></pre>
+<h2 id="notes">Notes</h2>
+<h3 id="texture-field">Texture field</h3>
+<p>The texture field in <code>LeaderboardRow</code> is a base64 encoding of a (partial) <code>UUID to Profile and Skin/Cape</code> response from the Mojang API. 
+You may find the JSON structure on the <a href="https://wiki.vg/Mojang_API#UUID_to_Profile_and_Skin.2FCape">Protocol Wiki</a>. You'll most likely be  interested in the <code>textures.SKIN.url</code> field, keep in mind that this is an url for the complete skin.
+But you may find the players UUID in this url as well.</p>
+<p>This is a new field, not all responses will include this just yet.</p>
               
             </div>
           </div><footer>
