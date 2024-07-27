@@ -28,7 +28,6 @@ func main() {
 	})
 
 	ms.Get("/", Maps)
-	ms.Get("/:mapName", Map)
 
 	err = ms.Start()
 	if err != nil {

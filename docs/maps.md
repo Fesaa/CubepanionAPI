@@ -10,10 +10,6 @@ This service is served under `/cubepanion/maps`
 
 Returns an array of `Map`s.
 
-### GET /:mapName
-
-Returns a `Map` object for the specified map.
-
 ## Models
 
 ### Map

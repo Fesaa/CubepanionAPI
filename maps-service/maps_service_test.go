@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http/httptest"
 	"testing"
@@ -12,7 +11,7 @@ import (
 	"github.com/Fesaa/CubepanionAPI/maps-service/database"
 )
 
-var allMaps = []models.EggWarsMap{
+var allMaps = []models.GameMap{
 	{
 		UniqueName: "castle",
 		MapName:    "Castle",
@@ -32,19 +31,8 @@ func mock(config core.DatabaseConfig) (database.Database, error) {
 	return &MockDatabase{}, nil
 }
 
-func (m *MockDatabase) GetAllMaps() ([]models.EggWarsMap, error) {
+func (m *MockDatabase) GetAllMaps() ([]models.GameMap, error) {
 	return allMaps, nil
-}
-
-func (m *MockDatabase) GetMap(mapName string) (*models.EggWarsMap, error) {
-	for _, m := range allMaps {
-		if m.UniqueName == mapName {
-			return &m, nil
-		}
-	}
-
-	return nil, errors.New("Map not found")
-
 }
 
 func init() {
@@ -55,7 +43,6 @@ func init() {
 	}
 
 	ms.Get("/", Maps)
-	ms.Get("/:mapName", Map)
 }
 
 func TestMaps(t *testing.T) {
@@ -71,7 +58,7 @@ func TestMaps(t *testing.T) {
 
 	body, _ := io.ReadAll(resp.Body)
 
-	var got []models.EggWarsMap
+	var got []models.GameMap
 	err := json.Unmarshal(body, &got)
 	if err != nil {
 		t.Errorf("Error unmarshalling response: %s", err)
@@ -85,23 +72,6 @@ func TestMaps(t *testing.T) {
 
 	if got[0].UniqueName != "castle" {
 		t.Errorf("Expected map name to be castle, got %s", got[0].UniqueName)
-		t.FailNow()
-	}
-}
-
-func TestMap(t *testing.T) {
-	req := httptest.NewRequest("GET", "/castle", nil)
-
-	resp, _ := ms.App().Test(req, -1)
-	defer resp.Body.Close()
-
-	body, _ := io.ReadAll(resp.Body)
-
-	var got models.EggWarsMap
-	json.Unmarshal(body, &got)
-
-	if got.UniqueName != "castle" {
-		t.Errorf("Expected map name to be castle, got %s", got.UniqueName)
 		t.FailNow()
 	}
 }

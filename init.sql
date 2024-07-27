@@ -40,7 +40,8 @@ CREATE TYPE maptype AS ENUM ('cross', 'doublecross', 'square');
 CREATE TYPE genlocation AS ENUM ('base', 'semimiddle', 'middle');
 CREATE TYPE gentype AS ENUM ('iron', 'gold', 'diamond');
 
-CREATE TABLE IF NOT EXISTS eggwars_maps (
+CREATE TABLE IF NOT EXISTS game_maps (
+    game VARCHAR NOT NULL,
     unique_name VARCHAR NOT NULL,
     map_name VARCHAR NOT NULL,
     team_size INT NOT NULL,
@@ -59,7 +60,7 @@ CREATE TABLE IF NOT EXISTS generators (
     count INT NOT NULL,
     PRIMARY KEY (unique_name, ordering),
     FOREIGN KEY (unique_name)
-        REFERENCES eggwars_maps(unique_name)
+        REFERENCES game_maps(unique_name)
 );
 
 CREATE TABLE IF NOT EXISTS games (

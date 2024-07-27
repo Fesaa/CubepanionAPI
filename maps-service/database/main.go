@@ -31,10 +31,6 @@ func Connect(d core.DatabaseConfig) (Database, error) {
 	return &defaultDatabase{db: db}, nil
 }
 
-func (d *defaultDatabase) GetMap(name string) (*models.EggWarsMap, error) {
-	return innerGetEggWarsMap(name)
-}
-
-func (d *defaultDatabase) GetAllMaps() ([]models.EggWarsMap, error) {
+func (d *defaultDatabase) GetAllMaps() ([]models.GameMap, error) {
 	return innerGetEggWarsMaps()
 }

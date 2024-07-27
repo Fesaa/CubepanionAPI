@@ -17,14 +17,3 @@ func Maps(ms core.MicroService[core.MicroServiceConfig, database.Database], c *f
 
 	return c.JSON(maps)
 }
-
-func Map(ms core.MicroService[core.MicroServiceConfig, database.Database], c *fiber.Ctx) error {
-	name := c.Params("mapName")
-	maps, err := ms.DB().GetMap(name)
-	if err != nil {
-		log.Error("Error getting map", "error", err)
-		return c.Status(500).JSON(errors.AsFiberMap(errors.DBError))
-	}
-
-	return c.JSON(maps)
-}
