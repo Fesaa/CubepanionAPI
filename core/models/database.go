@@ -20,14 +20,15 @@ const (
 	CROSS        MapLayout = "cross"
 )
 
-type EggWarsMap struct {
+type GameMap struct {
+	Game       string      `json:"game"`
 	UniqueName string      `json:"unique_name"`
 	MapName    string      `json:"map_name"`
 	TeamSize   int         `json:"team_size"`
 	Layout     MapLayout   `json:"layout"`
 	Colours    string      `json:"colours"`
 	BuildLimit int         `json:"build_limit"`
-	Generators []Generator `json:"generators"`
+	Generators []Generator `json:"generators,omitempty"`
 }
 
 type GenType string
