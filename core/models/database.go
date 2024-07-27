@@ -21,36 +21,13 @@ const (
 )
 
 type GameMap struct {
-	Game       string      `json:"game"`
-	UniqueName string      `json:"unique_name"`
-	MapName    string      `json:"map_name"`
-	TeamSize   int         `json:"team_size"`
-	Layout     MapLayout   `json:"layout"`
-	Colours    string      `json:"colours"`
-	BuildLimit int         `json:"build_limit"`
-	Generators []Generator `json:"generators,omitempty"`
-}
-
-type GenType string
-type GenLocation string
-
-const (
-	DIAMOND GenType = "diamond"
-	GOLD    GenType = "gold"
-	IRON    GenType = "iron"
-
-	MIDDLE     GenLocation = "middle"
-	SEMIMIDDLE GenLocation = "semimiddle"
-	BASE       GenLocation = "base"
-)
-
-type Generator struct {
-	UniqueName string      `json:"unique_name"`
-	Ordering   int         `json:"ordering"`
-	Type       GenType     `json:"gen_type"`
-	Location   GenLocation `json:"gen_location"`
-	Level      int         `json:"level"`
-	Count      int         `json:"count"`
+	Game       string    `json:"game"`
+	UniqueName string    `json:"unique_name"`
+	MapName    string    `json:"map_name"`
+	TeamSize   int       `json:"team_size"`
+	Layout     MapLayout `json:"layout"`
+	Colours    string    `json:"colours"`
+	BuildLimit int       `json:"build_limit"`
 }
 
 type Game struct {
