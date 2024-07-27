@@ -19,7 +19,6 @@ var allMaps = []models.GameMap{
 		Layout:     models.SQUARE,
 		Colours:    "red,blue",
 		BuildLimit: 40,
-		Generators: []models.Generator{},
 	},
 }
 
