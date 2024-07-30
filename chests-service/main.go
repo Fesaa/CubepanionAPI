@@ -24,7 +24,8 @@ func main() {
 
 	ms.UseDefaults()
 	ms.UseRedisCache(cache.Config{
-		Expiration: 1 * time.Hour,
+		Expiration:   1 * time.Hour,
+		CacheControl: true,
 	})
 
 	ms.Get("/", CurrentChestLocations)

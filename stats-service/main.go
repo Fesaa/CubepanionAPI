@@ -4,6 +4,7 @@ import (
 	"github.com/Fesaa/CubepanionAPI/core"
 	"github.com/Fesaa/CubepanionAPI/core/log"
 	"github.com/Fesaa/CubepanionAPI/stats-service/database"
+	"github.com/gofiber/fiber/v2/middleware/cache"
 )
 
 func main() {
@@ -21,7 +22,9 @@ func main() {
 	}
 
 	ms.UseDefaults()
-	ms.UseRedisCache()
+	ms.UseRedisCache(cache.Config{
+		CacheControl: true,
+	})
 
 	ms.Get("/game/:game", GetGameStat)
 	ms.Get("/games", GetAllStats)

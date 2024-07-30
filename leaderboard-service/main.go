@@ -35,6 +35,7 @@ func main() {
 			}
 			return config.Expiration
 		},
+		CacheControl: true,
 	})
 
 	ms.Post("/", Submit)
